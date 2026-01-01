@@ -578,7 +578,13 @@ export const EventsPage = () => {
                 {/* Left side: Results info + Rows per page */}
                 <div className="flex items-center gap-4">
                   <div className="text-xs text-slate-400">
-                    Showing <span className="font-bold text-slate-700">1-{filteredEvents.length}</span> of <span className="font-bold text-slate-700">124</span> results
+                    {loading ? (
+                      <span>Loading...</span>
+                    ) : (
+                      <>
+                        Showing <span className="font-bold text-slate-700">{((pagination.page - 1) * pagination.pageSize) + 1}-{Math.min(pagination.page * pagination.pageSize, pagination.totalRecords)}</span> of <span className="font-bold text-slate-700">{pagination.totalRecords}</span> results
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-400">Rows per page:</span>
