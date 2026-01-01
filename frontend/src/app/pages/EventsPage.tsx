@@ -572,15 +572,23 @@ export const EventsPage = () => {
               <DropdownMenuItem onClick={() => setIsCreateViewDialogOpen(true)}>
                 <Plus size={14} className="mr-2" /> Save Current View
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled>
                 Rename Saved View
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Bulk Edit</DropdownMenuItem>
-              <DropdownMenuItem>Bulk Archive</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">Bulk Delete</DropdownMenuItem>
+              <DropdownMenuItem disabled>Bulk Edit (Coming Soon)</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleBulkArchive} disabled={selectedRows.length === 0}>
+                Bulk Archive ({selectedRows.length})
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-red-600" 
+                onClick={handleBulkDelete}
+                disabled={selectedRows.length === 0}
+              >
+                Bulk Delete ({selectedRows.length})
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Reset Filters</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleResetFilters}>Reset Filters</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         }
