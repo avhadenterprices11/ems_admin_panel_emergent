@@ -3,6 +3,8 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
+import eventsRoutes from './routes/events.routes';
+import savedViewsRoutes from './routes/saved-views.routes';
 import { AuthService } from './services/auth.service';
 
 dotenv.config();
