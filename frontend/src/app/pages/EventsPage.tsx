@@ -320,6 +320,24 @@ export const EventsPage = () => {
     fetchMetrics();
   }, [pagination.page, pageSize, searchQuery, activeViewId, sortBy, sortOrder, filters, dateRange]);
 
+  // Load saved views on mount
+  useEffect(() => {
+    const loadSavedViews = async () => {
+      try {
+        const viewsResult = await savedViewsAPI.getViews('events');
+        const customViews = viewsResult.data.map((v: any) => ({
+          id: v.id.toString(),
+          label: v.name,
+          type: 'custom',
+        }));
+        setViews([...defaultViews, ...customViews]);
+      } catch (error) {
+        console.error('Error loading saved views:', error);
+      }
+    };
+    loadSavedViews();
+  }, []);
+
   const filteredEvents = events;
 
   // Selection handlers
