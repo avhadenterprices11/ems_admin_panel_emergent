@@ -637,13 +637,13 @@ export const EventsPage = () => {
                       />
                     </TableHead>
                     <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider h-[50px]">Event Details</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Type</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Start Date</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">End Date</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Owner</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Location</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Attendance</TableHead>
-                    <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Status</TableHead>
+                    {visibleColumns.type && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Type</TableHead>}
+                    {visibleColumns.startDate && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Start Date</TableHead>}
+                    {visibleColumns.endDate && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">End Date</TableHead>}
+                    {visibleColumns.owner && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Owner</TableHead>}
+                    {visibleColumns.location && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Location</TableHead>}
+                    {visibleColumns.attendance && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Attendance</TableHead>}
+                    {visibleColumns.status && <TableHead className="text-[#253154] font-bold text-[11px] uppercase tracking-wider">Status</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
