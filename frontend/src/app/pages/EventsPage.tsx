@@ -585,7 +585,8 @@ export const EventsPage = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ))
+                  )}
                 </TableBody>
               </Table>
 
