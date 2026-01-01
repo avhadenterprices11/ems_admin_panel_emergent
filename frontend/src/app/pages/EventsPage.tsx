@@ -284,7 +284,7 @@ export const EventsPage = () => {
         <Button 
           size="sm" 
           className="flex-1 bg-[#0f172b] text-white hover:bg-[#1d293d]"
-          onClick={() => onManageEvent(event.id)}
+          onClick={() => onManageEvent(event.event_code)}
         >
           Manage
         </Button>
