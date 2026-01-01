@@ -607,14 +607,38 @@ export const EventsPage = () => {
                 
                 {/* Right side: Pagination controls */}
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="h-8 text-xs border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50" disabled>Previous</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 text-xs border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50" 
+                    disabled={pagination.page === 1}
+                    onClick={() => setPagination({...pagination, page: pagination.page - 1})}
+                  >
+                    Previous
+                  </Button>
                   <div className="flex items-center gap-1">
-                    <Button variant="secondary" size="sm" className="h-8 w-8 text-xs bg-blue-50 text-blue-600 font-bold rounded-lg">1</Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 text-xs text-slate-600 hover:bg-slate-50 rounded-lg">2</Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 text-xs text-slate-600 hover:bg-slate-50 rounded-lg">3</Button>
-                    <span className="text-xs text-slate-400">...</span>
+                    {Array.from({ length: Math.min(pagination.totalPages, 3) }, (_, i) => i + 1).map(page => (
+                      <Button 
+                        key={page}
+                        variant={page === pagination.page ? "secondary" : "ghost"}
+                        size="sm" 
+                        className={`h-8 w-8 text-xs rounded-lg ${page === pagination.page ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                        onClick={() => setPagination({...pagination, page})}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                    {pagination.totalPages > 3 && <span className="text-xs text-slate-400">...</span>}
                   </div>
-                  <Button variant="outline" size="sm" className="h-8 text-xs border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50">Next</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 text-xs border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50"
+                    disabled={pagination.page === pagination.totalPages}
+                    onClick={() => setPagination({...pagination, page: pagination.page + 1})}
+                  >
+                    Next
+                  </Button>
                 </div>
               </div>
             </div>
