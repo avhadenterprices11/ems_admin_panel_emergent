@@ -18,7 +18,7 @@ import { ImportDialog, ImportField } from '../components/common/ImportDialog';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatsGrid } from '../components/common/StatsGrid';
 import { ListControls } from '../components/common/ListControls';
-import { MetricsGrid, type MetricData } from '../components/ui';
+import { MetricsGrid, type MetricData } from '../components/ui/MetricsGrid';
 import { ResponsiveControl, ResponsiveMenuItem, ResponsiveMenuCheckboxItem, ResponsiveMenuLabel, ResponsiveMenuSeparator } from '../components/common/ResponsiveControl';
 import { SavedViews, View } from '../components/common/SavedViews';
 import { CreateViewDialog } from '../components/common/CreateViewDialog';
