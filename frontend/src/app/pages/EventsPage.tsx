@@ -654,7 +654,7 @@ export const EventsPage = () => {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="h-32 text-center">
+                      <TableCell colSpan={getTotalColumnCount()} className="h-32 text-center">
                         <div className="flex items-center justify-center gap-2 text-slate-500">
                           <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
                           <span>Loading events...</span>
@@ -663,7 +663,7 @@ export const EventsPage = () => {
                     </TableRow>
                   ) : filteredEvents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="h-32 text-center text-slate-500">
+                      <TableCell colSpan={getTotalColumnCount()} className="h-32 text-center text-slate-500">
                         No events found
                       </TableCell>
                     </TableRow>
