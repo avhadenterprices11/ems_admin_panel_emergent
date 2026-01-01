@@ -1,0 +1,41 @@
+import 'reflect-metadata';
+import express, { Application } from 'express';
+import cors from 'cors';
+import * as dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes';
+import { AuthService } from './services/auth.service';
+
+dotenv.config();
+
+const app: Application = express();
+const PORT = process.env.PORT || 8001;
+
+app.use(cors({
+  origin: process.env.CORS_ORIGINS?.split(',') || '*',
+  credentials: true,
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/api', (req, res) => {
+  res.json({ message: 'Hello World' });
+});
+
+app.use('/api/auth', authRoutes);
+
+async function startServer() {
+  try {
+    const authService = new AuthService();
+    await authService.createDefaultUser();
+    
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
