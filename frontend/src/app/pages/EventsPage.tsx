@@ -492,11 +492,24 @@ export const EventsPage = () => {
           <ResponsiveControl label="Sort" icon={<ArrowUpDown size={16} />}>
             <ResponsiveMenuLabel>Sort Order</ResponsiveMenuLabel>
             <ResponsiveMenuSeparator />
-            <ResponsiveMenuItem>Start Date (Newest)</ResponsiveMenuItem>
-            <ResponsiveMenuItem>Start Date (Oldest)</ResponsiveMenuItem>
-            <ResponsiveMenuItem>Attendance (High → Low)</ResponsiveMenuItem>
-            <ResponsiveMenuItem>Status</ResponsiveMenuItem>
-            <ResponsiveMenuItem>Event Name (A-Z)</ResponsiveMenuItem>
+            <ResponsiveMenuItem onClick={() => handleSortChange('start-newest')}>
+              Start Date (Newest)
+            </ResponsiveMenuItem>
+            <ResponsiveMenuItem onClick={() => handleSortChange('start-oldest')}>
+              Start Date (Oldest)
+            </ResponsiveMenuItem>
+            <ResponsiveMenuItem onClick={() => handleSortChange('attendance-high')}>
+              Attendance (High → Low)
+            </ResponsiveMenuItem>
+            <ResponsiveMenuItem onClick={() => handleSortChange('status')}>
+              Status
+            </ResponsiveMenuItem>
+            <ResponsiveMenuItem onClick={() => handleSortChange('name-az')}>
+              Event Name (A-Z)
+            </ResponsiveMenuItem>
+            <ResponsiveMenuItem onClick={() => handleSortChange('name-za')}>
+              Event Name (Z-A)
+            </ResponsiveMenuItem>
           </ResponsiveControl>
         }
         columnsControl={
