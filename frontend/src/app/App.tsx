@@ -38,14 +38,19 @@ import { ConferenceManagePage } from './pages/ConferenceManagePage';
 import { AwardsPage } from './pages/AwardsPage';
 import { AwardManagePage } from './pages/AwardManagePage';
 import { MetricsExample } from './pages/MetricsExample';
+import LoginPage from './pages/LoginPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Toaster } from 'sonner';
 
 export default function App() {
   return (
     <>
+      <Toaster position="top-right" richColors />
       <CustomScrollbarStyles />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<AdminLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             {/* Redirect root to dashboard */}
             <Route index element={<Navigate to="/dashboard" replace />} />
             
