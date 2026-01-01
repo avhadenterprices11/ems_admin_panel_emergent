@@ -517,13 +517,48 @@ export const EventsPage = () => {
             <ResponsiveMenuLabel>Toggle Columns</ResponsiveMenuLabel>
             <ResponsiveMenuSeparator />
             <ResponsiveMenuCheckboxItem checked disabled>Event Details</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>Type</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>Start Date</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>End Date</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>Owner</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>Location</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>Attendance</ResponsiveMenuCheckboxItem>
-            <ResponsiveMenuCheckboxItem checked>Status</ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.type}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, type: checked})}
+            >
+              Type
+            </ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.startDate}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, startDate: checked})}
+            >
+              Start Date
+            </ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.endDate}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, endDate: checked})}
+            >
+              End Date
+            </ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.owner}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, owner: checked})}
+            >
+              Owner
+            </ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.location}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, location: checked})}
+            >
+              Location
+            </ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.attendance}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, attendance: checked})}
+            >
+              Attendance
+            </ResponsiveMenuCheckboxItem>
+            <ResponsiveMenuCheckboxItem 
+              checked={visibleColumns.status}
+              onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, status: checked})}
+            >
+              Status
+            </ResponsiveMenuCheckboxItem>
           </ResponsiveControl>
         }
         moreControl={
