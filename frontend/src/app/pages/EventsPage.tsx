@@ -23,20 +23,22 @@ import { ResponsiveControl, ResponsiveMenuItem, ResponsiveMenuCheckboxItem, Resp
 import { SavedViews, View } from '../components/common/SavedViews';
 import { CreateViewDialog } from '../components/common/CreateViewDialog';
 
-// Event interface
+// Event interface (matching backend)
 interface Event {
   id: string;
+  event_code: string;
   name: string;
   type: string;
-  startDate: string;
-  endDate: string;
-  eventOwner: string;
+  start_date: string;
+  end_date: string;
+  owner: string;
   location: string;
-  registrations: number;
-  checkedInCount: number;
+  total_registrations: number;
+  checked_in_count: number;
+  capacity: number | null;
   status: string;
-  isRegistrationOpen: boolean;
-  isCheckinActive: boolean;
+  is_registration_open: boolean;
+  is_checkin_active: boolean;
 }
 
 // Mock data
