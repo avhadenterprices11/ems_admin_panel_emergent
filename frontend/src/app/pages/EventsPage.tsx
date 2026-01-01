@@ -145,6 +145,11 @@ export const EventsPage = () => {
     status: true,
   });
 
+  // Calculate total column count (checkbox + event details + visible columns)
+  const getTotalColumnCount = () => {
+    return 2 + Object.values(visibleColumns).filter(Boolean).length;
+  };
+
   // Handle sort changes
   const handleSortChange = (value: string) => {
     switch (value) {
