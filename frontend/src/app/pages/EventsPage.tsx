@@ -260,25 +260,6 @@ export const EventsPage = () => {
       { label: "Location", value: (e) => e.location },
       { label: "Checked In", value: (e) => `${e.checked_in_count}/${e.total_registrations}` },
     ],
-  };
-      { label: "Date", value: (e) => `${e.startDate} - ${e.endDate}` },
-      { label: "Location", value: (e) => e.location },
-      { label: "Owner", value: (e) => e.eventOwner },
-      { 
-        label: "Attendance", 
-        value: (e) => (
-          <div className="flex items-center gap-2">
-            <span>{e.checkedInCount.toLocaleString()} checked in</span>
-            <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-blue-500 rounded-full" 
-                style={{ width: `${(e.checkedInCount / e.registrations) * 100}%` }}
-              />
-            </div>
-          </div>
-        )
-      }
-    ],
     actions: (event) => (
       <div className="flex gap-2 w-full">
         <Button 
