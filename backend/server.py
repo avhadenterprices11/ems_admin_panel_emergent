@@ -93,7 +93,7 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_db():
-    \"\"\"Initialize database and create default admin user\"\"\"
+    """Initialize database and create default admin user"""
     auth_service = AuthService(db)
     await auth_service.create_default_user()
     logger.info("Default admin user created (email: admin@example.com, password: admin123)")
