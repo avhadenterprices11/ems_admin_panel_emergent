@@ -492,14 +492,14 @@ export const EventsPage = () => {
                 <TableBody>
                   {filteredEvents.map((event) => (
                     <TableRow 
-                      key={event.id} 
-                      className={`group border-slate-50 hover:bg-slate-50/60 transition-colors h-[72px] cursor-pointer ${selectedRows.includes(event.id) ? 'bg-slate-50/80' : ''}`}
-                      onClick={() => onManageEvent(event.id)} 
+                      key={event.event_code} 
+                      className={`group border-slate-50 hover:bg-slate-50/60 transition-colors h-[72px] cursor-pointer ${selectedRows.includes(event.event_code) ? 'bg-slate-50/80' : ''}`}
+                      onClick={() => onManageEvent(event.event_code)} 
                     >
                       <TableCell className="pl-4">
                         <Checkbox 
-                          checked={selectedRows.includes(event.id)}
-                          onCheckedChange={() => toggleRow(event.id)}
+                          checked={selectedRows.includes(event.event_code)}
+                          onCheckedChange={() => toggleRow(event.event_code)}
                           onClick={(e) => e.stopPropagation()}
                           className="border-slate-200 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" 
                         />
@@ -507,7 +507,7 @@ export const EventsPage = () => {
                       <TableCell>
                         <div className="flex flex-col gap-0.5">
                           <span className="font-bold text-[#1d293d] text-[13px]">{event.name}</span>
-                          <span className="text-[11px] text-[#62748e]">{event.id}</span>
+                          <span className="text-[11px] text-[#62748e]">{event.event_code}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -516,17 +516,17 @@ export const EventsPage = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-[#1d293d] text-[13px] font-medium">
-                        {event.startDate}
+                        {new Date(event.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </TableCell>
                       <TableCell className="text-[#62748e] text-[13px]">
-                        {event.endDate}
+                        {new Date(event.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-200">
-                            {event.eventOwner.charAt(0)}
+                            {event.owner.charAt(0)}
                           </div>
-                          <span className="text-[#1d293d] text-[13px]">{event.eventOwner}</span>
+                          <span className="text-[#1d293d] text-[13px]">{event.owner}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -538,13 +538,13 @@ export const EventsPage = () => {
                       <TableCell>
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1">
-                            <span className="font-bold text-[#1d293d] text-[13px]">{event.checkedInCount.toLocaleString()}</span>
-                            <span className="text-[11px] text-[#94a3b8]">/ {event.registrations.toLocaleString()}</span>
+                            <span className="font-bold text-[#1d293d] text-[13px]">{event.checked_in_count.toLocaleString()}</span>
+                            <span className="text-[11px] text-[#94a3b8]">/ {event.total_registrations.toLocaleString()}</span>
                           </div>
                           <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-blue-500 rounded-full" 
-                              style={{ width: `${(event.checkedInCount / event.registrations) * 100}%` }}
+                              style={{ width: `${(event.checked_in_count / event.total_registrations) * 100}%` }}
                             />
                           </div>
                         </div>
@@ -554,13 +554,13 @@ export const EventsPage = () => {
                           <Badge variant="outline" className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border-0 ${getStatusColor(event.status)}`}>
                             {event.status}
                           </Badge>
-                          {event.isCheckinActive && (
+                          {event.is_checkin_active && (
                             <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               Check-in Active
                             </div>
                           )}
-                          {!event.isCheckinActive && event.isRegistrationOpen && (
+                          {!event.is_checkin_active && event.is_registration_open && (
                             <div className="flex items-center gap-1 text-[10px] text-blue-600 font-medium">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                               Reg. Open
