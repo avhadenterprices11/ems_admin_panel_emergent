@@ -419,7 +419,12 @@ export const EventsPage = () => {
     <div className="flex flex-col gap-6">
       {/* 1. TOP UTILITY BAR */}
       <PageHeader 
-        dateRangePicker={<DatePickerWithRange />}
+        dateRangePicker={
+          <DatePickerWithRange 
+            value={dateRange}
+            onChange={setDateRange}
+          />
+        }
         primaryAction={{
           label: "Add New Event",
           onClick: onAddEvent,
