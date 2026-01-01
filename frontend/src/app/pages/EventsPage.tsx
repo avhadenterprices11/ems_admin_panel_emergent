@@ -323,7 +323,7 @@ export const EventsPage = () => {
       <MetricsGrid metrics={[
         { 
           title: "Total Events", 
-          value: "124",
+          value: metrics.totalEvents.toString(),
           icon: Calendar,
           bgClass: "bg-[#7151ff]",
           colorClass: "text-white",
@@ -331,7 +331,7 @@ export const EventsPage = () => {
         },
         { 
           title: "Active Events", 
-          value: "45", 
+          value: metrics.activeEvents.toString(), 
           icon: Activity,
           bgClass: "bg-[#00af35]",
           colorClass: "text-white",
@@ -339,7 +339,7 @@ export const EventsPage = () => {
         },
         { 
           title: "Draft Events", 
-          value: "12", 
+          value: metrics.draftEvents.toString(), 
           icon: FileText,
           bgClass: "bg-[#089cff]",
           colorClass: "text-white",
@@ -347,7 +347,7 @@ export const EventsPage = () => {
         },
         { 
           title: "Total Registrations", 
-          value: "3,820", 
+          value: metrics.totalRegistrations.toLocaleString(), 
           icon: Users,
           bgClass: "bg-[#da41c5]",
           colorClass: "text-white",
@@ -355,7 +355,7 @@ export const EventsPage = () => {
         },
         { 
           title: "Growth Rate", 
-          value: "+12%", 
+          value: `${metrics.growthRate > 0 ? '+' : ''}${metrics.growthRate}%`, 
           icon: TrendingUp,
           bgClass: "bg-[#fab446]",
           colorClass: "text-white",
