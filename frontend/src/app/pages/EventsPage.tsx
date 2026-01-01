@@ -683,64 +683,78 @@ export const EventsPage = () => {
                           <span className="text-[11px] text-[#62748e]">{event.event_code}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className={`rounded-md px-2 py-0.5 font-normal text-[11px] border-none ${getEventTypeColor(event.type)}`}>
-                          {event.type}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-[#1d293d] text-[13px] font-medium">
-                        {new Date(event.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </TableCell>
-                      <TableCell className="text-[#62748e] text-[13px]">
-                        {new Date(event.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-200">
-                            {event.owner.charAt(0)}
-                          </div>
-                          <span className="text-[#1d293d] text-[13px]">{event.owner}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1.5 text-[#62748e] text-[13px]">
-                          <MapPin size={12} />
-                          <span className="truncate max-w-[100px]" title={event.location}>{event.location}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-0.5">
-                          <div className="flex items-center gap-1">
-                            <span className="font-bold text-[#1d293d] text-[13px]">{event.checked_in_count.toLocaleString()}</span>
-                            <span className="text-[11px] text-[#94a3b8]">/ {event.total_registrations.toLocaleString()}</span>
-                          </div>
-                          <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-blue-500 rounded-full" 
-                              style={{ width: `${(event.checked_in_count / event.total_registrations) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1 items-start">
-                          <Badge variant="outline" className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border-0 ${getStatusColor(event.status)}`}>
-                            {event.status}
+                      {visibleColumns.type && (
+                        <TableCell>
+                          <Badge variant="secondary" className={`rounded-md px-2 py-0.5 font-normal text-[11px] border-none ${getEventTypeColor(event.type)}`}>
+                            {event.type}
                           </Badge>
-                          {event.is_checkin_active && (
-                            <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              Check-in Active
+                        </TableCell>
+                      )}
+                      {visibleColumns.startDate && (
+                        <TableCell className="text-[#1d293d] text-[13px] font-medium">
+                          {new Date(event.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </TableCell>
+                      )}
+                      {visibleColumns.endDate && (
+                        <TableCell className="text-[#62748e] text-[13px]">
+                          {new Date(event.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </TableCell>
+                      )}
+                      {visibleColumns.owner && (
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-200">
+                              {event.owner.charAt(0)}
                             </div>
-                          )}
-                          {!event.is_checkin_active && event.is_registration_open && (
-                            <div className="flex items-center gap-1 text-[10px] text-blue-600 font-medium">
-                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                              Reg. Open
+                            <span className="text-[#1d293d] text-[13px]">{event.owner}</span>
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns.location && (
+                        <TableCell>
+                          <div className="flex items-center gap-1.5 text-[#62748e] text-[13px]">
+                            <MapPin size={12} />
+                            <span className="truncate max-w-[100px]" title={event.location}>{event.location}</span>
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns.attendance && (
+                        <TableCell>
+                          <div className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-1">
+                              <span className="font-bold text-[#1d293d] text-[13px]">{event.checked_in_count.toLocaleString()}</span>
+                              <span className="text-[11px] text-[#94a3b8]">/ {event.total_registrations.toLocaleString()}</span>
                             </div>
-                          )}
-                        </div>
-                      </TableCell>
+                            <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-blue-500 rounded-full" 
+                                style={{ width: `${(event.checked_in_count / event.total_registrations) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns.status && (
+                        <TableCell>
+                          <div className="flex flex-col gap-1 items-start">
+                            <Badge variant="outline" className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border-0 ${getStatusColor(event.status)}`}>
+                              {event.status}
+                            </Badge>
+                            {event.is_checkin_active && (
+                              <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Check-in Active
+                              </div>
+                            )}
+                            {!event.is_checkin_active && event.is_registration_open && (
+                              <div className="flex items-center gap-1 text-[10px] text-blue-600 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                Reg. Open
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                   )}
