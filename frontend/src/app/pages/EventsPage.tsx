@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Plus, Upload, Download, Filter, ArrowUpDown, LayoutTemplate, Ellipsis,
   MapPin, CircleCheck, Archive, ChevronDown, Calendar, Activity, FileText, FolderArchive, Users, TrendingUp
 } from 'lucide-react';
+import { eventsAPI, savedViewsAPI } from '../api/events.api';
+import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Checkbox } from '../components/ui/checkbox';
 import { Badge } from '../components/ui/badge';
