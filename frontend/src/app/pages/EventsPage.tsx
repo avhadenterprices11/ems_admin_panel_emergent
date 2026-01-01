@@ -242,9 +242,9 @@ export const EventsPage = () => {
 
   // Mobile config
   const mobileConfig: MobileCardConfig<Event> = {
-    idField: (event) => event.id,
+    idField: (event) => event.event_code,
     valueField: (event) => (
-      <span>{event.registrations.toLocaleString()} <span className="text-slate-400 font-normal text-xs">Reg.</span></span>
+      <span>{event.total_registrations.toLocaleString()} <span className="text-slate-400 font-normal text-xs">Reg.</span></span>
     ),
     titleField: (event) => event.name,
     statusField: (event) => (
@@ -254,6 +254,13 @@ export const EventsPage = () => {
     ),
     expandedFields: [
       { label: "Type", value: (e) => e.type },
+      { label: "Start Date", value: (e) => new Date(e.start_date).toLocaleDateString() },
+      { label: "End Date", value: (e) => new Date(e.end_date).toLocaleDateString() },
+      { label: "Owner", value: (e) => e.owner },
+      { label: "Location", value: (e) => e.location },
+      { label: "Checked In", value: (e) => `${e.checked_in_count}/${e.total_registrations}` },
+    ],
+  };
       { label: "Date", value: (e) => `${e.startDate} - ${e.endDate}` },
       { label: "Location", value: (e) => e.location },
       { label: "Owner", value: (e) => e.eventOwner },
