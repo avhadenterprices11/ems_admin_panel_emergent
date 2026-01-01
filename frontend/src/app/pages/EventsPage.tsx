@@ -135,6 +135,126 @@ export const EventsPage = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [filters, setFilters] = useState<any>({});
   const [dateRange, setDateRange] = useState<any>(null);
+  const [visibleColumns, setVisibleColumns] = useState({
+    type: true,
+    startDate: true,
+    endDate: true,
+    owner: true,
+    location: true,
+    attendance: true,
+    status: true,
+  });
+
+  // Handle sort changes
+  const handleSortChange = (value: string) => {
+    switch (value) {
+      case 'start-newest':
+        setSortBy('start_date');
+        setSortOrder('desc');
+        break;
+      case 'start-oldest':
+        setSortBy('start_date');
+        setSortOrder('asc');
+        break;
+      case 'attendance-high':
+        setSortBy('total_registrations');
+        setSortOrder('desc');
+        break;
+      case 'attendance-low':
+        setSortBy('total_registrations');
+        setSortOrder('asc');
+        break;
+      case 'status':
+        setSortBy('status');
+        setSortOrder('asc');
+        break;
+      case 'name-az':
+        setSortBy('name');
+        setSortOrder('asc');
+        break;
+      case 'name-za':
+        setSortBy('name');
+        setSortOrder('desc');
+        break;
+    }
+  };
+
+  // Handle bulk actions
+  const handleBulkArchive = async () => {
+    if (selectedRows.length === 0) {
+      toast.error('Please select events to archive');
+      return;
+    }
+    try {
+      await eventsAPI.bulkArchive(selectedRows);
+      toast.success(`${selectedRows.length} event(s) archived successfully`);
+      setSelectedRows([]);
+      fetchEvents();
+      fetchMetrics();
+    } catch (error) {
+      toast.error('Failed to archive events');
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedRows.length === 0) {
+      toast.error('Please select events to delete');
+      return;
+    }
+    try {
+      await eventsAPI.bulkDelete(selectedRows);
+      toast.success(`${selectedRows.length} event(s) deleted successfully`);
+      setSelectedRows([]);
+      fetchEvents();
+      fetchMetrics();
+    } catch (error) {
+      toast.error('Failed to delete events');
+    }
+  };
+
+  // Handle reset filters
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setActiveViewId('all');
+    setFilters({});
+    setDateRange(null);
+    setSortBy('start_date');
+    setSortOrder('desc');
+    setPagination({ ...pagination, page: 1 });
+  };
+
+  // Handle save view
+  const handleSaveView = async (name: string) => {
+    try {
+      const configuration = {
+        search: searchQuery,
+        tab: activeViewId,
+        filters,
+        dateRange: dateRange ? {
+          from: dateRange.from?.toISOString(),
+          to: dateRange.to?.toISOString(),
+        } : null,
+        sortBy,
+        sortOrder,
+        visibleColumns,
+        pageSize,
+      };
+      
+      await savedViewsAPI.createView(name, 'events', configuration);
+      toast.success('View saved successfully');
+      
+      // Refresh views list
+      const viewsResult = await savedViewsAPI.getViews('events');
+      const customViews = viewsResult.data.map((v: any) => ({
+        id: v.id.toString(),
+        label: v.name,
+        type: 'custom',
+      }));
+      setViews([...defaultViews, ...customViews]);
+    } catch (error) {
+      toast.error('Failed to save view');
+    }
+  };
 
   // Fetch events
   const fetchEvents = async () => {
