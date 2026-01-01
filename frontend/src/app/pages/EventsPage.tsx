@@ -348,13 +348,9 @@ export const EventsPage = () => {
     navigate(`/events/${id}`);
   };
 
-  const handleAddView = (name: string) => {
-    const newView: View = {
-      id: name.toLowerCase().replace(/\s+/g, '-'),
-      label: name,
-      type: 'custom'
-    };
-    setViews([...views, newView]);
+  const handleAddView = async (name: string) => {
+    await handleSaveView(name);
+    setIsCreateViewDialogOpen(false);
   };
 
   const handleExportData = (options: any) => {
