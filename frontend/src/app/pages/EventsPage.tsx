@@ -106,7 +106,23 @@ const getStatusColor = (status: string) => {
 
 export const EventsPage = () => {
   const navigate = useNavigate();
-  const [events] = useState<Event[]>(mockEvents);
+  
+  // State
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState({
+    totalEvents: 0,
+    activeEvents: 0,
+    draftEvents: 0,
+    totalRegistrations: 0,
+    growthRate: 0,
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+    totalRecords: 0,
+    totalPages: 0,
+  });
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeViewId, setActiveViewId] = useState('all');
@@ -115,14 +131,71 @@ export const EventsPage = () => {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isCreateViewDialogOpen, setIsCreateViewDialogOpen] = useState(false);
   const [pageSize, setPageSize] = useState(10);
+  const [sortBy, setSortBy] = useState('start_date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [filters, setFilters] = useState<any>({});
+  const [dateRange, setDateRange] = useState<any>(null);
 
-  // Filter events based on search
-  const filteredEvents = events.filter(event =>
-    event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.eventOwner.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Fetch events
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const params: any = {
+        page: pagination.page,
+        pageSize,
+        search: searchQuery || undefined,
+        tab: activeViewId !== 'all' ? activeViewId : undefined,
+        sortBy,
+        sortOrder,
+        ...filters,
+      };
+
+      if (dateRange?.from) {
+        params.startDateFrom = dateRange.from.toISOString();
+      }
+      if (dateRange?.to) {
+        params.startDateTo = dateRange.to.toISOString();
+      }
+
+      const result = await eventsAPI.getEvents(params);
+      setEvents(result.data || []);
+      setPagination(result.pagination);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast.error('Failed to load events');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch metrics
+  const fetchMetrics = async () => {
+    try {
+      const params: any = {
+        tab: activeViewId !== 'all' ? activeViewId : undefined,
+      };
+
+      if (dateRange?.from) {
+        params.startDateFrom = dateRange.from.toISOString();
+      }
+      if (dateRange?.to) {
+        params.startDateTo = dateRange.to.toISOString();
+      }
+
+      const result = await eventsAPI.getMetrics(params);
+      setMetrics(result);
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchEvents();
+    fetchMetrics();
+  }, [pagination.page, pageSize, searchQuery, activeViewId, sortBy, sortOrder, filters, dateRange]);
+
+  const filteredEvents = events;
 
   // Selection handlers
   const toggleRow = (id: string) => {
