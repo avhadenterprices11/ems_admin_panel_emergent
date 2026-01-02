@@ -24,6 +24,7 @@
     "googleapis": "^169.0.0",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.0.1",
+    "mongodb": "^7.0.0",
     "multer": "^2.0.2",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
