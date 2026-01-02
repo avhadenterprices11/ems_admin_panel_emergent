@@ -16,7 +16,7 @@ const app: Application = express();
 const PORT = process.env.PORT || 8001;
 
 // Serve uploaded files
-app.use('/uploads', express.static('/app/uploads'));
+app.use('/api/uploads', express.static('/app/uploads'));
 
 app.use(cors({
   origin: process.env.CORS_ORIGINS === '*' ? '*' : process.env.CORS_ORIGINS?.split(','),
