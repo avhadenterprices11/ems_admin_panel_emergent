@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { eventsAPI } from '../api/events.api';
 import { toast } from 'sonner';
+import { FileUpload } from '../components/FileUpload';
 import { EmailOverrideSection } from '../components/EmailOverrideSection';
 import {
   MOCK_USERS,
