@@ -55,7 +55,7 @@ A full-stack Event Management Admin System built with:
 │   └── App.tsx
 ```
 
-### Backend Structure (Clean Node.js/TypeScript)
+### Backend Structure (Clean Node.js/TypeScript with PostgreSQL)
 ```
 /app/backend/
 ├── src/
@@ -72,7 +72,9 @@ A full-stack Event Management Admin System built with:
 │   │   ├── zoom.service.ts
 │   │   └── google-meet.service.ts
 │   ├── database/
-│   │   └── mongo.ts           # MongoDB connection
+│   │   ├── db.ts              # Knex database connection
+│   │   ├── knexfile.ts        # Knex configuration
+│   │   └── migrations/        # Database migrations
 │   ├── routes/                # API route definitions
 │   ├── dtos/                  # Data transfer objects
 │   ├── interfaces/            # TypeScript interfaces
@@ -84,7 +86,7 @@ A full-stack Event Management Admin System built with:
 └── .env
 ```
 
-**Note:** The backend is 100% Node.js/TypeScript - no Python code.
+**Note:** The backend is 100% Node.js/TypeScript with PostgreSQL/Knex - no Python or MongoDB code.
 
 ## API Endpoints
 
