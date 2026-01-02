@@ -156,7 +156,7 @@ const EventSetupPageComponent = () => {
   }, [watchDescription, seoAutoFilled.meta_description, setValue]);
 
   // Handle file uploads
-  const handleFileUpload = async (file: File, field: string) => {
+  const handleFileUpload = async (file: any, field: string) => {
     try {
       const url = await eventsAPI.uploadFile(file, 'events');
       setValue(field as any, url);
@@ -168,7 +168,7 @@ const EventSetupPageComponent = () => {
     }
   };
 
-  const handleMultipleFilesUpload = async (files: FileList, field: string) => {
+  const handleMultipleFilesUpload = async (files: any, field: string) => {
     try {
       const fileArray = Array.from(files);
       const urls = await eventsAPI.uploadMultipleFiles(fileArray, 'events');
