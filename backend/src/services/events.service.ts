@@ -1,11 +1,54 @@
 import db from '../database/db';
 import { Event, EventListQuery, EventMetrics } from '../interfaces/event.interface';
 import { CreateEventDTO } from '../dtos/create-event.dto';
+import { ZoomService } from './zoom.service';
+import { GoogleMeetService } from './google-meet.service';
 import { Knex } from 'knex';
 
 export class EventsService {
+  private zoomService: ZoomService;
+  private googleMeetService: GoogleMeetService;
+
+  constructor() {
+    this.zoomService = new ZoomService();
+    this.googleMeetService = new GoogleMeetService();
+  }
+
   async createEvent(eventData: CreateEventDTO): Promise<Event> {
     const now = new Date();
+    let meeting_url = eventData.meeting_url || null;
+
+    // Handle virtual event platform integration
+    if (eventData.mode === 'virtual' && eventData.virtual_platform) {
+      try {
+        if (eventData.virtual_platform === 'zoom') {
+          // Calculate duration in minutes
+          const startTime = new Date(eventData.start_date);
+          const endTime = new Date(eventData.end_date);
+          const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+
+          meeting_url = await this.zoomService.createMeeting({
+            topic: eventData.name,
+            start_time: eventData.start_date,
+            duration: durationMinutes,
+            timezone: eventData.timezone || 'UTC',
+            agenda: eventData.description,
+          });
+        } else if (eventData.virtual_platform === 'google-meet') {
+          meeting_url = await this.googleMeetService.createMeetingLink({
+            summary: eventData.name,
+            description: eventData.description,
+            start: eventData.start_date,
+            end: eventData.end_date,
+            timezone: eventData.timezone || 'UTC',
+          });
+        }
+      } catch (error) {
+        console.error('Virtual platform integration error:', error);
+        // Don't fail the entire event creation, just log the error
+        // User can manually add meeting link later
+      }
+    }
     
     const eventRecord = {
       event_code: eventData.event_code,
