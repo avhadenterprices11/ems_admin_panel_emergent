@@ -70,6 +70,7 @@ const EventSetupPageComponent = () => {
       country: '',
       meeting_url: '',
       banner_image_url: '',
+      promo_video_url: '',
       gallery_images: [],
       accessibility_notes: '',
       emergency_contact: '',
