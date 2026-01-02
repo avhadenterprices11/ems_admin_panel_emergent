@@ -347,14 +347,22 @@ const EventSetupPageComponent = () => {
             <div className="space-y-4">
               {/* Banner Image Upload */}
               <div className="space-y-2">
-                <Label className="text-slate-700 font-medium">Event Banner Image</Label>
-                <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
-                  <div className="bg-slate-100 p-3 rounded-full mb-3 group-hover:bg-slate-200 transition-colors">
-                    <Image className="text-slate-400" size={24} />
-                  </div>
-                  <p className="text-sm font-medium text-slate-700">Drag & drop or click to upload</p>
-                  <p className="text-xs text-slate-400 mt-1">Recommended size: 2160x1080px (2:1 ratio)</p>
-                </div>
+                <Controller
+                  name="banner_image_url"
+                  control={control}
+                  render={({ field }) => (
+                    <FileUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      multiple={false}
+                      accept="image/*"
+                      label="Event Banner Image"
+                      showPreview={true}
+                      folder="events/banners"
+                    />
+                  )}
+                />
+                <p className="text-xs text-slate-400">Recommended size: 2160x1080px (2:1 ratio)</p>
               </div>
 
               {/* Event Title */}
