@@ -1,8 +1,98 @@
 import db from '../database/db';
 import { Event, EventListQuery, EventMetrics } from '../interfaces/event.interface';
+import { CreateEventDTO } from '../dtos/create-event.dto';
 import { Knex } from 'knex';
 
 export class EventsService {
+  async createEvent(eventData: CreateEventDTO): Promise<Event> {
+    const now = new Date();
+    
+    const eventRecord = {
+      event_code: eventData.event_code,
+      name: eventData.name,
+      description: eventData.description || null,
+      category: eventData.category || null,
+      type: eventData.type,
+      event_type: eventData.event_type || null,
+      start_date: eventData.start_date,
+      end_date: eventData.end_date,
+      all_day: eventData.all_day || false,
+      timezone: eventData.timezone || null,
+      url_slug: eventData.url_slug || null,
+      
+      // Registration
+      reg_start_at: eventData.reg_start_at || null,
+      reg_end_at: eventData.reg_end_at || null,
+      capacity: eventData.capacity || null,
+      waitlist_enabled: eventData.waitlist_enabled || false,
+      
+      // Venue
+      mode: eventData.mode || null,
+      venue_id: eventData.venue_id || null,
+      venue_name: eventData.venue_name || null,
+      location: eventData.location,
+      address_line1: eventData.address_line1 || null,
+      address_line2: eventData.address_line2 || null,
+      city: eventData.city || null,
+      state: eventData.state || null,
+      zip_code: eventData.zip_code || null,
+      country: eventData.country || null,
+      meeting_url: eventData.meeting_url || null,
+      accessibility_notes: eventData.accessibility_notes || null,
+      emergency_contact: eventData.emergency_contact || null,
+      
+      // Owner
+      owner: eventData.owner,
+      
+      // Media
+      banner_image_url: eventData.banner_image_url || null,
+      gallery_images: eventData.gallery_images ? JSON.stringify(eventData.gallery_images) : null,
+      
+      // SEO
+      meta_title: eventData.meta_title || null,
+      meta_description: eventData.meta_description || null,
+      
+      // Settings
+      status: eventData.status,
+      visibility: eventData.visibility || 'public',
+      is_registration_open: eventData.is_registration_open || false,
+      is_checkin_active: eventData.is_checkin_active || false,
+      check_in_mode: eventData.check_in_mode || null,
+      data_collection_form_id: eventData.data_collection_form_id || null,
+      
+      // People
+      co_hosts: eventData.co_hosts ? JSON.stringify(eventData.co_hosts) : null,
+      tags: eventData.tags ? JSON.stringify(eventData.tags) : null,
+      
+      // JSON Structures
+      partners: eventData.partners ? JSON.stringify(eventData.partners) : null,
+      sponsors: eventData.sponsors ? JSON.stringify(eventData.sponsors) : null,
+      agenda: eventData.agenda ? JSON.stringify(eventData.agenda) : null,
+      
+      // Email
+      email_config: eventData.email_config ? JSON.stringify(eventData.email_config) : null,
+      
+      // Internal
+      internal_notes: eventData.internal_notes || null,
+      lifecycle_status: eventData.lifecycle_status || 'draft',
+      
+      // Defaults for existing fields
+      total_registrations: 0,
+      checked_in_count: 0,
+      
+      // Timestamps
+      created_at: now,
+      updated_at: now,
+      deleted_at: null,
+    };
+
+    const [createdEvent] = await db<Event>('events')
+      .insert(eventRecord)
+      .returning('*');
+
+    return createdEvent;
+  }
+
   async getEventsList(query: EventListQuery) {
     const {
       page = 1,
