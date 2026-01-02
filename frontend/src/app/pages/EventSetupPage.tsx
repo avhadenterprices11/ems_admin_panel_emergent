@@ -123,27 +123,88 @@ const EventSetupPageComponent = () => {
     }
   }, [watchVenueId, setValue]);
 
-  const onSubmit = (data: any) => {
-    // Normalize all URL fields before submission
-    if (data.partners) {
-      data.partners = data.partners.map((partner: any) => ({
-        ...partner,
-        link: partner.link ? normalizeUrl(partner.link) : ''
-      }));
-    }
-    if (data.sponsors) {
-      data.sponsors = data.sponsors.map((sponsor: any) => ({
-        ...sponsor,
-        link: sponsor.link ? normalizeUrl(sponsor.link) : ''
-      }));
-    }
-    
-    console.log('Form submitted:', data);
-    setIsSaving(true);
-    setTimeout(() => {
+  const onSubmit = async (data: any) => {
+    try {
+      setIsSaving(true);
+      
+      // Normalize all URL fields before submission
+      if (data.partners) {
+        data.partners = data.partners.map((partner: any) => ({
+          ...partner,
+          link: partner.link ? normalizeUrl(partner.link) : ''
+        }));
+      }
+      if (data.sponsors) {
+        data.sponsors = data.sponsors.map((sponsor: any) => ({
+          ...partner,
+          link: sponsor.link ? normalizeUrl(sponsor.link) : ''
+        }));
+      }
+      
+      // Map frontend fields to backend schema
+      const eventData = {
+        event_code: `EVT-${Date.now().toString().slice(-6)}`, // Generate unique code
+        name: data.title || '',
+        description: data.description || '',
+        category: data.category || '',
+        type: data.type || 'Conference',
+        event_type: data.event_type || 'public',
+        start_date: data.start_at ? new Date(data.start_at).toISOString() : new Date().toISOString(),
+        end_date: data.end_at ? new Date(data.end_at).toISOString() : new Date().toISOString(),
+        all_day: data.all_day || false,
+        timezone: data.timezone || 'UTC',
+        url_slug: data.url_slug || '',
+        reg_start_at: data.reg_start_at ? new Date(data.reg_start_at).toISOString() : null,
+        reg_end_at: data.reg_end_at ? new Date(data.reg_end_at).toISOString() : null,
+        capacity: data.capacity || null,
+        waitlist_enabled: data.waitlist || false,
+        mode: data.mode || 'in-person',
+        venue_id: data.venue_id || null,
+        venue_name: data.venue_name || '',
+        location: data.address_1 || '',
+        address_line1: data.address_1 || '',
+        address_line2: data.address_2 || '',
+        city: data.city || '',
+        state: data.state || '',
+        zip_code: data.zip || '',
+        country: data.country || '',
+        meeting_url: data.meeting_url || null,
+        accessibility_notes: data.accessibility_notes || '',
+        emergency_contact: data.emergency_contact || '',
+        owner: data.owner_id || 'Admin',
+        banner_image_url: data.banner_image_url || null,
+        gallery_images: data.gallery_images || [],
+        meta_title: data.meta_title || '',
+        meta_description: data.meta_description || '',
+        status: data.lifecycle_status === 'published' ? 'Published' : 'Draft',
+        visibility: data.visibility || 'public',
+        is_registration_open: data.lifecycle_status === 'published',
+        is_checkin_active: false,
+        check_in_mode: data.check_in_mode || 'qr',
+        data_collection_form_id: data.data_collection_form ? parseInt(data.data_collection_form) : null,
+        co_hosts: data.co_hosts || [],
+        tags: data.tags || [],
+        partners: data.partners || [],
+        sponsors: data.sponsors || [],
+        agenda: data.agenda || [],
+        email_config: data.email_overrides || null,
+        internal_notes: data.internal_notes || '',
+        lifecycle_status: data.lifecycle_status || 'draft',
+      };
+      
+      const createdEvent = await eventsAPI.createEvent(eventData);
+      
+      toast.success('Event created successfully!');
+      setTimeout(() => {
+        navigate('/events');
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error creating event:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to create event';
+      toast.error(errorMessage);
+    } finally {
       setIsSaving(false);
-      navigate('/events');
-    }, 1000);
+    }
   };
 
   const handlePublish = () => {
