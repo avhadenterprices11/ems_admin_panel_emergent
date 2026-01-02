@@ -67,6 +67,8 @@ const EventSetupPageComponent = () => {
       zip: '',
       country: '',
       meeting_url: '',
+      banner_image_url: '',
+      gallery_images: [],
       accessibility_notes: '',
       emergency_contact: '',
       agenda: [],
