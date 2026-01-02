@@ -30,6 +30,7 @@ app.get('/api', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/saved-views', savedViewsRoutes);
+app.use('/api/upload', fileUploadRoutes);
 
 async function startServer() {
   try {
