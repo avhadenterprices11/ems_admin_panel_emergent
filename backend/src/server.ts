@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import eventsRoutes from './routes/events.routes';
 import savedViewsRoutes from './routes/saved-views.routes';
+import fileUploadRoutes from './routes/file-upload.routes';
 import { AuthService } from './services/auth.service';
 
 dotenv.config();
