@@ -24,6 +24,48 @@ export interface EventMetricsParams {
   tab?: string;
 }
 
+export interface OverviewMetrics {
+  totalRegistrations: number;
+  registrationsChange: number;
+  grossRevenue: number;
+  revenueChange: number;
+  pageViews: number;
+  pageViewsChange: number;
+  conversionRate: number;
+  conversionRateChange: number;
+}
+
+export interface FunnelData {
+  pageViews: number;
+  addToCart: number;
+  checkoutStarted: number;
+  completedRegistration: number;
+}
+
+export interface TicketInventory {
+  id: number;
+  name: string;
+  sold: number;
+  total: number;
+  status: string;
+}
+
+export interface AttentionAlert {
+  type: 'warning' | 'error' | 'info';
+  text: string;
+  category: string;
+}
+
+export interface ActivityLog {
+  id: number;
+  actorType: string;
+  actorId: number | null;
+  actionType: string;
+  description: string;
+  createdAt: string;
+  metadata: any;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
@@ -38,6 +80,38 @@ export const eventsAPI = {
   createEvent: async (eventData: any) => {
     const response = await apiClient.post('/events', eventData);
     return response.data;
+  },
+
+  // Get single event by ID
+  getEventById: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}`);
+    return response.data;
+  },
+
+  // Event Overview APIs
+  getOverviewMetrics: async (eventId: number | string, params?: { startDate?: string; endDate?: string }) => {
+    const response = await apiClient.get(`/events/${eventId}/overview/metrics`, { params });
+    return response.data as OverviewMetrics;
+  },
+
+  getRegistrationFunnel: async (eventId: number | string, params?: { startDate?: string; endDate?: string }) => {
+    const response = await apiClient.get(`/events/${eventId}/overview/funnel`, { params });
+    return response.data as FunnelData;
+  },
+
+  getTicketInventory: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/overview/tickets`);
+    return response.data as TicketInventory[];
+  },
+
+  getAttentionAlerts: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/overview/alerts`);
+    return response.data as AttentionAlert[];
+  },
+
+  getActivityTimeline: async (eventId: number | string, limit?: number) => {
+    const response = await apiClient.get(`/events/${eventId}/overview/activity`, { params: { limit } });
+    return response.data as ActivityLog[];
   },
 
   uploadFile: async (file: File, folder: string = 'events') => {
