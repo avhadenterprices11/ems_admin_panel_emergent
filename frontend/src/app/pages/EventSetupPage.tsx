@@ -1130,12 +1130,22 @@ const EventSetupPageComponent = () => {
                   </Button>
 
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">Logo</Label>
-                    <div className="border-2 border-dashed border-slate-200 rounded-lg bg-white flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer p-8">
-                      <Upload className="text-slate-300 mb-2" size={24} />
-                      <span className="text-xs text-slate-400">Click to upload</span>
-                      <p className="text-xs text-slate-400 mt-1">Supported formats: PNG, JPG, SVG</p>
-                    </div>
+                    <Controller
+                      name={`partners.${index}.logo`}
+                      control={control}
+                      render={({ field }) => (
+                        <FileUpload
+                          value={field.value}
+                          onChange={field.onChange}
+                          multiple={false}
+                          accept="image/*"
+                          label="Partner Logo"
+                          showPreview={true}
+                          folder="events/partners"
+                        />
+                      )}
+                    />
+                    <p className="text-xs text-slate-400">Supported: PNG, JPG, SVG</p>
                   </div>
 
                   <div className="space-y-2">
