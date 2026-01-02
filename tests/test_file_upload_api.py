@@ -272,8 +272,14 @@ class TestSavedViews:
         response = requests.get(f"{BASE_URL}/api/saved-views", params={'module': 'events'})
         assert response.status_code == 200
         data = response.json()
-        assert isinstance(data, list)
-        print(f"✓ Saved views returned {len(data)} views")
+        # API returns either a list or an object with data array
+        if isinstance(data, dict):
+            assert 'data' in data
+            views = data['data']
+        else:
+            views = data
+        assert isinstance(views, list)
+        print(f"✓ Saved views returned {len(views)} views")
 
 
 if __name__ == "__main__":
