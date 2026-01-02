@@ -88,7 +88,8 @@ export class S3Service {
     fs.writeFileSync(fullPath, file.buffer);
     
     // Return a URL that can be served
-    const baseUrl = process.env.APP_URL || 'https://eventmanager-18.preview.emergentagent.com';
+    // Use preview_endpoint from env or fall back to APP_URL
+    const baseUrl = process.env.preview_endpoint || process.env.APP_URL || 'https://eventmanager-18.preview.emergentagent.com';
     return `${baseUrl}/api/uploads/${fileName}`;
   }
 
