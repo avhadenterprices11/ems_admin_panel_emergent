@@ -170,8 +170,12 @@ VITE_API_URL=https://eventmanager-18.preview.emergentagent.com
 
 ### Backend (.env)
 ```
-MONGO_URL=mongodb://localhost:27017
-DB_NAME=event_management
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=event_management
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+
 JWT_SECRET=your-secret-key-change-in-production
 JWT_EXPIRES_IN=7d
 PORT=8001
@@ -180,7 +184,7 @@ AWS_ACCESS_KEY_ID=           # For production S3
 AWS_SECRET_ACCESS_KEY=       # For production S3
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=event-management-uploads
-preview_endpoint=https://eventmanager-18.preview.emergentagent.com
+PREVIEW_URL=https://eventmanager-18.preview.emergentagent.com
 ```
 
 ## Testing
