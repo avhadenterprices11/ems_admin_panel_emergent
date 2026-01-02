@@ -127,6 +127,11 @@ export class CreateEventDTO {
 
   @IsOptional()
   @IsString()
+  @IsIn(['zoom', 'google-meet', 'other'])
+  virtual_platform?: string;
+
+  @IsOptional()
+  @IsString()
   venue_id?: string;
 
   @IsOptional()
