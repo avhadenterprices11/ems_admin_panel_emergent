@@ -2,9 +2,12 @@ import { Router } from 'express';
 import { EventsController } from '../controllers/events.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
+import { CreateEventDTO } from '../dtos/create-event.dto';
 
 const router = Router();
 const eventsController = new EventsController();
+
+router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
 router.get('/', (req, res) => eventsController.list(req, res));
 
