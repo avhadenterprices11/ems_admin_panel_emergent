@@ -1,37 +1,21 @@
-import { getDb, toJSON, ObjectId } from '../database/mongo';
-
-interface SavedView {
-  _id?: ObjectId;
-  name: string;
-  module: string;
-  configuration: any;
-  user_id?: string | null;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: Date | null;
-}
+import db from '../database/db';
+import { SavedView } from '../interfaces/saved-view.interface';
 
 export class SavedViewsService {
-  async getUserViews(module: string, userId?: string): Promise<any[]> {
-    const db = await getDb();
-    
-    const filter: any = {
-      module,
-      deleted_at: null,
-    };
+  async getUserViews(module: string, userId?: string): Promise<SavedView[]> {
+    let query = db<SavedView>('saved_views')
+      .where('module', module)
+      .where('deleted_at', null);
 
     if (userId) {
-      filter.$or = [{ user_id: userId }, { user_id: null }];
+      query = query.where((builder) => {
+        builder.where('user_id', userId).orWhereNull('user_id');
+      });
     } else {
-      filter.user_id = null;
+      query = query.whereNull('user_id');
     }
 
-    const views = await db.collection<SavedView>('saved_views')
-      .find(filter)
-      .sort({ created_at: -1 })
-      .toArray();
-
-    return views.map(toJSON);
+    return await query.orderBy('created_at', 'desc');
   }
 
   async createView(data: {
@@ -39,44 +23,43 @@ export class SavedViewsService {
     module: string;
     configuration: any;
     user_id?: string;
-  }): Promise<any> {
-    const db = await getDb();
-    const now = new Date();
+  }): Promise<SavedView> {
+    const [view] = await db<SavedView>('saved_views')
+      .insert({
+        name: data.name,
+        module: data.module,
+        configuration: JSON.stringify(data.configuration),
+        user_id: data.user_id ? parseInt(data.user_id) : null,
+      })
+      .returning('*');
 
-    const result = await db.collection<SavedView>('saved_views').insertOne({
-      name: data.name,
-      module: data.module,
-      configuration: data.configuration,
-      user_id: data.user_id || null,
-      created_at: now,
-      updated_at: now,
-      deleted_at: null,
-    });
-
-    const view = await db.collection<SavedView>('saved_views').findOne({ _id: result.insertedId });
-    return toJSON(view);
+    return {
+      ...view,
+      configuration: typeof view.configuration === 'string' ? JSON.parse(view.configuration) : view.configuration,
+    };
   }
 
-  async renameView(id: string, name: string): Promise<any | null> {
-    const db = await getDb();
-    
-    const result = await db.collection<SavedView>('saved_views').findOneAndUpdate(
-      { _id: new ObjectId(id), deleted_at: null },
-      { $set: { name, updated_at: new Date() } },
-      { returnDocument: 'after' }
-    );
+  async renameView(id: string, name: string): Promise<SavedView | null> {
+    const [view] = await db<SavedView>('saved_views')
+      .where('id', parseInt(id))
+      .where('deleted_at', null)
+      .update({ name, updated_at: db.fn.now() })
+      .returning('*');
 
-    return result ? toJSON(result) : null;
+    if (!view) return null;
+
+    return {
+      ...view,
+      configuration: typeof view.configuration === 'string' ? JSON.parse(view.configuration) : view.configuration,
+    };
   }
 
   async deleteView(id: string): Promise<boolean> {
-    const db = await getDb();
-    
-    const result = await db.collection<SavedView>('saved_views').updateOne(
-      { _id: new ObjectId(id), deleted_at: null },
-      { $set: { deleted_at: new Date() } }
-    );
+    const updated = await db<SavedView>('saved_views')
+      .where('id', parseInt(id))
+      .where('deleted_at', null)
+      .update({ deleted_at: db.fn.now() });
 
-    return result.modifiedCount > 0;
+    return updated > 0;
   }
 }
