@@ -80,7 +80,7 @@ export class EventsService {
       state: eventData.state || null,
       zip_code: eventData.zip_code || null,
       country: eventData.country || null,
-      meeting_url: eventData.meeting_url || null,
+      meeting_url: meeting_url,
       accessibility_notes: eventData.accessibility_notes || null,
       emergency_contact: eventData.emergency_contact || null,
       
