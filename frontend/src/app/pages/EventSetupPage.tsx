@@ -146,14 +146,14 @@ const EventSetupPageComponent = () => {
         .replace(/^-+|-+$/g, '');
       setValue('url_slug', slug);
     }
-  }, [watchTitle]);
+  }, [watchTitle, seoAutoFilled.meta_title, seoAutoFilled.url_slug, setValue]);
 
   useEffect(() => {
     if (watchDescription && !seoAutoFilled.meta_description) {
       const shortDesc = watchDescription.substring(0, 160);
       setValue('meta_description', shortDesc);
     }
-  }, [watchDescription]);
+  }, [watchDescription, seoAutoFilled.meta_description, setValue]);
 
   // Handle file uploads
   const handleFileUpload = async (file: File, field: string) => {
