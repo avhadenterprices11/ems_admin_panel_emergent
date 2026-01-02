@@ -3,7 +3,7 @@
 ## Project Overview
 A full-stack Event Management Admin System built with:
 - **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Shadcn/UI components
-- **Backend**: Node.js, TypeScript, Express.js, MongoDB
+- **Backend**: Node.js, TypeScript, Express.js, PostgreSQL with Knex
 - **File Storage**: AWS S3 (with local storage fallback)
 
 ## Core Modules
