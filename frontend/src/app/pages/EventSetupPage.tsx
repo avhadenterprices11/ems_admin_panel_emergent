@@ -846,27 +846,45 @@ const EventSetupPageComponent = () => {
               <h3 className="text-lg font-bold text-[#1d293d]">Event Media</h3>
             </div>
             <div className="space-y-6">
+              {/* Promo Video Upload */}
               <div className="space-y-2">
-                <Label className="text-slate-700 font-medium">Upload Promo Video</Label>
-                <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
-                  <div className="bg-slate-100 p-3 rounded-full mb-3 group-hover:bg-slate-200 transition-colors">
-                    <Upload className="text-slate-400" size={24} />
-                  </div>
-                  <p className="text-sm font-medium text-slate-700">Drag & drop or click to upload</p>
-                  <p className="text-xs text-slate-400 mt-1">Supported formats: MP4, MOV</p>
-                </div>
-                <p className="text-xs text-slate-500">Optional promo video shown on the event page</p>
+                <Controller
+                  name="promo_video_url"
+                  control={control}
+                  render={({ field }) => (
+                    <FileUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      multiple={false}
+                      accept="video/*"
+                      label="Upload Promo Video"
+                      showPreview={true}
+                      folder="events/videos"
+                    />
+                  )}
+                />
+                <p className="text-xs text-slate-500">Optional promo video shown on the event page. Supported: MP4, MOV</p>
               </div>
 
+              {/* Gallery Upload */}
               <div className="space-y-2">
-                <Label className="text-slate-700 font-medium">Gallery</Label>
-                <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
-                  <div className="bg-slate-100 p-3 rounded-full mb-3 group-hover:bg-slate-200 transition-colors">
-                    <Image className="text-slate-400" size={24} />
-                  </div>
-                  <p className="text-sm font-medium text-slate-700">Drag & drop or click to upload</p>
-                  <p className="text-xs text-slate-400 mt-1">Upload multiple images for event gallery</p>
-                </div>
+                <Controller
+                  name="gallery_images"
+                  control={control}
+                  render={({ field }) => (
+                    <FileUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      multiple={true}
+                      accept="image/*"
+                      maxFiles={20}
+                      label="Gallery"
+                      showPreview={true}
+                      folder="events/gallery"
+                    />
+                  )}
+                />
+                <p className="text-xs text-slate-400">Upload multiple images for event gallery</p>
               </div>
             </div>
           </div>
