@@ -195,8 +195,8 @@ export class EventsService {
   async getEventsList(query: EventListQuery) {
     const db = await getDb();
     const {
-      page = 1,
-      pageSize = 10,
+      page: pageStr = '1',
+      pageSize: pageSizeStr = '10',
       search,
       tab,
       type,
@@ -211,6 +211,10 @@ export class EventsService {
       sortBy = 'start_date',
       sortOrder = 'desc',
     } = query;
+
+    // Convert string params to numbers
+    const page = typeof pageStr === 'string' ? parseInt(pageStr, 10) : pageStr;
+    const pageSize = typeof pageSizeStr === 'string' ? parseInt(pageSizeStr, 10) : pageSizeStr;
 
     const filter: any = { deleted_at: null };
 
