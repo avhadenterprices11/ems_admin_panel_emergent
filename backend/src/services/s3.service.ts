@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Configure AWS S3
 const s3 = new AWS.S3({
@@ -10,12 +12,19 @@ const s3 = new AWS.S3({
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'event-management-uploads';
+const USE_LOCAL_STORAGE = !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY;
+const LOCAL_UPLOAD_DIR = '/app/uploads';
+
+// Ensure local upload directory exists
+if (USE_LOCAL_STORAGE && !fs.existsSync(LOCAL_UPLOAD_DIR)) {
+  fs.mkdirSync(LOCAL_UPLOAD_DIR, { recursive: true });
+}
 
 // Multer memory storage
 export const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB limit
   },
   fileFilter: (req, file, cb) => {
     const allowedMimes = [
@@ -24,15 +33,18 @@ export const upload = multer({
       'image/png',
       'image/gif',
       'image/webp',
+      'image/svg+xml',
       'video/mp4',
       'video/mpeg',
       'video/quicktime',
+      'video/webm',
+      'application/pdf',
     ];
     
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only images and videos are allowed.'));
+      cb(new Error(`Invalid file type: ${file.mimetype}. Allowed: images, videos, and PDFs.`));
     }
   },
 });
@@ -42,12 +54,17 @@ export class S3Service {
     const fileExtension = file.originalname.split('.').pop();
     const fileName = `${folder}/${uuidv4()}.${fileExtension}`;
 
+    if (USE_LOCAL_STORAGE) {
+      // Store locally for development/testing
+      return this.uploadToLocal(file, fileName);
+    }
+
     const params = {
       Bucket: BUCKET_NAME,
       Key: fileName,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: 'public-read',
+      ACL: 'public-read' as const,
     };
 
     try {
@@ -55,8 +72,24 @@ export class S3Service {
       return result.Location;
     } catch (error) {
       console.error('S3 upload error:', error);
-      throw new Error('Failed to upload file to S3');
+      // Fallback to local storage if S3 fails
+      return this.uploadToLocal(file, fileName);
     }
+  }
+
+  private async uploadToLocal(file: Express.Multer.File, fileName: string): Promise<string> {
+    const fullPath = path.join(LOCAL_UPLOAD_DIR, fileName);
+    const dir = path.dirname(fullPath);
+    
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    fs.writeFileSync(fullPath, file.buffer);
+    
+    // Return a URL that can be served
+    const baseUrl = process.env.APP_URL || 'https://eventmanager-18.preview.emergentagent.com';
+    return `${baseUrl}/uploads/${fileName}`;
   }
 
   async uploadMultipleFiles(files: Express.Multer.File[], folder: string = 'events'): Promise<string[]> {
@@ -65,6 +98,18 @@ export class S3Service {
   }
 
   async deleteFile(fileUrl: string): Promise<void> {
+    if (USE_LOCAL_STORAGE || fileUrl.includes('/uploads/')) {
+      // Delete from local storage
+      const fileName = fileUrl.split('/uploads/')[1];
+      if (fileName) {
+        const fullPath = path.join(LOCAL_UPLOAD_DIR, fileName);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      }
+      return;
+    }
+
     const key = fileUrl.split('.com/')[1];
     
     const params = {
