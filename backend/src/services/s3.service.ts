@@ -89,7 +89,7 @@ export class S3Service {
     
     // Return a URL that can be served
     const baseUrl = process.env.APP_URL || 'https://eventmanager-18.preview.emergentagent.com';
-    return `${baseUrl}/uploads/${fileName}`;
+    return `${baseUrl}/api/uploads/${fileName}`;
   }
 
   async uploadMultipleFiles(files: Express.Multer.File[], folder: string = 'events'): Promise<string[]> {
