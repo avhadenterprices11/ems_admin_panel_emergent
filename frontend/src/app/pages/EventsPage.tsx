@@ -362,7 +362,7 @@ export const EventsPage = () => {
     navigate('/events/new');
   };
 
-  const onManageEvent = (id: string) => {
+  const onManageEvent = (id: string | number) => {
     navigate(`/events/${id}`);
   };
 
