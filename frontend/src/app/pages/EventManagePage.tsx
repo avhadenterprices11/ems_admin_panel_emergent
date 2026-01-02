@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ChevronLeft, 
   Calendar, 
   ExternalLink, 
-  LayoutDashboard
+  LayoutDashboard,
+  Loader2
 } from 'lucide-react';
 import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -15,25 +16,102 @@ import { EventAttendees } from '../components/event-manage/EventAttendees';
 import { EventCommunications } from '../components/event-manage/EventCommunications';
 import { EventReports } from '../components/event-manage/EventReports';
 import { EventSettings } from '../components/event-manage/EventSettings';
+import { eventsAPI } from '../api/events.api';
+import { toast } from 'sonner';
 
-// Mock event data - in real app would fetch from API
-const mockEvent = {
-  id: '1',
-  name: 'Global Tech Summit 2024',
-  date: 'Jan 15 - Jan 17, 2024',
-  status: 'Published'
-};
+interface EventDetail {
+  id: number;
+  event_code: string;
+  name: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  type: string;
+  location: string;
+  mode: string;
+}
 
 export function EventManagePage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
+  const [event, setEvent] = useState<EventDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  const event = mockEvent; // In real app: fetch based on id
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await eventsAPI.getEventById(id);
+        setEvent(data);
+      } catch (err: any) {
+        console.error('Error fetching event:', err);
+        setError(err.response?.data?.message || 'Failed to load event');
+        toast.error('Failed to load event details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
   
   const handleBack = () => {
     navigate('/events');
   };
+
+  const formatDateRange = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    
+    if (start.toDateString() === end.toDateString()) {
+      return start.toLocaleDateString('en-US', options);
+    }
+    
+    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', options)}`;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Published':
+        return 'text-emerald-600 bg-emerald-50';
+      case 'Draft':
+        return 'text-slate-600 bg-slate-100';
+      case 'Archived':
+        return 'text-orange-600 bg-orange-50';
+      default:
+        return 'text-blue-600 bg-blue-50';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <p className="text-slate-500">Loading event details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4">
+        <p className="text-slate-500">{error || 'Event not found'}</p>
+        <Button onClick={handleBack} variant="outline">
+          <ChevronLeft size={16} className="mr-2" />
+          Back to Events
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full gap-6">
@@ -59,10 +137,10 @@ export function EventManagePage() {
             <h1 className="text-2xl font-bold text-[#1d293d]">{event.name}</h1>
             <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
               <span className="flex items-center gap-1">
-                <Calendar size={14} /> {event.date}
+                <Calendar size={14} /> {formatDateRange(event.start_date, event.end_date)}
               </span>
               <span>•</span>
-              <span className="text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
+              <span className={`font-medium px-2 py-0.5 rounded-full text-xs ${getStatusColor(event.status)}`}>
                 {event.status}
               </span>
             </div>
@@ -137,7 +215,7 @@ export function EventManagePage() {
         {/* 4. TAB CONTENT */}
         <div className="flex-1 pt-6">
           <TabsContent value="overview" className="mt-0 h-full animate-in fade-in zoom-in-95 duration-200">
-            <EventOverview />
+            <EventOverview eventId={event.id} />
           </TabsContent>
           <TabsContent value="tickets" className="mt-0 animate-in fade-in zoom-in-95 duration-200">
             <EventTickets />
