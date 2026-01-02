@@ -1,10 +1,11 @@
-import { getDb, toJSON, ObjectId } from '../database/mongo';
+import db from '../database/db';
 import { CreateEventDTO } from '../dtos/create-event.dto';
 import { ZoomService } from './zoom.service';
 import { GoogleMeetService } from './google-meet.service';
+import { Knex } from 'knex';
 
 interface Event {
-  _id?: ObjectId;
+  id: number;
   event_code: string;
   name: string;
   description?: string;
@@ -95,8 +96,7 @@ export class EventsService {
     this.googleMeetService = new GoogleMeetService();
   }
 
-  async createEvent(eventData: CreateEventDTO): Promise<any> {
-    const db = await getDb();
+  async createEvent(eventData: CreateEventDTO): Promise<Event> {
     const now = new Date();
     let meeting_url = eventData.meeting_url || null;
 
@@ -130,54 +130,54 @@ export class EventsService {
       }
     }
 
-    const eventRecord: Omit<Event, '_id'> = {
+    const eventRecord = {
       event_code: eventData.event_code,
       name: eventData.name,
-      description: eventData.description || undefined,
-      category: eventData.category || undefined,
+      description: eventData.description || null,
+      category: eventData.category || null,
       type: eventData.type,
-      event_type: eventData.event_type || undefined,
+      event_type: eventData.event_type || null,
       start_date: eventData.start_date,
       end_date: eventData.end_date,
       all_day: eventData.all_day || false,
-      timezone: eventData.timezone || undefined,
-      url_slug: eventData.url_slug || undefined,
-      reg_start_at: eventData.reg_start_at || undefined,
-      reg_end_at: eventData.reg_end_at || undefined,
-      capacity: eventData.capacity || undefined,
+      timezone: eventData.timezone || null,
+      url_slug: eventData.url_slug || null,
+      reg_start_at: eventData.reg_start_at || null,
+      reg_end_at: eventData.reg_end_at || null,
+      capacity: eventData.capacity || null,
       waitlist_enabled: eventData.waitlist_enabled || false,
-      mode: eventData.mode || undefined,
-      venue_id: eventData.venue_id || undefined,
-      venue_name: eventData.venue_name || undefined,
-      location: eventData.location || undefined,
-      address_line1: eventData.address_line1 || undefined,
-      address_line2: eventData.address_line2 || undefined,
-      city: eventData.city || undefined,
-      state: eventData.state || undefined,
-      zip_code: eventData.zip_code || undefined,
-      country: eventData.country || undefined,
-      meeting_url: meeting_url || undefined,
-      accessibility_notes: eventData.accessibility_notes || undefined,
-      emergency_contact: eventData.emergency_contact || undefined,
+      mode: eventData.mode || null,
+      venue_id: eventData.venue_id || null,
+      venue_name: eventData.venue_name || null,
+      location: eventData.location || null,
+      address_line1: eventData.address_line1 || null,
+      address_line2: eventData.address_line2 || null,
+      city: eventData.city || null,
+      state: eventData.state || null,
+      zip_code: eventData.zip_code || null,
+      country: eventData.country || null,
+      meeting_url: meeting_url,
+      accessibility_notes: eventData.accessibility_notes || null,
+      emergency_contact: eventData.emergency_contact || null,
       owner: eventData.owner,
-      banner_image_url: eventData.banner_image_url || undefined,
-      promo_video_url: (eventData as any).promo_video_url || undefined,
-      gallery_images: eventData.gallery_images || [],
-      meta_title: eventData.meta_title || undefined,
-      meta_description: eventData.meta_description || undefined,
+      banner_image_url: eventData.banner_image_url || null,
+      promo_video_url: (eventData as any).promo_video_url || null,
+      gallery_images: eventData.gallery_images ? JSON.stringify(eventData.gallery_images) : null,
+      meta_title: eventData.meta_title || null,
+      meta_description: eventData.meta_description || null,
       status: eventData.status,
       visibility: eventData.visibility || 'public',
       is_registration_open: eventData.is_registration_open || false,
       is_checkin_active: eventData.is_checkin_active || false,
-      check_in_mode: eventData.check_in_mode || undefined,
-      data_collection_form_id: eventData.data_collection_form_id || undefined,
-      co_hosts: eventData.co_hosts || [],
-      tags: eventData.tags || [],
-      partners: eventData.partners || [],
-      sponsors: eventData.sponsors || [],
-      agenda: eventData.agenda || [],
-      email_config: eventData.email_config || undefined,
-      internal_notes: eventData.internal_notes || undefined,
+      check_in_mode: eventData.check_in_mode || null,
+      data_collection_form_id: eventData.data_collection_form_id || null,
+      co_hosts: eventData.co_hosts ? JSON.stringify(eventData.co_hosts) : null,
+      tags: eventData.tags ? JSON.stringify(eventData.tags) : null,
+      partners: eventData.partners ? JSON.stringify(eventData.partners) : null,
+      sponsors: eventData.sponsors ? JSON.stringify(eventData.sponsors) : null,
+      agenda: eventData.agenda ? JSON.stringify(eventData.agenda) : null,
+      email_config: eventData.email_config ? JSON.stringify(eventData.email_config) : null,
+      internal_notes: eventData.internal_notes || null,
       lifecycle_status: eventData.lifecycle_status || 'draft',
       total_registrations: 0,
       checked_in_count: 0,
@@ -186,14 +186,14 @@ export class EventsService {
       deleted_at: null,
     };
 
-    const result = await db.collection('events').insertOne(eventRecord);
-    const createdEvent = await db.collection('events').findOne({ _id: result.insertedId });
-    
-    return toJSON(createdEvent);
+    const [createdEvent] = await db<Event>('events')
+      .insert(eventRecord)
+      .returning('*');
+
+    return this.parseEventJson(createdEvent);
   }
 
   async getEventsList(query: EventListQuery) {
-    const db = await getDb();
     const {
       page: pageStr = '1',
       pageSize: pageSizeStr = '10',
@@ -216,77 +216,80 @@ export class EventsService {
     const page = typeof pageStr === 'string' ? parseInt(pageStr, 10) : pageStr;
     const pageSize = typeof pageSizeStr === 'string' ? parseInt(pageSizeStr, 10) : pageSizeStr;
 
-    const filter: any = { deleted_at: null };
+    let queryBuilder = db<Event>('events').where('deleted_at', null);
 
     // Search
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { event_code: { $regex: search, $options: 'i' } },
-      ];
+      queryBuilder = queryBuilder.where((builder) => {
+        builder
+          .where('name', 'ilike', `%${search}%`)
+          .orWhere('event_code', 'ilike', `%${search}%`);
+      });
     }
 
     // Tab filtering
-    this.applyTabFilter(filter, tab);
+    if (tab) {
+      queryBuilder = this.applyTabFilter(queryBuilder, tab);
+    }
 
     // Type filter
     if (type) {
-      filter.type = type;
+      queryBuilder = queryBuilder.where('type', type);
     }
 
     // Location filter
     if (location) {
-      filter.location = { $regex: location, $options: 'i' };
+      queryBuilder = queryBuilder.where('location', 'ilike', `%${location}%`);
     }
 
     // Owner filter
     if (owner) {
-      filter.owner = { $regex: owner, $options: 'i' };
+      queryBuilder = queryBuilder.where('owner', 'ilike', `%${owner}%`);
     }
 
     // Status filter
     if (status) {
-      filter.status = status;
+      queryBuilder = queryBuilder.where('status', status);
     }
 
     // Registration status filter
     if (registrationStatus) {
-      filter.is_registration_open = registrationStatus === 'open';
+      if (registrationStatus === 'open') {
+        queryBuilder = queryBuilder.where('is_registration_open', true);
+      } else if (registrationStatus === 'closed') {
+        queryBuilder = queryBuilder.where('is_registration_open', false);
+      }
     }
 
     // Attendance range filter
     if (attendanceMin !== undefined) {
-      filter.total_registrations = { ...filter.total_registrations, $gte: attendanceMin };
+      queryBuilder = queryBuilder.where('total_registrations', '>=', attendanceMin);
     }
     if (attendanceMax !== undefined) {
-      filter.total_registrations = { ...filter.total_registrations, $lte: attendanceMax };
+      queryBuilder = queryBuilder.where('total_registrations', '<=', attendanceMax);
     }
 
     // Date range filter
     if (startDateFrom) {
-      filter.start_date = { ...filter.start_date, $gte: startDateFrom };
+      queryBuilder = queryBuilder.where('start_date', '>=', startDateFrom);
     }
     if (startDateTo) {
-      filter.start_date = { ...filter.start_date, $lte: startDateTo };
+      queryBuilder = queryBuilder.where('start_date', '<=', startDateTo);
     }
 
     // Get total count
-    const total = await db.collection('events').countDocuments(filter);
+    const totalRecords = await queryBuilder.clone().count('* as count').first();
+    const total = parseInt(totalRecords?.count as string || '0');
 
     // Sorting
-    const sort: any = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+    queryBuilder = queryBuilder.orderBy(sortBy, sortOrder as 'asc' | 'desc');
 
     // Pagination
     const offset = (page - 1) * pageSize;
-    const events = await db.collection('events')
-      .find(filter)
-      .sort(sort)
-      .skip(offset)
-      .limit(pageSize)
-      .toArray();
+    const events = await queryBuilder.limit(pageSize).offset(offset);
 
     return {
-      data: events.map(toJSON),
+      data: events.map(e => this.parseEventJson(e)),
       pagination: {
         page,
         pageSize,
@@ -297,85 +300,75 @@ export class EventsService {
   }
 
   async calculateMetrics(query: { startDateFrom?: string; startDateTo?: string; tab?: string }): Promise<EventMetrics> {
-    const db = await getDb();
     const { startDateFrom, startDateTo, tab } = query;
 
-    const filter: any = { deleted_at: null };
+    let queryBuilder = db<Event>('events').where('deleted_at', null);
 
     // Apply date range if provided
     if (startDateFrom) {
-      filter.start_date = { ...filter.start_date, $gte: startDateFrom };
+      queryBuilder = queryBuilder.where('start_date', '>=', startDateFrom);
     }
     if (startDateTo) {
-      filter.start_date = { ...filter.start_date, $lte: startDateTo };
+      queryBuilder = queryBuilder.where('start_date', '<=', startDateTo);
     }
 
     // Apply tab filter if provided
-    this.applyTabFilter(filter, tab);
+    if (tab) {
+      queryBuilder = this.applyTabFilter(queryBuilder, tab);
+    }
 
-    const totalEvents = await db.collection('events').countDocuments(filter);
-    const activeEvents = await db.collection('events').countDocuments({ ...filter, status: 'Published' });
-    const draftEvents = await db.collection('events').countDocuments({ ...filter, status: 'Draft' });
+    const totalEvents = await queryBuilder.clone().count('* as count').first();
+    const activeEvents = await queryBuilder.clone().where('status', 'Published').count('* as count').first();
+    const draftEvents = await queryBuilder.clone().where('status', 'Draft').count('* as count').first();
+    const totalRegs = await queryBuilder.clone().sum('total_registrations as sum').first();
 
-    // Sum total registrations
-    const regsPipeline = [
-      { $match: filter },
-      { $group: { _id: null, total: { $sum: '$total_registrations' } } }
-    ];
-    const regsResult = await db.collection('events').aggregate(regsPipeline).toArray();
-    const totalRegistrations = regsResult[0]?.total || 0;
-
-    // Calculate growth rate
+    // Calculate growth rate (compare to previous period)
     const growthRate = await this.calculateGrowthRate(startDateFrom, startDateTo);
 
     return {
-      totalEvents,
-      activeEvents,
-      draftEvents,
-      totalRegistrations,
+      totalEvents: parseInt(totalEvents?.count as string || '0'),
+      activeEvents: parseInt(activeEvents?.count as string || '0'),
+      draftEvents: parseInt(draftEvents?.count as string || '0'),
+      totalRegistrations: parseInt(totalRegs?.sum as string || '0'),
       growthRate,
     };
   }
 
   async bulkArchiveEvents(eventIds: string[]): Promise<number> {
-    const db = await getDb();
-    const result = await db.collection('events').updateMany(
-      { event_code: { $in: eventIds }, deleted_at: null },
-      { $set: { status: 'Archived', updated_at: new Date() } }
-    );
-    return result.modifiedCount;
+    const updated = await db<Event>('events')
+      .whereIn('event_code', eventIds)
+      .where('deleted_at', null)
+      .update({ status: 'Archived', updated_at: db.fn.now() });
+
+    return updated;
   }
 
   async bulkDeleteEvents(eventIds: string[]): Promise<number> {
-    const db = await getDb();
-    const result = await db.collection('events').updateMany(
-      { event_code: { $in: eventIds }, deleted_at: null },
-      { $set: { deleted_at: new Date() } }
-    );
-    return result.modifiedCount;
+    const updated = await db<Event>('events')
+      .whereIn('event_code', eventIds)
+      .where('deleted_at', null)
+      .update({ deleted_at: db.fn.now() });
+
+    return updated;
   }
 
-  private applyTabFilter(filter: any, tab?: string): void {
-    if (!tab) return;
-
+  private applyTabFilter(queryBuilder: Knex.QueryBuilder, tab: string): Knex.QueryBuilder {
     const today = new Date().toISOString().split('T')[0];
 
     switch (tab) {
       case 'active':
-        filter.status = 'Published';
-        filter.start_date = { ...filter.start_date, $gte: today };
-        break;
+        return queryBuilder.where('status', 'Published').where('start_date', '>=', today);
       case 'draft':
-        filter.status = 'Draft';
-        break;
+        return queryBuilder.where('status', 'Draft');
       case 'archived':
-        filter.status = 'Archived';
-        break;
+        return queryBuilder.where('status', 'Archived');
       case 'live':
-        filter.status = 'Published';
-        filter.start_date = { ...filter.start_date, $lte: today };
-        filter.end_date = { $gte: today };
-        break;
+        return queryBuilder
+          .where('status', 'Published')
+          .where('start_date', '<=', today)
+          .where('end_date', '>=', today);
+      default:
+        return queryBuilder;
     }
   }
 
@@ -384,7 +377,6 @@ export class EventsService {
       return 0;
     }
 
-    const db = await getDb();
     const start = new Date(startDateFrom);
     const end = new Date(startDateTo);
     const periodDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
@@ -400,25 +392,41 @@ export class EventsService {
     prevStart.setDate(prevStart.getDate() - periodDays);
 
     // Current period registrations
-    const currentPipeline = [
-      { $match: { deleted_at: null, start_date: { $gte: startDateFrom, $lte: startDateTo } } },
-      { $group: { _id: null, total: { $sum: '$total_registrations' } } }
-    ];
-    const currentResult = await db.collection('events').aggregate(currentPipeline).toArray();
-    const current = currentResult[0]?.total || 0;
+    const currentRegs = await db<Event>('events')
+      .where('deleted_at', null)
+      .where('start_date', '>=', startDateFrom)
+      .where('start_date', '<=', startDateTo)
+      .sum('total_registrations as sum')
+      .first();
 
     // Previous period registrations
-    const prevPipeline = [
-      { $match: { deleted_at: null, start_date: { $gte: prevStart.toISOString(), $lte: prevEnd.toISOString() } } },
-      { $group: { _id: null, total: { $sum: '$total_registrations' } } }
-    ];
-    const prevResult = await db.collection('events').aggregate(prevPipeline).toArray();
-    const previous = prevResult[0]?.total || 0;
+    const prevRegs = await db<Event>('events')
+      .where('deleted_at', null)
+      .where('start_date', '>=', prevStart.toISOString())
+      .where('start_date', '<=', prevEnd.toISOString())
+      .sum('total_registrations as sum')
+      .first();
+
+    const current = parseInt(currentRegs?.sum as string || '0');
+    const previous = parseInt(prevRegs?.sum as string || '0');
 
     if (previous === 0) {
       return current > 0 ? 100 : 0;
     }
 
     return Math.round(((current - previous) / previous) * 100);
+  }
+
+  private parseEventJson(event: any): Event {
+    return {
+      ...event,
+      gallery_images: typeof event.gallery_images === 'string' ? JSON.parse(event.gallery_images) : event.gallery_images,
+      co_hosts: typeof event.co_hosts === 'string' ? JSON.parse(event.co_hosts) : event.co_hosts,
+      tags: typeof event.tags === 'string' ? JSON.parse(event.tags) : event.tags,
+      partners: typeof event.partners === 'string' ? JSON.parse(event.partners) : event.partners,
+      sponsors: typeof event.sponsors === 'string' ? JSON.parse(event.sponsors) : event.sponsors,
+      agenda: typeof event.agenda === 'string' ? JSON.parse(event.agenda) : event.agenda,
+      email_config: typeof event.email_config === 'string' ? JSON.parse(event.email_config) : event.email_config,
+    };
   }
 }
