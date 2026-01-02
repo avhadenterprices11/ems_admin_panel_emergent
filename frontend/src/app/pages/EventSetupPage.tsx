@@ -136,7 +136,7 @@ const EventSetupPageComponent = () => {
       }
       if (data.sponsors) {
         data.sponsors = data.sponsors.map((sponsor: any) => ({
-          ...partner,
+          ...sponsor,
           link: sponsor.link ? normalizeUrl(sponsor.link) : ''
         }));
       }
