@@ -111,6 +111,14 @@ A full-stack Event Management Admin System built with:
 - `POST /api/events/bulk-archive` - Archive multiple events
 - `POST /api/events/bulk-delete` - Soft delete multiple events
 
+### Event Detail - Overview Tab
+- `GET /api/events/:eventId` - Get event details by ID
+- `GET /api/events/:eventId/overview/metrics` - Get overview summary metrics
+- `GET /api/events/:eventId/overview/funnel` - Get registration funnel data
+- `GET /api/events/:eventId/overview/tickets` - Get ticket inventory health
+- `GET /api/events/:eventId/overview/alerts` - Get attention needed alerts
+- `GET /api/events/:eventId/overview/activity` - Get event activity timeline
+
 ### File Upload
 - `POST /api/upload/single` - Upload single file
 - `POST /api/upload/multiple` - Upload multiple files
