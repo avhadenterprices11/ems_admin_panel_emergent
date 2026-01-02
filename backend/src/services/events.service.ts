@@ -61,8 +61,8 @@ interface Event {
 }
 
 interface EventListQuery {
-  page?: number;
-  pageSize?: number;
+  page?: number | string;
+  pageSize?: number | string;
   search?: string;
   tab?: string;
   type?: string;
