@@ -40,6 +40,26 @@ export const eventsAPI = {
     return response.data;
   },
 
+  uploadFile: async (file: File, folder: string = 'events') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
+    const response = await apiClient.post('/upload/single', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.url;
+  },
+
+  uploadMultipleFiles: async (files: File[], folder: string = 'events') => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    formData.append('folder', folder);
+    const response = await apiClient.post('/upload/multiple', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.urls;
+  },
+
   bulkArchive: async (eventIds: string[]) => {
     const response = await apiClient.post('/events/bulk-archive', { eventIds });
     return response.data;
