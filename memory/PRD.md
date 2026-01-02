@@ -37,6 +37,17 @@ A full-stack Event Management Admin System built with:
 - Agenda builder
 - Email configuration overrides
 
+### 4. Event Detail Module - Overview Tab ✅ COMPLETE (Jan 2, 2026)
+- **Row Click Navigation**: Click event row in Events table navigates to Event Detail page
+- **Page Header**: Event name, date range, status badge, breadcrumb navigation
+- **Tab Navigation**: Overview (active), Tickets, Registrations, Attendees & Check-in, Communications, Reports, Settings
+- **Top KPI Cards**: Total Registrations, Gross Revenue, Page Views, Conversion Rate (with comparison to previous period)
+- **Registration Funnel**: Page Views → Add to Cart → Checkout Started → Completed Registration (with period selector)
+- **Ticket Inventory Health**: Shows all tickets with sold/capacity and status badges (Selling Fast, Available, Sold Out)
+- **Attention Needed Alerts**: Pending refunds, low inventory warnings, failed payments
+- **Event Timeline**: Chronological list of system and admin actions
+- **Recent Internal Activity**: Activity log feed with actor types and timestamps
+
 ## Technical Architecture
 
 ### Frontend Structure
