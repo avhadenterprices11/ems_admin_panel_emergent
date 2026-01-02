@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { EventsController } from '../controllers/events.controller';
+import { EventOverviewController } from '../controllers/event-overview.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
 
 const router = Router();
 const eventsController = new EventsController();
+const eventOverviewController = new EventOverviewController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
@@ -16,5 +18,13 @@ router.get('/metrics', (req, res) => eventsController.getMetrics(req, res));
 router.post('/bulk-archive', validateDTO(BulkActionDTO), (req, res) => eventsController.bulkArchive(req, res));
 
 router.post('/bulk-delete', validateDTO(BulkActionDTO), (req, res) => eventsController.bulkDelete(req, res));
+
+// Event Detail - Overview Tab APIs
+router.get('/:eventId', (req, res) => eventOverviewController.getEventById(req, res));
+router.get('/:eventId/overview/metrics', (req, res) => eventOverviewController.getMetrics(req, res));
+router.get('/:eventId/overview/funnel', (req, res) => eventOverviewController.getFunnel(req, res));
+router.get('/:eventId/overview/tickets', (req, res) => eventOverviewController.getTicketInventory(req, res));
+router.get('/:eventId/overview/alerts', (req, res) => eventOverviewController.getAlerts(req, res));
+router.get('/:eventId/overview/activity', (req, res) => eventOverviewController.getActivityTimeline(req, res));
 
 export default router;
