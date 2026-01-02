@@ -3,7 +3,6 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import path from 'path';
 import * as dotenv from 'dotenv';
-import { connectToMongo } from './database/mongo';
 import authRoutes from './routes/auth.routes';
 import eventsRoutes from './routes/events.routes';
 import savedViewsRoutes from './routes/saved-views.routes';
@@ -39,9 +38,6 @@ app.use('/api/upload', fileUploadRoutes);
 
 async function startServer() {
   try {
-    // Connect to MongoDB
-    await connectToMongo();
-    
     // Create default user
     const authService = new AuthService();
     await authService.createDefaultUser();
