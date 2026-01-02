@@ -107,6 +107,15 @@ const EventSetupPageComponent = () => {
   const watchVenueId = watch('venue_id');
   const watchStart = watch('start_at');
   const watchEnd = watch('end_at');
+  const watchTitle = watch('title');
+  const watchDescription = watch('description');
+
+  // SEO Auto-generation - only on first input, don't override manual changes
+  const [seoAutoFilled, setSeoAutoFilled] = useState({
+    meta_title: false,
+    meta_description: false,
+    url_slug: false,
+  });
 
   // Venue preset auto-fill
   useEffect(() => {
@@ -122,6 +131,52 @@ const EventSetupPageComponent = () => {
       }
     }
   }, [watchVenueId, setValue]);
+
+  useEffect(() => {
+    if (watchTitle && !seoAutoFilled.meta_title) {
+      setValue('meta_title', watchTitle);
+    }
+    if (watchTitle && !seoAutoFilled.url_slug) {
+      const slug = watchTitle
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      setValue('url_slug', slug);
+    }
+  }, [watchTitle]);
+
+  useEffect(() => {
+    if (watchDescription && !seoAutoFilled.meta_description) {
+      const shortDesc = watchDescription.substring(0, 160);
+      setValue('meta_description', shortDesc);
+    }
+  }, [watchDescription]);
+
+  // Handle file uploads
+  const handleFileUpload = async (file: File, field: string) => {
+    try {
+      const url = await eventsAPI.uploadFile(file, 'events');
+      setValue(field as any, url);
+      toast.success('File uploaded successfully');
+      return url;
+    } catch (error) {
+      toast.error('Failed to upload file');
+      throw error;
+    }
+  };
+
+  const handleMultipleFilesUpload = async (files: FileList, field: string) => {
+    try {
+      const fileArray = Array.from(files);
+      const urls = await eventsAPI.uploadMultipleFiles(fileArray, 'events');
+      setValue(field as any, urls);
+      toast.success(`${urls.length} files uploaded successfully`);
+      return urls;
+    } catch (error) {
+      toast.error('Failed to upload files');
+      throw error;
+    }
+  };
 
   const onSubmit = async (data: any) => {
     try {
