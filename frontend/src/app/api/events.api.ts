@@ -35,6 +35,11 @@ export const eventsAPI = {
     return response.data;
   },
 
+  createEvent: async (eventData: any) => {
+    const response = await apiClient.post('/events', eventData);
+    return response.data;
+  },
+
   bulkArchive: async (eventIds: string[]) => {
     const response = await apiClient.post('/events/bulk-archive', { eventIds });
     return response.data;
