@@ -55,26 +55,36 @@ A full-stack Event Management Admin System built with:
 │   └── App.tsx
 ```
 
-### Backend Structure
+### Backend Structure (Clean Node.js/TypeScript)
 ```
-/app/backend/src/
-├── controllers/
-│   ├── auth.controller.ts
-│   ├── events.controller.ts
-│   ├── file-upload.controller.ts
-│   └── saved-views.controller.ts
-├── services/
-│   ├── auth.service.ts
-│   ├── events.service.ts
-│   ├── s3.service.ts          # File upload with S3/local fallback
-│   ├── saved-views.service.ts
-│   ├── zoom.service.ts
-│   └── google-meet.service.ts
-├── database/
-│   └── mongo.ts               # MongoDB connection
-├── routes/
-└── server.ts
+/app/backend/
+├── src/
+│   ├── controllers/           # Request handlers
+│   │   ├── auth.controller.ts
+│   │   ├── events.controller.ts
+│   │   ├── file-upload.controller.ts
+│   │   └── saved-views.controller.ts
+│   ├── services/              # Business logic
+│   │   ├── auth.service.ts
+│   │   ├── events.service.ts
+│   │   ├── s3.service.ts      # File upload (S3/local fallback)
+│   │   ├── saved-views.service.ts
+│   │   ├── zoom.service.ts
+│   │   └── google-meet.service.ts
+│   ├── database/
+│   │   └── mongo.ts           # MongoDB connection
+│   ├── routes/                # API route definitions
+│   ├── dtos/                  # Data transfer objects
+│   ├── interfaces/            # TypeScript interfaces
+│   ├── middlewares/           # Express middlewares
+│   ├── utils/                 # Utility functions
+│   └── server.ts              # Express app entry point
+├── package.json
+├── tsconfig.json
+└── .env
 ```
+
+**Note:** The backend is 100% Node.js/TypeScript - no Python code.
 
 ## API Endpoints
 
