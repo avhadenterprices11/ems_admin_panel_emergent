@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import express, { Application } from 'express';
 import cors from 'cors';
+import path from 'path';
 import * as dotenv from 'dotenv';
 import { connectToMongo } from './database/mongo';
 import authRoutes from './routes/auth.routes';
@@ -13,6 +14,9 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8001;
+
+// Serve uploaded files
+app.use('/uploads', express.static('/app/uploads'));
 
 app.use(cors({
   origin: process.env.CORS_ORIGINS === '*' ? '*' : process.env.CORS_ORIGINS?.split(','),
