@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { eventsAPI } from '../api/events.api';
+import { toast } from 'sonner';
 import { EmailOverrideSection } from '../components/EmailOverrideSection';
 import {
   MOCK_USERS,
