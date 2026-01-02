@@ -110,24 +110,24 @@ A full-stack Event Management Admin System built with:
 - `PUT /api/saved-views/:id` - Rename saved view
 - `DELETE /api/saved-views/:id` - Delete saved view
 
-## Database Schema (MongoDB)
+## Database Schema (PostgreSQL with Knex)
 
 ### users
-- email, password_hash, created_at, updated_at, deleted_at
+- id (primary key), email (unique), password_hash, created_at, updated_at, deleted_at
 
 ### events
-- event_code, name, description, category, type, event_type
+- id (primary key), event_code (unique), name, description, category, type, event_type
 - start_date, end_date, all_day, timezone
 - registration fields: reg_start_at, reg_end_at, capacity, waitlist_enabled
 - venue fields: mode, venue_id, venue_name, location, city, state, country
-- media fields: banner_image_url, promo_video_url, gallery_images[]
+- media fields: banner_image_url, promo_video_url, gallery_images (jsonb)
 - seo fields: meta_title, meta_description, url_slug
 - settings: status, visibility, check_in_mode, data_collection_form_id
-- relationships: co_hosts[], tags[], partners[], sponsors[], agenda[]
+- relationships: co_hosts (jsonb), tags (jsonb), partners (jsonb), sponsors (jsonb), agenda (jsonb)
 - timestamps: created_at, updated_at, deleted_at
 
 ### saved_views
-- name, module, configuration, user_id, created_at, updated_at, deleted_at
+- id (primary key), name, module, configuration (jsonb), user_id (foreign key), created_at, updated_at, deleted_at
 
 ## Completed Work (January 2, 2026)
 
