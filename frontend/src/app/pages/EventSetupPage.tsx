@@ -156,10 +156,10 @@ const EventSetupPageComponent = () => {
   }, [watchDescription, seoAutoFilled.meta_description, setValue]);
 
   // Handle file uploads
-  const handleFileUpload = async (file: any, field: string) => {
+  const handleFileUpload = async (file, field) => {
     try {
       const url = await eventsAPI.uploadFile(file, 'events');
-      setValue(field as any, url);
+      setValue(field, url);
       toast.success('File uploaded successfully');
       return url;
     } catch (error) {
@@ -168,11 +168,11 @@ const EventSetupPageComponent = () => {
     }
   };
 
-  const handleMultipleFilesUpload = async (files: any, field: string) => {
+  const handleMultipleFilesUpload = async (files, field) => {
     try {
       const fileArray = Array.from(files);
       const urls = await eventsAPI.uploadMultipleFiles(fileArray, 'events');
-      setValue(field as any, urls);
+      setValue(field, urls);
       toast.success(`${urls.length} files uploaded successfully`);
       return urls;
     } catch (error) {
