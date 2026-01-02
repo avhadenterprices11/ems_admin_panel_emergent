@@ -691,7 +691,8 @@ export const EventsPage = () => {
                     <TableRow 
                       key={event.event_code} 
                       className={`group border-slate-50 hover:bg-slate-50/60 transition-colors h-[72px] cursor-pointer ${selectedRows.includes(event.event_code) ? 'bg-slate-50/80' : ''}`}
-                      onClick={() => onManageEvent(event.event_code)} 
+                      onClick={() => onManageEvent(event.id)} 
+                      data-testid={`event-row-${event.id}`}
                     >
                       <TableCell className="pl-4">
                         <Checkbox 
