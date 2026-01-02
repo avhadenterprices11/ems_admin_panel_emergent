@@ -58,6 +58,7 @@ const EventSetupPageComponent = () => {
       capacity: '',
       waitlist: false,
       mode: 'in-person',
+      virtual_platform: '',
       venue_id: 'custom',
       venue_name: '',
       address_1: '',
