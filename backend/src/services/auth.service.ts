@@ -1,25 +1,14 @@
-import { getDb, toJSON, ObjectId } from '../database/mongo';
+import db from '../database/db';
+import { User, UserCreateInput } from '../interfaces/user.interface';
 import { PasswordUtils } from '../utils/password.utils';
 import { TokenUtils } from '../utils/token.utils';
 import { LoginDTO, TokenResponseDTO, UserResponseDTO } from '../dtos/auth.dto';
 
-interface User {
-  _id?: ObjectId;
-  id?: string;
-  email: string;
-  password_hash: string;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at: Date | null;
-}
-
 export class AuthService {
   async login(loginDto: LoginDTO): Promise<TokenResponseDTO> {
-    const db = await getDb();
-    const user = await db.collection<User>('users').findOne({
-      email: loginDto.email,
-      deleted_at: null
-    });
+    const user = await db<User>('users')
+      .where({ email: loginDto.email, deleted_at: null })
+      .first();
 
     if (!user) {
       throw new Error('Invalid email or password');
@@ -35,7 +24,7 @@ export class AuthService {
     }
 
     const token = TokenUtils.createAccessToken({
-      sub: user._id!.toString(),
+      sub: user.id.toString(),
       email: user.email,
     });
 
@@ -52,54 +41,59 @@ export class AuthService {
       return null;
     }
 
-    const db = await getDb();
-    const user = await db.collection<User>('users').findOne({
-      _id: new ObjectId(payload.sub),
-      deleted_at: null
-    });
+    const user = await db<User>('users')
+      .where({ id: parseInt(payload.sub), deleted_at: null })
+      .first();
 
     if (!user) {
       return null;
     }
 
     return {
-      id: user._id!.toString(),
+      id: user.id.toString(),
       email: user.email,
       created_at: user.created_at,
       updated_at: user.updated_at,
     };
   }
 
-  async createUser(email: string, password: string): Promise<User> {
-    const db = await getDb();
-    const hashedPassword = await PasswordUtils.hash(password);
-    const now = new Date();
+  async createUser(input: UserCreateInput): Promise<User> {
+    const hashedPassword = await PasswordUtils.hash(input.password_hash);
 
-    const result = await db.collection<User>('users').insertOne({
-      email,
-      password_hash: hashedPassword,
-      created_at: now,
-      updated_at: now,
-      deleted_at: null,
-    });
+    const [user] = await db<User>('users')
+      .insert({
+        email: input.email,
+        password_hash: hashedPassword,
+      })
+      .returning('*');
 
-    const user = await db.collection<User>('users').findOne({ _id: result.insertedId });
-    return user!;
+    return user;
   }
 
   async createDefaultUser(): Promise<void> {
-    const db = await getDb();
-    const existingUser = await db.collection<User>('users').findOne({
-      email: 'admin@example.com',
-      deleted_at: null
-    });
+    try {
+      const existingUser = await db<User>('users')
+        .where({ email: 'admin@example.com', deleted_at: null })
+        .first();
 
-    if (existingUser) {
-      console.log('Default admin user already exists');
-      return;
+      if (existingUser) {
+        console.log('Default admin user already exists');
+        return;
+      }
+
+      await this.createUser({
+        email: 'admin@example.com',
+        password_hash: 'admin123',
+      });
+
+      console.log('Default admin user created (email: admin@example.com, password: admin123)');
+    } catch (error: any) {
+      // Table might not exist yet, that's okay
+      if (error.code === '42P01') {
+        console.log('Users table does not exist yet. Run migrations first.');
+      } else {
+        console.error('Error creating default user:', error.message);
+      }
     }
-
-    await this.createUser('admin@example.com', 'admin123');
-    console.log('Default admin user created (email: admin@example.com, password: admin123)');
   }
 }
