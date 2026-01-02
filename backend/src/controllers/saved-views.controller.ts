@@ -42,7 +42,7 @@ export class SavedViewsController {
       const { id } = req.params;
       const { name } = req.body as RenameSavedViewDTO;
       
-      const view = await this.savedViewsService.renameView(parseInt(id), name);
+      const view = await this.savedViewsService.renameView(id, name);
       
       if (!view) {
         res.status(404).json({ message: 'Saved view not found' });
@@ -59,7 +59,7 @@ export class SavedViewsController {
   async delete(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const success = await this.savedViewsService.deleteView(parseInt(id));
+      const success = await this.savedViewsService.deleteView(id);
       
       if (!success) {
         res.status(404).json({ message: 'Saved view not found' });
