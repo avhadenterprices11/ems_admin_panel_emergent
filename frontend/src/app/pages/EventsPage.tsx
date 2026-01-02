@@ -404,7 +404,8 @@ export const EventsPage = () => {
         <Button 
           size="sm" 
           className="flex-1 bg-[#0f172b] text-white hover:bg-[#1d293d]"
-          onClick={() => onManageEvent(event.event_code)}
+          onClick={() => onManageEvent(event.id)}
+          data-testid={`manage-event-${event.id}`}
         >
           Manage
         </Button>
