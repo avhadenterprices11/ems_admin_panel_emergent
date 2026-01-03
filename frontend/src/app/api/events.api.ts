@@ -724,6 +724,108 @@ export const eventsAPI = {
     const response = await apiClient.put(`/events/devices/${deviceId}/status`, { status, battery_level });
     return response.data as CheckinDevice;
   },
+
+  // Communications - Campaigns APIs
+  getCampaigns: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/campaigns`);
+    return response.data as Campaign[];
+  },
+
+  getCampaignStats: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/campaigns/stats`);
+    return response.data as CampaignStats;
+  },
+
+  getCampaignById: async (eventId: number | string, campaignId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/campaigns/${campaignId}`);
+    return response.data as Campaign;
+  },
+
+  createCampaign: async (eventId: number | string, data: CreateCampaignInput) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns`, data);
+    return response.data as Campaign;
+  },
+
+  updateCampaign: async (eventId: number | string, campaignId: number | string, data: UpdateCampaignInput) => {
+    const response = await apiClient.put(`/events/${eventId}/campaigns/${campaignId}`, data);
+    return response.data as Campaign;
+  },
+
+  deleteCampaign: async (eventId: number | string, campaignId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/campaigns/${campaignId}`);
+    return response.data;
+  },
+
+  duplicateCampaign: async (eventId: number | string, campaignId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns/${campaignId}/duplicate`);
+    return response.data as Campaign;
+  },
+
+  sendCampaign: async (eventId: number | string, campaignId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns/${campaignId}/send`);
+    return response.data as { success: boolean; message: string; recipientCount: number };
+  },
+
+  scheduleCampaign: async (eventId: number | string, campaignId: number | string, scheduled_at: string) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns/${campaignId}/schedule`, { scheduled_at });
+    return response.data as Campaign;
+  },
+
+  pauseCampaign: async (eventId: number | string, campaignId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns/${campaignId}/pause`);
+    return response.data as Campaign;
+  },
+
+  resumeCampaign: async (eventId: number | string, campaignId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns/${campaignId}/resume`);
+    return response.data as Campaign;
+  },
+
+  getAudienceSegments: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/campaigns/audience-segments`);
+    return response.data as AudienceSegment[];
+  },
+
+  previewAudience: async (eventId: number | string, audience_rule: AudienceRule) => {
+    const response = await apiClient.post(`/events/${eventId}/campaigns/preview-audience`, { audience_rule });
+    return response.data as { count: number };
+  },
+
+  // Communications - Templates APIs
+  getTemplates: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/templates`);
+    return response.data as MessageTemplate[];
+  },
+
+  getTemplateById: async (eventId: number | string, templateId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/templates/${templateId}`);
+    return response.data as MessageTemplate;
+  },
+
+  createTemplate: async (eventId: number | string, data: CreateTemplateInput) => {
+    const response = await apiClient.post(`/events/${eventId}/templates`, data);
+    return response.data as MessageTemplate;
+  },
+
+  updateTemplate: async (eventId: number | string, templateId: number | string, data: UpdateTemplateInput) => {
+    const response = await apiClient.put(`/events/${eventId}/templates/${templateId}`, data);
+    return response.data as MessageTemplate;
+  },
+
+  deleteTemplate: async (eventId: number | string, templateId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/templates/${templateId}`);
+    return response.data;
+  },
+
+  duplicateTemplate: async (eventId: number | string, templateId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/templates/${templateId}/duplicate`);
+    return response.data as MessageTemplate;
+  },
+
+  getTemplateVariables: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/templates/variables`);
+    return response.data as VariableCategory[];
+  },
 };
 
 export const savedViewsAPI = {
