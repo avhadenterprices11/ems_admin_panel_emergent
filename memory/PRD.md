@@ -196,6 +196,42 @@ A full-stack Event Management Admin System built with:
 
 **MOCKED**: Campaign send functionality is stubbed - marks campaigns as sent and creates recipient records but doesn't actually send emails/SMS
 
+### 9.3 Audience Segments Sub-tab ✅ COMPLETE (Jan 3, 2026)
+- **Segments Grid**: Cards showing segment icon, name, description, estimated count, Active/Inactive badge, match type, rules count, menu (Edit, Refresh Count, Delete)
+- **Create Segment Card**: Dashed border card for creating new segments
+- **Segment CRUD**:
+  - **Create**: Name (required), Description, Match type (ALL/ANY), Filter rules, Active toggle
+  - **Edit**: Update all segment fields, recalculates count automatically
+  - **Delete**: Soft delete with confirmation dialog
+  - **Refresh**: Recalculate segment members count
+- **Segment Builder** (Rule-based Audience Editor):
+  - **Left Panel**: Name input, Description textarea, Match Type buttons (Match ALL/Match ANY), Filter Rules section with field/operator/value selectors, Add Rule button, Active toggle
+  - **Right Panel**: Live Preview showing matched attendees in real-time (Name, Ticket, Status, Email columns) with total count badge
+  - **Supported Filter Fields**: Ticket Type, Check-in Status, Registration Status, Registration Date, Email, Name
+  - **Supported Operators**: equals, not_equals, contains, not_contains, in, not_in, greater_than, less_than, between, is_empty, is_not_empty
+  - **Match Logic**: ALL (AND) - all rules must match, ANY (OR) - any rule can match
+
+### 9.4 Settings Sub-tab ✅ COMPLETE (Jan 3, 2026)
+- **Header**: "Communication Settings" with Reset to Default and Save Settings buttons
+- **Sender Configuration** section:
+  - Default Sender Name input
+  - Reply-To Email input
+  - SMS Sender ID input (max 11 chars)
+- **Channel Controls** section:
+  - Email Channel toggle (enable/disable)
+  - SMS Channel toggle (enable/disable)
+- **Quiet Hours** section:
+  - Start Time picker
+  - End Time picker
+  - Warning banner when configured
+- **Privacy & Opt-Out** section:
+  - Respect Opt-Out Preferences toggle
+  - Custom Unsubscribe Page URL input
+- **Tracking & Analytics** section:
+  - Track Opens toggle
+  - Track Clicks toggle
+- **Validation**: Email format, time format (HH:MM), validates settings before campaign send
+
 ## Technical Architecture
 
 ### Frontend Structure
