@@ -13,7 +13,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('VITE_API_URL', 'https://eventpanel-3.preview.emergentagent.com')
+BASE_URL = os.environ.get('VITE_API_URL', 'https://eventflow-151.preview.emergentagent.com')
 TEST_EVENT_ID = 1
 
 

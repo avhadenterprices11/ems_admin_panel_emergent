@@ -9,7 +9,7 @@ import os
 import time
 import uuid
 
-BASE_URL = os.environ.get('VITE_API_URL', 'https://eventpanel-3.preview.emergentagent.com')
+BASE_URL = os.environ.get('VITE_API_URL', 'https://eventflow-151.preview.emergentagent.com')
 EVENT_ID = 1  # Tech Conference 2026
 
 

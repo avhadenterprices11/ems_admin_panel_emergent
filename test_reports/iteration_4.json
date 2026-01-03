@@ -33,7 +33,7 @@
     "frontend": "100%"
   },
   "test_credentials": {
-    "api_base_url": "https://eventpanel-3.preview.emergentagent.com",
+    "api_base_url": "https://eventflow-151.preview.emergentagent.com",
     "test_event_id": 1,
     "login_email": "admin@example.com",
     "login_password": "admin123"
