@@ -277,6 +277,16 @@ A full-stack Event Management Admin System built with:
   - POST /events/:eventId/reports/standard/:id/run - Run standard report
 - **Database Tables**: reports, report_fields, report_filters, report_runs
 
+## Upcoming Tasks
+
+### P1 - Settings Tab
+- Event Detail → Settings tab implementation
+- General settings, access control, notifications, integrations
+
+### P2 - Master Data Management
+- CRUD UI for event_categories
+- CRUD UI for event_tags
+
 ## Technical Architecture
 
 ### Frontend Structure
