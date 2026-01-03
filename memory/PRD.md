@@ -155,6 +155,47 @@ A full-stack Event Management Admin System built with:
   - **Payment & Status**: Payment status (Paid/Free/Pending), Payment method (Manual/Cash/Bank Transfer/Other), Registration status (Approved/Pending/Cancelled)
 - **Activity Logging**: All registration actions logged to event_activity_logs
 
+### 9. Event Detail Module - Communications Tab ✅ COMPLETE (Jan 3, 2026)
+
+#### 9.1 All Campaigns Sub-tab
+- **Campaign Stats**: Total campaigns, Sent campaigns, Scheduled campaigns, Draft campaigns, Total recipients, Avg open rate, Avg click rate
+- **Campaigns Table**: Campaign Name (with date), Type (Email/SMS icon), Status badge, Recipients, Performance (Open%/Click%), Actions dropdown
+- **Status Badges**: Draft (gray), Scheduled (blue), Sending (violet), Sent (green), Paused (amber)
+- **Campaign CRUD**:
+  - **Create**: 5-step wizard (Basics → Audience → Content → Schedule → Review)
+  - **Edit**: Open wizard for draft/scheduled campaigns
+  - **Delete**: Soft delete with confirmation dialog
+  - **Duplicate**: Create copy with "(Copy)" suffix and draft status
+- **Campaign Actions**:
+  - **Send Now**: Send immediately (draft campaigns only)
+  - **Schedule**: Set future send date/time
+  - **Pause**: Pause scheduled campaign
+  - **Resume**: Resume paused campaign
+- **Campaign Builder Wizard (5 Steps)**:
+  1. **Basics**: Campaign name (required), Channel selection (Email/SMS), Campaign type (One-time/Trigger-based)
+  2. **Audience**: Select from predefined segments (All Attendees, VIP Ticket Holders, Not Checked In, Checked In) with recipient counts
+  3. **Content**: Template selector, Subject line (email), Content textarea with variable badges for quick insertion
+  4. **Schedule**: Send immediately or schedule for later (date/time picker)
+  5. **Review**: Summary of all selections before confirmation
+- **Supported Variables**: {{FirstName}}, {{LastName}}, {{Email}}, {{TicketType}}, {{OrderId}}, {{EventName}}, {{EventDate}}, {{Location}}, {{QRCode}}, {{CalendarLink}}, {{Unsubscribe}}
+
+#### 9.2 Templates Sub-tab
+- **Templates Grid**: Cards with channel icon (Mail/MessageSquare), template name, last edited date, menu (Edit, Duplicate, Delete)
+- **Create Template Card**: Dashed border card for creating new templates
+- **Template CRUD**:
+  - **Create**: Name (required), Channel (Email/SMS), Subject (email only), Content (required)
+  - **Edit**: Update all template fields
+  - **Delete**: Soft delete with confirmation
+  - **Duplicate**: Create copy with "(Copy)" suffix
+- **Template Editor**:
+  - **Main Area**: Name input, Channel selection cards, Subject input (email), Content textarea
+  - **Variables Sidebar**: Click-to-insert variables organized by category:
+    - **Attendee**: First Name, Last Name, Email, Ticket Type, Order ID
+    - **Event**: Event Name, Event Date, Location, Venue Map
+    - **System**: QR Code Image, Add to Calendar, Unsubscribe Link
+
+**MOCKED**: Campaign send functionality is stubbed - marks campaigns as sent and creates recipient records but doesn't actually send emails/SMS
+
 ## Technical Architecture
 
 ### Frontend Structure
