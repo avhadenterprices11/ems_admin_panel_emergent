@@ -114,7 +114,7 @@ export const DATA_SOURCES = [
     fields: [
       { id: 'tkt_name', name: 'Ticket Type', column: 'name', type: 'text' },
       { id: 'tkt_price', name: 'Price', column: 'price', type: 'number' },
-      { id: 'tkt_sold', name: 'Quantity Sold', column: 'sold', type: 'number' },
+      { id: 'tkt_sold', name: 'Quantity Sold', column: 'sold_count', type: 'number' },
       { id: 'tkt_capacity', name: 'Capacity', column: 'capacity', type: 'number' },
     ],
   },
