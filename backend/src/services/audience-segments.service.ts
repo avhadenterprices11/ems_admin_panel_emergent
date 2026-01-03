@@ -352,7 +352,7 @@ export class AudienceSegmentsService {
         field: 'ticket_type', 
         label: 'Ticket Type', 
         type: 'select',
-        operators: ['equals', 'not_equals', 'in', 'not_in']
+        operators: ['equals', 'not_equals', 'in', 'not_in', 'contains']
       },
       { 
         field: 'checkin_status', 
@@ -373,20 +373,14 @@ export class AudienceSegmentsService {
         operators: ['equals', 'greater_than', 'less_than', 'between']
       },
       { 
-        field: 'city', 
-        label: 'City', 
-        type: 'text',
-        operators: ['equals', 'not_equals', 'contains', 'is_empty', 'is_not_empty']
-      },
-      { 
-        field: 'tags', 
-        label: 'Tags', 
-        type: 'array',
-        operators: ['contains', 'not_contains']
-      },
-      { 
         field: 'attendee_email', 
         label: 'Email', 
+        type: 'text',
+        operators: ['equals', 'contains', 'is_empty', 'is_not_empty']
+      },
+      { 
+        field: 'attendee_name', 
+        label: 'Name', 
         type: 'text',
         operators: ['equals', 'contains', 'is_empty', 'is_not_empty']
       },
