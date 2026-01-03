@@ -45,7 +45,6 @@ export interface SegmentMember {
   ticket_name?: string;
   checkin_status: string;
   registration_status?: string;
-  city?: string;
 }
 
 export class AudienceSegmentsService {
