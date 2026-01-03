@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { ChevronLeft, Save, Copy, Trash2, Mail, MessageSquare, Variable } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, Save, Copy, Trash2, Mail, MessageSquare, Variable, Loader2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
+import { MessageTemplate, CreateTemplateInput } from '../../../api/events.api';
 
 interface TemplateEditorProps {
+  eventId: number;
+  template?: MessageTemplate | null;
   onCancel: () => void;
-  onSave: (template: any) => void;
-  initialData?: any;
+  onSave: (data: CreateTemplateInput) => void;
 }
 
-const VariableItem = ({ name, code }: { name: string; code: string }) => (
+const VariableItem = ({ name, code, onClick }: { name: string; code: string; onClick: () => void }) => (
   <div
     className="flex items-center justify-between p-2 rounded hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-100 group"
-    onClick={() => {
-      navigator.clipboard.writeText(code);
-    }}
+    onClick={onClick}
   >
     <span className="text-sm font-medium text-slate-700">
       {name}
@@ -27,16 +27,41 @@ const VariableItem = ({ name, code }: { name: string; code: string }) => (
   </div>
 );
 
-export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateEditorProps) => {
-  const [formData, setFormData] = useState(initialData || {
-    name: "",
-    channel: "email",
-    subject: "",
-    content: ""
-  });
+export const CommsTemplateEditor = ({ eventId, template, onCancel, onSave }: TemplateEditorProps) => {
+  const [name, setName] = useState(template?.name || '');
+  const [channel, setChannel] = useState<'email' | 'sms'>(template?.channel || 'email');
+  const [subject, setSubject] = useState(template?.subject || '');
+  const [content, setContent] = useState(template?.content || '');
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
-    onSave(formData);
+  const handleSave = async () => {
+    if (!name.trim()) {
+      return;
+    }
+    if (!content.trim()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data: CreateTemplateInput = {
+        name: name.trim(),
+        channel,
+        subject: channel === 'email' ? subject.trim() : undefined,
+        content: content.trim(),
+      };
+      await onSave(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const insertVariable = (code: string) => {
+    setContent(prev => prev + code);
+  };
+
+  const copyToClipboard = (code: string) => {
+    navigator.clipboard.writeText(code);
   };
 
   return (
@@ -55,7 +80,7 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
           </Button>
           <div>
             <h2 className="text-xl font-bold text-[#1d293d]">
-              {initialData ? 'Edit Template' : 'Create New Template'}
+              {template ? 'Edit Template' : 'Create New Template'}
             </h2>
             <p className="text-sm text-slate-500">
               Design reusable messages for your team.
@@ -65,22 +90,20 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
 
         {/* Right: Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* Delete Button */}
-          <Button
-            variant="ghost"
-            className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-          >
-            <Trash2 size={16} className="mr-2" /> Delete
-          </Button>
-
-          {/* Duplicate Button */}
-          <Button variant="outline">
-            <Copy size={16} className="mr-2" /> Duplicate
+          {/* Cancel Button */}
+          <Button variant="ghost" onClick={onCancel}>
+            Cancel
           </Button>
 
           {/* Save Button */}
-          <Button className="bg-[#0f172b]" onClick={handleSave}>
-            <Save size={16} className="mr-2" /> Save Template
+          <Button 
+            className="bg-[#0f172b]" 
+            onClick={handleSave}
+            disabled={loading || !name.trim() || !content.trim()}
+            data-testid="save-template-btn"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+            Save Template
           </Button>
         </div>
       </div>
@@ -98,8 +121,9 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
                 </Label>
                 <Input
                   placeholder="e.g. Registration Confirmation"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  data-testid="template-name-input"
                 />
               </div>
 
@@ -110,11 +134,12 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
                   {/* Email Option */}
                   <div
                     className={`flex-1 border rounded-xl p-4 cursor-pointer flex items-center gap-3 ${
-                      formData.channel === 'email'
+                      channel === 'email'
                         ? 'border-[#0f172b] bg-slate-50'
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
-                    onClick={() => setFormData({ ...formData, channel: 'email' })}
+                    onClick={() => setChannel('email')}
+                    data-testid="template-channel-email"
                   >
                     <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
                       <Mail size={20} />
@@ -125,11 +150,12 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
                   {/* SMS Option */}
                   <div
                     className={`flex-1 border rounded-xl p-4 cursor-pointer flex items-center gap-3 ${
-                      formData.channel === 'sms'
+                      channel === 'sms'
                         ? 'border-[#0f172b] bg-slate-50'
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
-                    onClick={() => setFormData({ ...formData, channel: 'sms' })}
+                    onClick={() => setChannel('sms')}
+                    data-testid="template-channel-sms"
                   >
                     <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
                       <MessageSquare size={20} />
@@ -140,35 +166,37 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
               </div>
 
               {/* Subject Line (Email Only) */}
-              {formData.channel === 'email' && (
+              {channel === 'email' && (
                 <div className="grid gap-2">
                   <Label>Subject Line</Label>
                   <Input
                     placeholder="Your event registration details"
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    data-testid="template-subject-input"
                   />
                 </div>
               )}
 
               {/* Content Textarea */}
               <div className="grid gap-2">
-                <Label>Content</Label>
+                <Label>Content <span className="text-red-500">*</span></Label>
                 <Textarea
                   className="min-h-[300px] font-mono text-sm"
                   placeholder={
-                    formData.channel === 'email'
-                      ? "<html>...</html> or plain text"
+                    channel === 'email'
+                      ? "Write your email content here...\n\nHi {{FirstName}},\n\nThank you for registering for {{EventName}}!"
                       : "SMS content..."
                   }
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  data-testid="template-content-input"
                 />
 
                 {/* Character Count (SMS Only) */}
-                {formData.channel === 'sms' && (
+                {channel === 'sms' && (
                   <p className="text-xs text-slate-500 text-right">
-                    {formData.content.length} characters
+                    {content.length} characters
                   </p>
                 )}
               </div>
@@ -183,7 +211,7 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
             <Variable size={18} /> Available Variables
           </h3>
           <p className="text-sm text-slate-500 mb-6">
-            Click to copy variables to your clipboard.
+            Click to insert variables into your template.
           </p>
 
           <div className="space-y-6">
@@ -193,11 +221,11 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
                 Attendee
               </h4>
               <div className="space-y-2">
-                <VariableItem name="First Name" code="{{FirstName}}" />
-                <VariableItem name="Last Name" code="{{LastName}}" />
-                <VariableItem name="Email" code="{{Email}}" />
-                <VariableItem name="Ticket Type" code="{{TicketType}}" />
-                <VariableItem name="Order ID" code="{{OrderId}}" />
+                <VariableItem name="First Name" code="{{FirstName}}" onClick={() => insertVariable('{{FirstName}}')} />
+                <VariableItem name="Last Name" code="{{LastName}}" onClick={() => insertVariable('{{LastName}}')} />
+                <VariableItem name="Email" code="{{Email}}" onClick={() => insertVariable('{{Email}}')} />
+                <VariableItem name="Ticket Type" code="{{TicketType}}" onClick={() => insertVariable('{{TicketType}}')} />
+                <VariableItem name="Order ID" code="{{OrderId}}" onClick={() => insertVariable('{{OrderId}}')} />
               </div>
             </div>
 
@@ -207,10 +235,10 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
                 Event
               </h4>
               <div className="space-y-2">
-                <VariableItem name="Event Name" code="{{EventName}}" />
-                <VariableItem name="Event Date" code="{{EventDate}}" />
-                <VariableItem name="Location" code="{{Location}}" />
-                <VariableItem name="Venue Map" code="{{MapLink}}" />
+                <VariableItem name="Event Name" code="{{EventName}}" onClick={() => insertVariable('{{EventName}}')} />
+                <VariableItem name="Event Date" code="{{EventDate}}" onClick={() => insertVariable('{{EventDate}}')} />
+                <VariableItem name="Location" code="{{Location}}" onClick={() => insertVariable('{{Location}}')} />
+                <VariableItem name="Venue Map" code="{{MapLink}}" onClick={() => insertVariable('{{MapLink}}')} />
               </div>
             </div>
 
@@ -220,9 +248,9 @@ export const CommsTemplateEditor = ({ onCancel, onSave, initialData }: TemplateE
                 System
               </h4>
               <div className="space-y-2">
-                <VariableItem name="QR Code Image" code="{{QRCode}}" />
-                <VariableItem name="Add to Calendar" code="{{CalendarLink}}" />
-                <VariableItem name="Unsubscribe Link" code="{{Unsubscribe}}" />
+                <VariableItem name="QR Code Image" code="{{QRCode}}" onClick={() => insertVariable('{{QRCode}}')} />
+                <VariableItem name="Add to Calendar" code="{{CalendarLink}}" onClick={() => insertVariable('{{CalendarLink}}')} />
+                <VariableItem name="Unsubscribe Link" code="{{Unsubscribe}}" onClick={() => insertVariable('{{Unsubscribe}}')} />
               </div>
             </div>
           </div>
