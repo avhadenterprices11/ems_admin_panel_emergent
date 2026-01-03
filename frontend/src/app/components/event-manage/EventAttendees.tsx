@@ -683,12 +683,12 @@ export const EventAttendees: React.FC<EventAttendeesProps> = ({ eventId }) => {
             </div>
             <div className="space-y-2">
               <Label>Ticket Type (Optional)</Label>
-              <Select value={newAttendeeTicket} onValueChange={setNewAttendeeTicket}>
+              <Select value={newAttendeeTicket} onValueChange={(val) => setNewAttendeeTicket(val === 'none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select ticket" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No ticket</SelectItem>
+                  <SelectItem value="none">No ticket</SelectItem>
                   {tickets.map((ticket) => (
                     <SelectItem key={ticket.id} value={ticket.id.toString()}>
                       {ticket.name}
