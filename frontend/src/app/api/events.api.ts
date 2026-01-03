@@ -545,6 +545,47 @@ export const eventsAPI = {
     const response = await apiClient.put(`/events/${eventId}/settings`, settingsData);
     return response.data as EventSettings;
   },
+
+  // Registrations Tab APIs
+  getRegistrations: async (eventId: number | string, params?: RegistrationListParams) => {
+    const response = await apiClient.get(`/events/${eventId}/registrations`, { params });
+    return response.data as RegistrationListResponse;
+  },
+
+  getRegistrationStats: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/registrations/stats`);
+    return response.data as RegistrationStats;
+  },
+
+  getRegistrationById: async (eventId: number | string, registrationId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/registrations/${registrationId}`);
+    return response.data as Registration;
+  },
+
+  createRegistration: async (eventId: number | string, registrationData: CreateRegistrationInput) => {
+    const response = await apiClient.post(`/events/${eventId}/registrations`, registrationData);
+    return response.data as Registration;
+  },
+
+  updateRegistration: async (eventId: number | string, registrationId: number | string, registrationData: UpdateRegistrationInput) => {
+    const response = await apiClient.put(`/events/${eventId}/registrations/${registrationId}`, registrationData);
+    return response.data as Registration;
+  },
+
+  updateRegistrationStatus: async (eventId: number | string, registrationId: number | string, status: string) => {
+    const response = await apiClient.post(`/events/${eventId}/registrations/${registrationId}/status`, { status });
+    return response.data as Registration;
+  },
+
+  updateRegistrationPaymentStatus: async (eventId: number | string, registrationId: number | string, payment_status: string) => {
+    const response = await apiClient.post(`/events/${eventId}/registrations/${registrationId}/payment-status`, { payment_status });
+    return response.data as Registration;
+  },
+
+  deleteRegistration: async (eventId: number | string, registrationId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/registrations/${registrationId}`);
+    return response.data;
+  },
 };
 
 export const savedViewsAPI = {
