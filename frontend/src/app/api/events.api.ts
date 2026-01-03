@@ -536,6 +536,93 @@ export interface VariableCategory {
   variables: { name: string; code: string }[];
 }
 
+// Audience Segments interfaces
+export interface SegmentRule {
+  field: string;
+  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'in' | 'not_in' | 'greater_than' | 'less_than' | 'between' | 'is_empty' | 'is_not_empty';
+  value: any;
+}
+
+export interface AudienceSegment {
+  id: number;
+  event_id: number;
+  name: string;
+  description?: string;
+  match_type: 'ALL' | 'ANY';
+  rules_json: SegmentRule[];
+  estimated_count: number;
+  is_active: boolean;
+  last_evaluated_at?: string;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface CreateSegmentInput {
+  name: string;
+  description?: string;
+  match_type: 'ALL' | 'ANY';
+  rules_json: SegmentRule[];
+  is_active?: boolean;
+}
+
+export interface UpdateSegmentInput {
+  name?: string;
+  description?: string;
+  match_type?: 'ALL' | 'ANY';
+  rules_json?: SegmentRule[];
+  is_active?: boolean;
+}
+
+export interface SegmentMember {
+  attendee_id: number;
+  attendee_name: string;
+  attendee_email?: string;
+  ticket_name?: string;
+  checkin_status: string;
+  registration_status?: string;
+}
+
+export interface FilterField {
+  field: string;
+  label: string;
+  type: string;
+  operators: string[];
+}
+
+// Communication Settings interfaces
+export interface CommunicationSettings {
+  id: number;
+  event_id: number;
+  default_sender_name?: string;
+  reply_to_email?: string;
+  sms_sender_id?: string;
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  quiet_hours_start?: string;
+  quiet_hours_end?: string;
+  opt_out_enabled: boolean;
+  track_opens: boolean;
+  track_clicks: boolean;
+  unsubscribe_page_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateCommunicationSettingsInput {
+  default_sender_name?: string;
+  reply_to_email?: string;
+  sms_sender_id?: string;
+  email_enabled?: boolean;
+  sms_enabled?: boolean;
+  quiet_hours_start?: string;
+  quiet_hours_end?: string;
+  opt_out_enabled?: boolean;
+  track_opens?: boolean;
+  track_clicks?: boolean;
+  unsubscribe_page_url?: string;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
