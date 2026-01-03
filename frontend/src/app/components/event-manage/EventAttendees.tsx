@@ -1,393 +1,714 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   QrCode,
   UserCheck,
-  Printer,
-  RotateCcw,
-  Clock,
-  Check,
+  MoreHorizontal,
   Smartphone,
+  MapPin,
+  RefreshCw,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Printer,
+  Users,
   Wifi,
-  WifiOff,
-  MapPin
+  Battery,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
-import { Switch } from '../ui/switch';
-import { Progress } from '../ui/progress';
+import { Label } from '../ui/label';
+import { Checkbox } from '../ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { ResponsiveTable, MobileCardConfig } from '../ui/responsive-table';
-import { ExportDialog, ExportColumn, ExportOptions } from '../common/ExportDialog';
-import { ImportDialog, ImportField, ImportMode } from '../common/ImportDialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { 
+  eventsAPI, 
+  Attendee, 
+  CheckinMetrics, 
+  CheckinDevice,
+  LocationStats,
+  Ticket,
+} from '../../api/events.api';
+import { toast } from 'sonner';
+import { cn } from '../ui/utils';
 
-interface Attendee {
-  id: string;
-  name: string;
-  ticket: string;
-  status: 'Checked In' | 'Not Checked In';
-  time: string;
-  device: string;
+interface EventAttendeesProps {
+  eventId: number;
 }
 
-const mockAttendees: Attendee[] = [
-  { id: "ATT-001", name: "Alice Freeman", ticket: "General Admission", status: "Checked In", time: "09:42 AM", device: "Scanner 1" },
-  { id: "ATT-002", name: "Bob Smith", ticket: "VIP Access", status: "Checked In", time: "09:15 AM", device: "Admin App" },
-  { id: "ATT-003", name: "Charlie Davis", ticket: "Student Pass", status: "Not Checked In", time: "-", device: "-" },
-  { id: "ATT-004", name: "Diana Prince", ticket: "General Admission", status: "Not Checked In", time: "-", device: "-" }
-];
+export const EventAttendees: React.FC<EventAttendeesProps> = ({ eventId }) => {
+  // Data state
+  const [attendees, setAttendees] = useState<Attendee[]>([]);
+  const [metrics, setMetrics] = useState<CheckinMetrics | null>(null);
+  const [devices, setDevices] = useState<CheckinDevice[]>([]);
+  const [locations, setLocations] = useState<LocationStats[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
 
-interface DeviceItemProps {
-  name: string;
-  status: 'online' | 'offline';
-  battery: number;
-  checkins: number;
-}
+  // UI state
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isQROpen, setIsQROpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCheckedInOnly, setShowCheckedInOnly] = useState(false);
 
-const DeviceItem = ({ name, status, battery, checkins }: DeviceItemProps) => (
-  <div className="p-3 border border-slate-100 rounded-lg bg-slate-50/50">
-    <div className="flex justify-between items-start mb-2">
-      <div className="flex items-center gap-2">
-        <Smartphone size={14} className="text-slate-400" />
-        <span className="text-sm font-medium text-[#1d293d] truncate w-[120px]">
-          {name}
-        </span>
+  // QR Scanner state
+  const [qrCode, setQRCode] = useState('');
+  const [scannerLocation, setScannerLocation] = useState('');
+
+  // Add attendee form
+  const [newAttendeeName, setNewAttendeeName] = useState('');
+  const [newAttendeeEmail, setNewAttendeeEmail] = useState('');
+  const [newAttendeeTicket, setNewAttendeeTicket] = useState<string>('');
+
+  // Fetch all data
+  const fetchAttendees = async () => {
+    try {
+      setLoading(true);
+      const params: any = { page, limit };
+      
+      if (showCheckedInOnly || activeFilter === 'checked_in') {
+        params.checkin_status = 'checked_in';
+      } else if (activeFilter === 'not_checked_in') {
+        params.checkin_status = 'not_checked_in';
+      }
+      
+      if (searchQuery) {
+        params.search = searchQuery;
+      }
+
+      const result = await eventsAPI.getAttendees(eventId, params);
+      setAttendees(result.attendees);
+      setTotal(result.total);
+    } catch (error) {
+      console.error('Error fetching attendees:', error);
+      toast.error('Failed to load attendees');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMetrics = async () => {
+    try {
+      const metricsData = await eventsAPI.getCheckinMetrics(eventId);
+      setMetrics(metricsData);
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    }
+  };
+
+  const fetchDevices = async () => {
+    try {
+      const devicesData = await eventsAPI.getActiveDevices(eventId);
+      setDevices(devicesData);
+    } catch (error) {
+      console.error('Error fetching devices:', error);
+    }
+  };
+
+  const fetchLocations = async () => {
+    try {
+      const locationsData = await eventsAPI.getLocationStats(eventId);
+      setLocations(locationsData);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+    }
+  };
+
+  const fetchTickets = async () => {
+    try {
+      const ticketsData = await eventsAPI.getTickets(eventId);
+      setTickets(ticketsData);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAttendees();
+    fetchMetrics();
+    fetchDevices();
+    fetchLocations();
+    fetchTickets();
+  }, [eventId]);
+
+  useEffect(() => {
+    fetchAttendees();
+  }, [page, activeFilter, searchQuery, showCheckedInOnly]);
+
+  // Sync attendees from registrations
+  const handleSync = async () => {
+    try {
+      setSyncing(true);
+      const result = await eventsAPI.syncAttendees(eventId);
+      toast.success(result.message);
+      fetchAttendees();
+      fetchMetrics();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to sync attendees');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Manual check-in
+  const handleManualCheckin = async (attendeeId: number, location?: string) => {
+    try {
+      const result = await eventsAPI.manualCheckin(eventId, attendeeId, location);
+      if (result.success) {
+        toast.success(result.message);
+        fetchAttendees();
+        fetchMetrics();
+        fetchLocations();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to check in');
+    }
+  };
+
+  // Undo check-in
+  const handleUndoCheckin = async (attendeeId: number) => {
+    try {
+      const result = await eventsAPI.undoCheckin(eventId, attendeeId);
+      if (result.success) {
+        toast.success(result.message);
+        fetchAttendees();
+        fetchMetrics();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to undo check-in');
+    }
+  };
+
+  // QR check-in
+  const handleQRCheckin = async () => {
+    if (!qrCode.trim()) {
+      toast.error('Please enter a QR code');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const result = await eventsAPI.qrCheckin(eventId, {
+        qr_code: qrCode.trim(),
+        location: scannerLocation || undefined,
+        device_name: 'Web Scanner',
+      });
+
+      if (result.success) {
+        toast.success(`${result.attendee?.attendee_name} checked in successfully!`);
+        setQRCode('');
+        fetchAttendees();
+        fetchMetrics();
+        fetchLocations();
+        fetchDevices();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to process QR check-in');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Add new attendee
+  const handleAddAttendee = async () => {
+    if (!newAttendeeName.trim()) {
+      toast.error('Attendee name is required');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.createAttendee(
+        eventId,
+        newAttendeeName.trim(),
+        newAttendeeEmail?.trim() || undefined,
+        newAttendeeTicket ? parseInt(newAttendeeTicket) : undefined
+      );
+      toast.success('Attendee added successfully');
+      setIsAddOpen(false);
+      setNewAttendeeName('');
+      setNewAttendeeEmail('');
+      setNewAttendeeTicket('');
+      fetchAttendees();
+      fetchMetrics();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to add attendee');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Format time
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
+  const formatDateTime = (dateString?: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
+  // Get status display
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case 'checked_in':
+        return { label: 'Checked In', color: 'bg-emerald-50 text-emerald-600', icon: CheckCircle2 };
+      case 'no_show':
+        return { label: 'No Show', color: 'bg-rose-50 text-rose-600', icon: XCircle };
+      default:
+        return { label: 'Not Here', color: 'bg-slate-100 text-slate-500', icon: Clock };
+    }
+  };
+
+  if (loading && attendees.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
       </div>
-      {status === 'online' ? (
-        <Wifi size={14} className="text-emerald-500" />
-      ) : (
-        <WifiOff size={14} className="text-slate-300" />
-      )}
-    </div>
-    <div className="flex justify-between text-xs text-slate-500">
-      <span>Battery: {battery > 0 ? `${battery}%` : '-'}</span>
-      <span>{checkins} scans</span>
-    </div>
-  </div>
-);
-
-export const EventAttendees = () => {
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-
-  const handleExportData = async (options: ExportOptions) => {
-    console.log("Exporting attendees", options);
-  };
-
-  const handleImportData = async (file: File, mode: ImportMode) => {
-    console.log("Importing", file, mode);
-  };
-
-  const mobileConfig: MobileCardConfig<Attendee> = {
-    idField: (att) => att.id,
-    titleField: (att) => att.name,
-    valueField: (att) => (
-      <span className="text-slate-900 font-medium text-xs">
-        {att.ticket}
-      </span>
-    ),
-    statusField: (att) => (
-      att.status === 'Checked In' ? (
-        <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-0 text-[10px] px-2 py-0 h-5">
-          <Check size={10} className="mr-1" /> Checked In
-        </Badge>
-      ) : (
-        <Badge variant="outline" className="text-slate-400 border-slate-200 text-[10px] px-2 py-0 h-5">
-          Not Here
-        </Badge>
-      )
-    ),
-    expandedFields: [
-      { label: "Check-in Time", value: (att) => att.time },
-      { label: "Device", value: (att) => att.device },
-    ],
-    actions: (att) => (
-      <Button
-        size="sm"
-        variant="outline"
-        className={`w-full ${
-          att.status === 'Checked In'
-            ? 'text-amber-600 border-amber-200 bg-amber-50'
-            : 'text-emerald-600 border-emerald-200 bg-emerald-50'
-        }`}
-      >
-        {att.status === 'Checked In' ? (
-          <>
-            <RotateCcw size={14} className="mr-2" /> Undo Check-in
-          </>
-        ) : (
-          <>
-            <UserCheck size={14} className="mr-2" /> Check In
-          </>
-        )}
-      </Button>
-    )
-  };
-
-  const exportColumns: ExportColumn[] = [
-    { id: 'id', label: 'Attendee ID' },
-    { id: 'name', label: 'Name' },
-    { id: 'ticket', label: 'Ticket Type' },
-    { id: 'status', label: 'Check-in Status' },
-    { id: 'time', label: 'Check-in Time' },
-    { id: 'device', label: 'Check-in Device' }
-  ];
-
-  const importFields: ImportField[] = [
-    { id: 'name', label: 'Attendee Name', required: true, type: 'text' },
-    { id: 'ticket', label: 'Ticket Type', required: true, type: 'select', options: ['General Admission', 'VIP Access', 'Student Pass'] },
-    { id: 'status', label: 'Status', required: false, type: 'select', options: ['Checked In', 'Not Checked In'] }
-  ];
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Top Section: Live Status + Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Live Check-in Status */}
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm md:col-span-2">
-          <div className="flex justify-between items-start mb-4">
+      {/* Live Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-lg text-[#1d293d]">Live Check-in Status</h3>
-              <p className="text-slate-500 text-sm">Real-time attendance tracking</p>
+              <p className="text-sm text-slate-500">Checked In</p>
+              <p className="text-2xl font-bold text-[#1d293d]">
+                {metrics?.total_checked_in || 0} / {metrics?.total_registrations || 0}
+              </p>
+              <p className="text-xs text-emerald-600 mt-1">
+                {metrics?.checkin_percentage?.toFixed(1) || 0}% checked in
+              </p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium border border-emerald-100">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Live System Active
-            </div>
-          </div>
-
-          <div className="flex items-end gap-2 mb-2">
-            <span className="text-4xl font-bold text-[#1d293d]">542</span>
-            <span className="text-lg text-slate-400 mb-1">/ 1,250</span>
-          </div>
-
-          <Progress value={43} className="h-3 mb-4" />
-
-          <div className="grid grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="text-slate-500 block">Peak Check-in</span>
-              <span className="font-medium">9:00 - 9:30 AM</span>
-            </div>
-            <div>
-              <span className="text-slate-500 block">Last Check-in</span>
-              <span className="font-medium">2 mins ago</span>
-            </div>
-            <div>
-              <span className="text-slate-500 block">No-show Rate</span>
-              <span className="font-medium">0.5%</span>
+            <div className="p-3 bg-emerald-50 rounded-xl">
+              <UserCheck className="h-6 w-6 text-emerald-600" />
             </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
-          <div>
-            <h3 className="font-bold text-lg text-[#1d293d] mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Button className="w-full justify-start bg-[#0f172b]">
-                <QrCode className="mr-2" size={16} /> Launch Scanner
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <UserCheck className="mr-2" size={16} /> Manual Check-in
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Printer className="mr-2" size={16} /> Print Badge
-              </Button>
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-500">Peak Check-in Time</p>
+              <p className="text-2xl font-bold text-[#1d293d]">
+                {metrics?.peak_checkin_time || '-'}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">Busiest period</p>
+            </div>
+            <div className="p-3 bg-blue-50 rounded-xl">
+              <Clock className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-500">Last Check-in</p>
+              <p className="text-2xl font-bold text-[#1d293d]">
+                {metrics?.last_checkin_ago || 'No check-ins'}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {metrics?.last_checkin_time ? formatTime(metrics.last_checkin_time) : '-'}
+              </p>
+            </div>
+            <div className="p-3 bg-violet-50 rounded-xl">
+              <RefreshCw className="h-6 w-6 text-violet-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-500">No-Show Rate</p>
+              <p className="text-2xl font-bold text-[#1d293d]">
+                {metrics?.no_show_rate?.toFixed(1) || 0}%
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {metrics?.no_show_count || 0} attendees
+              </p>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-xl">
+              <XCircle className="h-6 w-6 text-amber-600" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Section: Attendee List + Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Attendee List */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* Search Bar */}
-          <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <Input
-                  placeholder="Search attendees..."
-                  className="pl-9 bg-slate-50 border-slate-200"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch id="show-checked-in" />
-                <label
-                  htmlFor="show-checked-in"
-                  className="text-sm text-slate-600 cursor-pointer"
-                >
-                  Show Checked-in Only
-                </label>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <Button className="bg-[#0e042f] hover:bg-[#1d293d] text-white rounded-xl" size="sm" onClick={() => setIsImportDialogOpen(true)}>
-                Import List
-              </Button>
-              <Button className="bg-[#0e042f] hover:bg-[#1d293d] text-white rounded-xl ml-2" size="sm" onClick={() => setIsExportDialogOpen(true)}>
-                Export List
-              </Button>
-            </div>
+      {/* Actions Bar */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <Input
+              placeholder="Search by name or QR code..."
+              className="pl-9 bg-slate-50 border-slate-200"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+              data-testid="attendee-search-input"
+            />
           </div>
-
-          {/* Attendee Table */}
-          <ResponsiveTable
-            data={mockAttendees}
-            mobileConfig={mobileConfig}
-            renderDesktop={() => (
-              <div className="bg-white rounded-[20px] border border-slate-100 shadow-sm overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50/50">
-                      <TableHead className="text-[#253154] font-bold">Attendee</TableHead>
-                      <TableHead className="text-[#253154] font-bold">Ticket Type</TableHead>
-                      <TableHead className="text-[#253154] font-bold">Check-in Time</TableHead>
-                      <TableHead className="text-[#253154] font-bold">Status</TableHead>
-                      <TableHead className="text-right text-[#253154] font-bold">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockAttendees.map((att) => (
-                      <TableRow key={att.id} className="hover:bg-slate-50/60">
-                        <TableCell>
-                          <div className="font-medium text-[#1d293d]">
-                            {att.name}
-                          </div>
-                          <div className="text-xs text-slate-400">
-                            {att.id}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm text-slate-600">
-                          {att.ticket}
-                        </TableCell>
-                        <TableCell className="text-sm text-slate-500">
-                          {att.status === 'Checked In' ? (
-                            <div className="flex items-center gap-1">
-                              <Clock size={12} /> {att.time}
-                              <span className="text-[10px] text-slate-400 ml-1">
-                                ({att.device})
-                              </span>
-                            </div>
-                          ) : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {att.status === 'Checked In' ? (
-                            <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-0">
-                              <Check size={12} className="mr-1" /> Checked In
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-slate-400 border-slate-200">
-                              Not Here
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            {att.status === 'Checked In' ? (
-                              <RotateCcw
-                                size={16}
-                                className="text-slate-400 hover:text-amber-600"
-                              />
-                            ) : (
-                              <UserCheck
-                                size={16}
-                                className="text-emerald-600 hover:text-emerald-700"
-                              />
-                            )}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          />
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="checkedInOnly"
+              checked={showCheckedInOnly}
+              onCheckedChange={(checked) => { setShowCheckedInOnly(!!checked); setPage(1); }}
+            />
+            <Label htmlFor="checkedInOnly" className="text-sm text-slate-600 cursor-pointer">
+              Checked-in only
+            </Label>
+          </div>
         </div>
 
-        {/* Sidebar */}
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Button
+            variant="outline"
+            onClick={handleSync}
+            disabled={syncing}
+            data-testid="sync-attendees-btn"
+          >
+            {syncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw size={16} className="mr-2" />}
+            Sync from Registrations
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsQROpen(true)}
+            data-testid="launch-scanner-btn"
+          >
+            <QrCode size={16} className="mr-2" /> Launch Scanner
+          </Button>
+          <Button
+            className="bg-[#0e042f] hover:bg-[#1d293d] text-white"
+            onClick={() => setIsAddOpen(true)}
+            data-testid="add-attendee-btn"
+          >
+            <UserCheck size={16} className="mr-2" /> Add Attendee
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Attendees Table - Takes 2 columns */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+          {attendees.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+              <Users size={48} className="mb-4" />
+              <p className="text-lg font-medium">No attendees found</p>
+              <p className="text-sm">Sync from registrations or add attendees manually</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50/50">
+                  <TableHead className="w-[40px]">
+                    <Checkbox />
+                  </TableHead>
+                  <TableHead className="text-[#253154] font-bold">Attendee</TableHead>
+                  <TableHead className="text-[#253154] font-bold">Ticket Type</TableHead>
+                  <TableHead className="text-[#253154] font-bold">Check-in Time</TableHead>
+                  <TableHead className="text-[#253154] font-bold">Status</TableHead>
+                  <TableHead className="text-right text-[#253154] font-bold">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {attendees.map((attendee) => {
+                  const statusInfo = getStatusDisplay(attendee.checkin_status);
+                  const StatusIcon = statusInfo.icon;
+
+                  return (
+                    <TableRow key={attendee.id} className="hover:bg-slate-50/60" data-testid={`attendee-row-${attendee.id}`}>
+                      <TableCell>
+                        <Checkbox />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
+                            {attendee.attendee_name?.charAt(0) || '?'}
+                          </div>
+                          <div>
+                            <div className="font-medium text-[#1d293d]">
+                              {attendee.attendee_name}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {attendee.attendee_email || attendee.qr_code_value}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-slate-600">
+                          {attendee.ticket_name || 'General'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-slate-600">
+                          {attendee.checkin_time ? formatDateTime(attendee.checkin_time) : '-'}
+                        </div>
+                        {attendee.checkin_location && (
+                          <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                            <MapPin size={10} /> {attendee.checkin_location}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={cn('font-normal border-0', statusInfo.color)}>
+                          <StatusIcon size={12} className="mr-1" /> {statusInfo.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400" data-testid={`attendee-actions-${attendee.id}`}>
+                              <MoreHorizontal size={16} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            {attendee.checkin_status !== 'checked_in' ? (
+                              <DropdownMenuItem onClick={() => handleManualCheckin(attendee.id)}>
+                                <UserCheck size={14} className="mr-2" /> Manual Check-in
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem onClick={() => handleUndoCheckin(attendee.id)}>
+                                <RefreshCw size={14} className="mr-2" /> Undo Check-in
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem>
+                              <Printer size={14} className="mr-2" /> Print Badge
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              <QrCode size={14} className="mr-2" /> View QR Code
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+
+          {/* Pagination */}
+          {attendees.length > 0 && (
+            <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
+              <span>Showing {(page - 1) * limit + 1}-{Math.min(page * limit, total)} of {total} attendees</span>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={page === 1}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  disabled={page * limit >= total}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar - Devices & Locations */}
         <div className="space-y-6">
           {/* Active Devices */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-            <h3 className="font-bold text-lg text-[#1d293d] mb-4">Active Devices</h3>
-            <div className="space-y-4">
-              <DeviceItem
-                name="Main Entrance Scanner 1"
-                status="online"
-                battery={85}
-                checkins={240}
-              />
-              <DeviceItem
-                name="Main Entrance Scanner 2"
-                status="online"
-                battery={42}
-                checkins={185}
-              />
-              <DeviceItem
-                name="VIP Desk Tablet"
-                status="offline"
-                battery={0}
-                checkins={45}
-              />
-              <DeviceItem
-                name="Staff Mobile App (Sarah)"
-                status="online"
-                battery={90}
-                checkins={72}
-              />
-            </div>
-            <Button variant="outline" className="w-full mt-4">
-              Manage Devices
-            </Button>
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+            <h3 className="text-sm font-semibold text-[#1d293d] mb-4 flex items-center gap-2">
+              <Smartphone size={16} /> Active Devices
+            </h3>
+            {devices.length === 0 ? (
+              <p className="text-sm text-slate-400 text-center py-4">No devices registered</p>
+            ) : (
+              <div className="space-y-3">
+                {devices.map((device) => (
+                  <div key={device.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        'w-2 h-2 rounded-full',
+                        device.status === 'online' ? 'bg-emerald-500' : 'bg-slate-300'
+                      )} />
+                      <div>
+                        <div className="text-sm font-medium text-[#1d293d]">{device.device_name}</div>
+                        <div className="text-xs text-slate-400">{device.total_scans} scans</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {device.battery_level && (
+                        <div className="flex items-center gap-1 text-xs text-slate-400">
+                          <Battery size={12} /> {device.battery_level}%
+                        </div>
+                      )}
+                      {device.status === 'online' && <Wifi size={14} className="text-emerald-500" />}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Location Logs */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-            <h3 className="font-bold text-lg text-[#1d293d] mb-4">Location Logs</h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 text-sm">
-                <MapPin size={16} className="text-slate-400 mt-0.5" />
-                <div>
-                  <span className="font-medium text-slate-700">North Gate</span>
-                  <div className="text-xs text-slate-500">
-                    320 check-ins (Last: 1m ago)
+          {/* Locations */}
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+            <h3 className="text-sm font-semibold text-[#1d293d] mb-4 flex items-center gap-2">
+              <MapPin size={16} /> Check-in Locations
+            </h3>
+            {locations.length === 0 ? (
+              <p className="text-sm text-slate-400 text-center py-4">No location data yet</p>
+            ) : (
+              <div className="space-y-3">
+                {locations.map((loc, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="text-sm font-medium text-[#1d293d]">{loc.location}</div>
+                      <div className="text-xs text-slate-400">{loc.checkin_count} check-ins</div>
+                    </div>
+                    <div className="text-xs text-slate-400">{loc.last_checkin_ago}</div>
                   </div>
-                </div>
+                ))}
               </div>
-              <div className="flex items-start gap-3 text-sm">
-                <MapPin size={16} className="text-slate-400 mt-0.5" />
-                <div>
-                  <span className="font-medium text-slate-700">VIP Entrance</span>
-                  <div className="text-xs text-slate-500">
-                    120 check-ins (Last: 5m ago)
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Export Dialog */}
-      <ExportDialog
-        open={isExportDialogOpen}
-        onOpenChange={setIsExportDialogOpen}
-        columns={exportColumns}
-        onExport={handleExportData}
-        entityName="attendees"
-      />
+      {/* QR Scanner Dialog */}
+      <Dialog open={isQROpen} onOpenChange={setIsQROpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>QR Code Scanner</DialogTitle>
+            <DialogDescription>
+              Enter or scan a QR code to check in an attendee
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>QR Code Value</Label>
+              <Input
+                placeholder="Enter QR code..."
+                value={qrCode}
+                onChange={(e) => setQRCode(e.target.value)}
+                className="font-mono"
+                data-testid="qr-code-input"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Location (Optional)</Label>
+              <Select value={scannerLocation} onValueChange={setScannerLocation}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Main Gate">Main Gate</SelectItem>
+                  <SelectItem value="VIP Entrance">VIP Entrance</SelectItem>
+                  <SelectItem value="Side Entrance">Side Entrance</SelectItem>
+                  <SelectItem value="Registration Desk">Registration Desk</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleQRCheckin} disabled={isSubmitting} data-testid="qr-checkin-btn">
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <QrCode size={16} className="mr-2" />}
+              Check In
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Import Dialog */}
-      <ImportDialog
-        open={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
-        fields={importFields}
-        onImport={handleImportData}
-        moduleName="attendees"
-      />
+      {/* Add Attendee Dialog */}
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Attendee</DialogTitle>
+            <DialogDescription>
+              Manually add an attendee to this event
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Full Name *</Label>
+              <Input
+                placeholder="e.g. John Doe"
+                value={newAttendeeName}
+                onChange={(e) => setNewAttendeeName(e.target.value)}
+                data-testid="add-attendee-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Email (Optional)</Label>
+              <Input
+                type="email"
+                placeholder="john@example.com"
+                value={newAttendeeEmail}
+                onChange={(e) => setNewAttendeeEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Ticket Type (Optional)</Label>
+              <Select value={newAttendeeTicket} onValueChange={setNewAttendeeTicket}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select ticket" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No ticket</SelectItem>
+                  {tickets.map((ticket) => (
+                    <SelectItem key={ticket.id} value={ticket.id.toString()}>
+                      {ticket.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleAddAttendee} disabled={isSubmitting || !newAttendeeName.trim()} data-testid="save-attendee-btn">
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Add Attendee
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
