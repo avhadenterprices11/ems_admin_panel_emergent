@@ -431,6 +431,111 @@ export interface CheckinResult {
   attendee?: Attendee;
 }
 
+// Communications - Campaign interfaces
+export interface Campaign {
+  id: number;
+  event_id: number;
+  name: string;
+  channel: 'email' | 'sms';
+  campaign_type: 'one-time' | 'trigger-based';
+  status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'failed';
+  template_id?: number;
+  subject?: string;
+  content?: string;
+  audience_rule?: AudienceRule;
+  scheduled_at?: string;
+  sent_at?: string;
+  total_recipients: number;
+  sent_count: number;
+  delivered_count: number;
+  open_count: number;
+  click_count: number;
+  bounce_count: number;
+  unsubscribe_count: number;
+  open_rate: number;
+  click_rate: number;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface CampaignStats {
+  totalCampaigns: number;
+  sentCampaigns: number;
+  scheduledCampaigns: number;
+  draftCampaigns: number;
+  totalRecipients: number;
+  avgOpenRate: number;
+  avgClickRate: number;
+}
+
+export interface AudienceRule {
+  type: 'all' | 'vip' | 'not_checked_in' | 'checked_in' | 'ticket_type' | 'custom';
+  ticket_ids?: number[];
+  custom_filter?: any;
+}
+
+export interface AudienceSegment {
+  name: string;
+  type: string;
+  count: number;
+}
+
+export interface CreateCampaignInput {
+  name: string;
+  channel: 'email' | 'sms';
+  campaign_type?: 'one-time' | 'trigger-based';
+  template_id?: number;
+  subject?: string;
+  content?: string;
+  audience_rule?: AudienceRule;
+  scheduled_at?: string;
+}
+
+export interface UpdateCampaignInput {
+  name?: string;
+  channel?: 'email' | 'sms';
+  campaign_type?: 'one-time' | 'trigger-based';
+  template_id?: number;
+  subject?: string;
+  content?: string;
+  audience_rule?: AudienceRule;
+  scheduled_at?: string;
+  status?: string;
+}
+
+// Communications - Template interfaces
+export interface MessageTemplate {
+  id: number;
+  event_id: number;
+  name: string;
+  channel: 'email' | 'sms';
+  subject?: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface CreateTemplateInput {
+  name: string;
+  channel: 'email' | 'sms';
+  subject?: string;
+  content: string;
+}
+
+export interface UpdateTemplateInput {
+  name?: string;
+  channel?: 'email' | 'sms';
+  subject?: string;
+  content?: string;
+}
+
+export interface VariableCategory {
+  category: string;
+  variables: { name: string; code: string }[];
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
