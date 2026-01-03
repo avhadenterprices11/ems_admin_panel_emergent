@@ -931,6 +931,78 @@ export const eventsAPI = {
     const response = await apiClient.get(`/events/${eventId}/templates/variables`);
     return response.data as VariableCategory[];
   },
+
+  // Communications - Audience Segments APIs
+  getSegments: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/segments`);
+    return response.data as AudienceSegment[];
+  },
+
+  getSegmentById: async (eventId: number | string, segmentId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/segments/${segmentId}`);
+    return response.data as AudienceSegment;
+  },
+
+  createSegment: async (eventId: number | string, data: CreateSegmentInput) => {
+    const response = await apiClient.post(`/events/${eventId}/segments`, data);
+    return response.data as AudienceSegment;
+  },
+
+  updateSegment: async (eventId: number | string, segmentId: number | string, data: UpdateSegmentInput) => {
+    const response = await apiClient.put(`/events/${eventId}/segments/${segmentId}`, data);
+    return response.data as AudienceSegment;
+  },
+
+  deleteSegment: async (eventId: number | string, segmentId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/segments/${segmentId}`);
+    return response.data;
+  },
+
+  previewSegment: async (eventId: number | string, rules_json: SegmentRule[], match_type: 'ALL' | 'ANY', limit?: number) => {
+    const response = await apiClient.post(`/events/${eventId}/segments/preview`, { rules_json, match_type, limit });
+    return response.data as { members: SegmentMember[]; total: number };
+  },
+
+  getSegmentMembers: async (eventId: number | string, segmentId: number | string, page?: number, limit?: number) => {
+    const response = await apiClient.get(`/events/${eventId}/segments/${segmentId}/members`, { params: { page, limit } });
+    return response.data as { members: SegmentMember[]; total: number };
+  },
+
+  refreshSegment: async (eventId: number | string, segmentId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/segments/${segmentId}/refresh`);
+    return response.data as AudienceSegment;
+  },
+
+  getFilterFields: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/segments/filter-fields`);
+    return response.data as FilterField[];
+  },
+
+  // Communications - Settings APIs
+  getCommunicationSettings: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/communication-settings`);
+    return response.data as CommunicationSettings;
+  },
+
+  updateCommunicationSettings: async (eventId: number | string, data: UpdateCommunicationSettingsInput) => {
+    const response = await apiClient.put(`/events/${eventId}/communication-settings`, data);
+    return response.data as CommunicationSettings;
+  },
+
+  validateCommunicationSettings: async (eventId: number | string, channel: 'email' | 'sms') => {
+    const response = await apiClient.post(`/events/${eventId}/communication-settings/validate`, { channel });
+    return response.data as { valid: boolean; errors: string[]; warnings: string[] };
+  },
+
+  getQuietHoursStatus: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/communication-settings/quiet-hours`);
+    return response.data as { inQuietHours: boolean; startTime?: string; endTime?: string };
+  },
+
+  resetCommunicationSettings: async (eventId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/communication-settings/reset`);
+    return response.data as CommunicationSettings;
+  },
 };
 
 export const savedViewsAPI = {
