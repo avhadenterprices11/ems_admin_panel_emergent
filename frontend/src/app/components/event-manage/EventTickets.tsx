@@ -144,9 +144,54 @@ export const EventTickets = ({ eventId }: EventTicketsProps) => {
     }
   };
 
+  // Fetch add-ons
+  const fetchAddons = async () => {
+    try {
+      const addonsData = await eventsAPI.getAddons(eventId);
+      setAddons(addonsData);
+    } catch (error) {
+      console.error('Error fetching addons:', error);
+      toast.error('Failed to load add-ons');
+    }
+  };
+
+  // Fetch promo codes
+  const fetchPromoCodes = async () => {
+    try {
+      const promosData = await eventsAPI.getPromoCodes(eventId);
+      setPromoCodes(promosData);
+    } catch (error) {
+      console.error('Error fetching promo codes:', error);
+      toast.error('Failed to load promo codes');
+    }
+  };
+
+  // Fetch settings
+  const fetchSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const settingsData = await eventsAPI.getEventSettings(eventId);
+      setSettings(settingsData);
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      toast.error('Failed to load settings');
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchTickets();
+    fetchAddons();
+    fetchPromoCodes();
   }, [eventId]);
+
+  // Fetch settings when switching to settings tab
+  useEffect(() => {
+    if (activeTab === 'settings' && !settings) {
+      fetchSettings();
+    }
+  }, [activeTab]);
 
   // Filter tickets by search
   const filteredTickets = tickets.filter(ticket =>
