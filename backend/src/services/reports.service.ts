@@ -581,8 +581,8 @@ export class ReportsService {
       .where('event_id', eventId)
       .select(
         'name as ticket_type',
-        'sold as quantity',
-        db.raw('price * sold as revenue')
+        'sold_count as quantity',
+        db.raw('price * sold_count as revenue')
       );
     return result;
   }
