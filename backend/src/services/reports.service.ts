@@ -405,8 +405,8 @@ export class ReportsService {
           .select(
             'e.name as event_name',
             't.name as ticket_type',
-            'r.attendee_name',
-            'r.attendee_email',
+            'r.registrant_name',
+            'r.registrant_email',
             'r.status',
             'r.payment_status',
             'r.total_amount as amount',
