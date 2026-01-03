@@ -230,7 +230,7 @@ export function EventManagePage() {
             <EventCommunications eventId={event.id} />
           </TabsContent>
           <TabsContent value="reports" className="mt-0 animate-in fade-in zoom-in-95 duration-200">
-            <EventReports />
+            <EventReports eventId={event.id} />
           </TabsContent>
           <TabsContent value="settings" className="mt-0 animate-in fade-in zoom-in-95 duration-200">
             <EventSettings />
