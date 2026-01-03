@@ -576,14 +576,14 @@ export const EventRegistrations: React.FC<EventRegistrationsProps> = ({ eventId 
                   <div className="col-span-2 space-y-2">
                     <Label htmlFor="ticketType">Ticket Type</Label>
                     <Select
-                      value={formData.ticket_id?.toString() || ''}
-                      onValueChange={(val) => setFormData({...formData, ticket_id: val ? parseInt(val) : undefined})}
+                      value={formData.ticket_id?.toString() || 'none'}
+                      onValueChange={(val) => setFormData({...formData, ticket_id: val === 'none' ? undefined : parseInt(val)})}
                     >
                       <SelectTrigger id="ticketType">
                         <SelectValue placeholder="Select ticket (optional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No ticket</SelectItem>
+                        <SelectItem value="none">No ticket</SelectItem>
                         {tickets.map(ticket => (
                           <SelectItem key={ticket.id} value={ticket.id.toString()}>
                             {ticket.name} - ${parseFloat(ticket.price.toString()).toFixed(2)}
