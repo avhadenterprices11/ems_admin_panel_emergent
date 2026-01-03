@@ -97,4 +97,29 @@ router.post('/:eventId/attendees/:attendeeId/checkin', (req, res) => attendeesCo
 router.post('/:eventId/attendees/:attendeeId/undo-checkin', (req, res) => attendeesController.undoCheckin(req, res));
 router.put('/devices/:deviceId/status', (req, res) => attendeesController.updateDeviceStatus(req, res));
 
+// Event Detail - Communications Tab - Campaigns APIs
+router.get('/:eventId/campaigns', (req, res) => campaignsController.getCampaigns(req, res));
+router.get('/:eventId/campaigns/stats', (req, res) => campaignsController.getCampaignStats(req, res));
+router.get('/:eventId/campaigns/audience-segments', (req, res) => campaignsController.getAudienceSegments(req, res));
+router.post('/:eventId/campaigns/preview-audience', (req, res) => campaignsController.previewAudience(req, res));
+router.post('/:eventId/campaigns', (req, res) => campaignsController.createCampaign(req, res));
+router.get('/:eventId/campaigns/:campaignId', (req, res) => campaignsController.getCampaignById(req, res));
+router.put('/:eventId/campaigns/:campaignId', (req, res) => campaignsController.updateCampaign(req, res));
+router.delete('/:eventId/campaigns/:campaignId', (req, res) => campaignsController.deleteCampaign(req, res));
+router.post('/:eventId/campaigns/:campaignId/duplicate', (req, res) => campaignsController.duplicateCampaign(req, res));
+router.post('/:eventId/campaigns/:campaignId/send', (req, res) => campaignsController.sendCampaign(req, res));
+router.post('/:eventId/campaigns/:campaignId/schedule', (req, res) => campaignsController.scheduleCampaign(req, res));
+router.post('/:eventId/campaigns/:campaignId/pause', (req, res) => campaignsController.pauseCampaign(req, res));
+router.post('/:eventId/campaigns/:campaignId/resume', (req, res) => campaignsController.resumeCampaign(req, res));
+router.get('/:eventId/campaigns/:campaignId/recipients', (req, res) => campaignsController.getCampaignRecipients(req, res));
+
+// Event Detail - Communications Tab - Templates APIs
+router.get('/:eventId/templates', (req, res) => templatesController.getTemplates(req, res));
+router.get('/:eventId/templates/variables', (req, res) => templatesController.getVariables(req, res));
+router.post('/:eventId/templates', (req, res) => templatesController.createTemplate(req, res));
+router.get('/:eventId/templates/:templateId', (req, res) => templatesController.getTemplateById(req, res));
+router.put('/:eventId/templates/:templateId', (req, res) => templatesController.updateTemplate(req, res));
+router.delete('/:eventId/templates/:templateId', (req, res) => templatesController.deleteTemplate(req, res));
+router.post('/:eventId/templates/:templateId/duplicate', (req, res) => templatesController.duplicateTemplate(req, res));
+
 export default router;
