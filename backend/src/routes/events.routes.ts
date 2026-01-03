@@ -46,4 +46,24 @@ router.post('/:eventId/tickets/:ticketId/toggle-sales', (req, res) => ticketsCon
 router.post('/:eventId/tickets/:ticketId/end-sales', (req, res) => ticketsController.endSales(req, res));
 router.post('/:eventId/tickets/:ticketId/duplicate', (req, res) => ticketsController.duplicateTicket(req, res));
 
+// Event Detail - Add-ons Tab APIs
+router.get('/:eventId/addons', (req, res) => addonsController.getAddons(req, res));
+router.post('/:eventId/addons', (req, res) => addonsController.createAddon(req, res));
+router.get('/:eventId/addons/:addonId', (req, res) => addonsController.getAddonById(req, res));
+router.put('/:eventId/addons/:addonId', (req, res) => addonsController.updateAddon(req, res));
+router.delete('/:eventId/addons/:addonId', (req, res) => addonsController.deleteAddon(req, res));
+router.post('/:eventId/addons/:addonId/toggle', (req, res) => addonsController.toggleStatus(req, res));
+
+// Event Detail - Promo Codes Tab APIs
+router.get('/:eventId/promo-codes', (req, res) => promoCodesController.getPromoCodes(req, res));
+router.post('/:eventId/promo-codes', (req, res) => promoCodesController.createPromoCode(req, res));
+router.get('/:eventId/promo-codes/:promoId', (req, res) => promoCodesController.getPromoCodeById(req, res));
+router.put('/:eventId/promo-codes/:promoId', (req, res) => promoCodesController.updatePromoCode(req, res));
+router.delete('/:eventId/promo-codes/:promoId', (req, res) => promoCodesController.deletePromoCode(req, res));
+router.post('/:eventId/promo-codes/:promoId/toggle', (req, res) => promoCodesController.toggleStatus(req, res));
+
+// Event Detail - Settings Tab APIs
+router.get('/:eventId/settings', (req, res) => eventSettingsController.getSettings(req, res));
+router.put('/:eventId/settings', (req, res) => eventSettingsController.updateSettings(req, res));
+
 export default router;
