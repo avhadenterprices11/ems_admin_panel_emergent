@@ -27,7 +27,7 @@
     "frontend": "100%"
   },
   "test_credentials": {
-    "api_base_url": "https://eventmanager-18.preview.emergentagent.com"
+    "api_base_url": "https://eventpanel-3.preview.emergentagent.com"
   },
   "seed_data_creation": "Created 4 test events with file uploads via API and UI testing",
   "retest_needed": false,

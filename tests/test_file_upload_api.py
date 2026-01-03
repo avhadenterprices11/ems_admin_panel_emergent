@@ -8,7 +8,7 @@ import os
 import base64
 import tempfile
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://eventmanager-18.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://eventpanel-3.preview.emergentagent.com').rstrip('/')
 
 
 class TestHealthCheck:

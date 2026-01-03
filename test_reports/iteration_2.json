@@ -28,7 +28,7 @@
     "frontend": "100%"
   },
   "test_credentials": {
-    "api_base_url": "https://eventmanager-18.preview.emergentagent.com",
+    "api_base_url": "https://eventpanel-3.preview.emergentagent.com",
     "test_event_id": 1
   },
   "seed_data_creation": "Test data exists for event ID 1 (Tech Summit 2024) with registrations, tickets, analytics, refunds, and activity logs",

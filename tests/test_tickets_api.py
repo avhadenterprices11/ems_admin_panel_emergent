@@ -16,7 +16,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('VITE_API_URL', 'https://eventmanager-18.preview.emergentagent.com')
+BASE_URL = os.environ.get('VITE_API_URL', 'https://eventpanel-3.preview.emergentagent.com')
 EVENT_ID = 1  # Test event ID
 
 
