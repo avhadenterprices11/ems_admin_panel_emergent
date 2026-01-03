@@ -239,6 +239,15 @@ A full-stack Event Management Admin System built with:
 ### event_activity_logs (NEW - Jan 2, 2026)
 - id (bigint), event_id, actor_type, actor_id, action_type, description, metadata, created_at
 
+### event_addons (NEW - Jan 3, 2026)
+- id (bigint), event_id, name, description, addon_type, price, currency, unlimited_quantity, quantity_limit, quantity_sold, per_order_limit, is_active, is_visible, created_at, updated_at, is_deleted
+
+### promo_codes (NEW - Jan 3, 2026)
+- id (bigint), event_id, code (unique per event), discount_type (percentage/fixed), discount_value, max_discount_amount, min_order_value, applicable_to (all/tickets/addons), applicable_items (jsonb), usage_limit, usage_count, valid_from, valid_until, is_active, created_at, updated_at, is_deleted
+
+### event_settings (NEW - Jan 3, 2026)
+- id (bigint), event_id (unique), pass_fees_to_attendees, charge_tax, tax_type, tax_rate, refund_policy, refund_deadline_days, refund_percentage, allow_transfers, allow_cancellations, lock_changes_after_event_start, hide_sold_out_tickets, auto_hide_past_tickets, approval_mode, pending_approval_expiry_hours, auto_send_confirmation, attach_invoice, show_tax_breakdown, stop_sales_when_full, allow_admin_overselling, auto_enable_waitlist, created_at, updated_at
+
 ## Completed Work (January 2, 2026)
 
 ### Session Accomplishments
