@@ -12,16 +12,15 @@ import {
   Play,
   BarChart2,
   Trash2,
-  ExternalLink,
+  Users,
+  RefreshCw,
   Loader2,
   AlertCircle,
+  Settings,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Switch } from '../ui/switch';
-import { Separator } from '../ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -29,7 +28,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { ResponsiveTable, MobileCardConfig } from '../ui/responsive-table';
 import { CommsCampaignBuilder } from './communications/CommsCampaignBuilder';
 import { CommsTemplateEditor } from './communications/CommsTemplateEditor';
-import { eventsAPI, Campaign, MessageTemplate } from '../../api/events.api';
+import { CommsAudienceBuilder } from './communications/CommsAudienceBuilder';
+import { CommsSettings } from './communications/CommsSettings';
+import { eventsAPI, Campaign, MessageTemplate, AudienceSegment, CreateSegmentInput } from '../../api/events.api';
 import { toast } from 'sonner';
 
 interface EventCommunicationsProps {
@@ -88,18 +89,89 @@ const TemplateCard = ({
   );
 };
 
+const SegmentCard = ({ 
+  segment, 
+  onEdit, 
+  onRefresh, 
+  onDelete 
+}: { 
+  segment: AudienceSegment; 
+  onEdit: () => void;
+  onRefresh: () => void;
+  onDelete: () => void;
+}) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  };
+
+  return (
+    <div 
+      className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
+      data-testid={`segment-card-${segment.id}`}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+          <Users size={20} />
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant={segment.is_active ? 'default' : 'secondary'} className={segment.is_active ? 'bg-emerald-100 text-emerald-700' : ''}>
+            {segment.is_active ? 'Active' : 'Inactive'}
+          </Badge>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2" data-testid={`segment-menu-${segment.id}`}>
+                <MoreHorizontal size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={onRefresh}>
+                <RefreshCw size={14} className="mr-2" /> Refresh Count
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-rose-600" onClick={onDelete}>Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      <h4 className="font-bold text-[#1d293d] mb-1">{segment.name}</h4>
+      {segment.description && <p className="text-xs text-slate-500 mb-2">{segment.description}</p>}
+      <div className="flex items-center justify-between text-xs text-slate-500">
+        <span className="flex items-center gap-1">
+          <Users size={12} /> {segment.estimated_count} attendees
+        </span>
+        <span>Updated: {formatDate(segment.last_evaluated_at)}</span>
+      </div>
+      <div className="mt-3 pt-3 border-t border-slate-100">
+        <div className="flex gap-1 flex-wrap">
+          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+            {segment.match_type === 'ALL' ? 'Match ALL' : 'Match ANY'}
+          </Badge>
+          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+            {segment.rules_json.length} rule{segment.rules_json.length !== 1 ? 's' : ''}
+          </Badge>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventId }) => {
   // Data state
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+  const [segments, setSegments] = useState<AudienceSegment[]>([]);
   const [loading, setLoading] = useState(true);
   
   // UI state
-  const [viewMode, setViewMode] = useState<'list' | 'create-campaign' | 'edit-campaign' | 'create-template' | 'edit-template'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'create-campaign' | 'edit-campaign' | 'create-template' | 'edit-template' | 'create-segment' | 'edit-segment'>('list');
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
+  const [selectedSegment, setSelectedSegment] = useState<AudienceSegment | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteType, setDeleteType] = useState<'campaign' | 'template'>('campaign');
+  const [deleteType, setDeleteType] = useState<'campaign' | 'template' | 'segment'>('campaign');
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -124,9 +196,19 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
     }
   };
 
+  const fetchSegments = async () => {
+    try {
+      const data = await eventsAPI.getSegments(eventId);
+      setSegments(data);
+    } catch (error) {
+      console.error('Error fetching segments:', error);
+      toast.error('Failed to load segments');
+    }
+  };
+
   const fetchAll = async () => {
     setLoading(true);
-    await Promise.all([fetchCampaigns(), fetchTemplates()]);
+    await Promise.all([fetchCampaigns(), fetchTemplates(), fetchSegments()]);
     setLoading(false);
   };
 
@@ -230,10 +312,47 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
     }
   };
 
-  const confirmDelete = (type: 'campaign' | 'template', id: number) => {
+  // Segment actions
+  const handleEditSegment = (segment: AudienceSegment) => {
+    setSelectedSegment(segment);
+    setViewMode('edit-segment');
+  };
+
+  const handleRefreshSegment = async (segmentId: number) => {
+    try {
+      await eventsAPI.refreshSegment(eventId, segmentId);
+      toast.success('Segment count refreshed');
+      fetchSegments();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to refresh segment');
+    }
+  };
+
+  const handleDeleteSegment = async () => {
+    if (!deleteItemId) return;
+    try {
+      setIsDeleting(true);
+      await eventsAPI.deleteSegment(eventId, deleteItemId);
+      toast.success('Segment deleted successfully');
+      fetchSegments();
+      setDeleteDialogOpen(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete segment');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const confirmDelete = (type: 'campaign' | 'template' | 'segment', id: number) => {
     setDeleteType(type);
     setDeleteItemId(id);
     setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (deleteType === 'campaign') handleDeleteCampaign();
+    else if (deleteType === 'template') handleDeleteTemplate();
+    else if (deleteType === 'segment') handleDeleteSegment();
   };
 
   // Campaign save handler
@@ -282,6 +401,24 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
     }
   };
 
+  // Segment save handler
+  const handleSegmentSave = async (data: CreateSegmentInput) => {
+    try {
+      if (selectedSegment) {
+        await eventsAPI.updateSegment(eventId, selectedSegment.id, data);
+        toast.success('Segment updated successfully');
+      } else {
+        await eventsAPI.createSegment(eventId, data);
+        toast.success('Segment created successfully');
+      }
+      fetchSegments();
+      setViewMode('list');
+      setSelectedSegment(null);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save segment');
+    }
+  };
+
   // Format date for display
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -314,6 +451,18 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
         template={selectedTemplate}
         onCancel={() => { setViewMode('list'); setSelectedTemplate(null); }} 
         onSave={handleTemplateSave} 
+      />
+    );
+  }
+
+  // Render segment builder
+  if (viewMode === 'create-segment' || viewMode === 'edit-segment') {
+    return (
+      <CommsAudienceBuilder 
+        eventId={eventId}
+        segment={selectedSegment}
+        onCancel={() => { setViewMode('list'); setSelectedSegment(null); }} 
+        onSave={handleSegmentSave} 
       />
     );
   }
@@ -373,13 +522,19 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
   return (
     <Tabs defaultValue="campaigns" className="space-y-6">
       {/* Top Bar */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <TabsList className="bg-white border border-slate-200 justify-start h-10 p-1">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <TabsList className="bg-white border border-slate-200 justify-start h-10 p-1 flex-wrap">
           <TabsTrigger value="campaigns" className="data-[state=active]:bg-slate-100" data-testid="campaigns-tab">
             All Campaigns
           </TabsTrigger>
           <TabsTrigger value="templates" className="data-[state=active]:bg-slate-100" data-testid="templates-tab">
             Templates
+          </TabsTrigger>
+          <TabsTrigger value="segments" className="data-[state=active]:bg-slate-100" data-testid="segments-tab">
+            Audience Segments
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="data-[state=active]:bg-slate-100" data-testid="settings-tab">
+            Settings
           </TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
@@ -428,12 +583,8 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
                     {campaigns.map((camp) => (
                       <TableRow key={camp.id} className="hover:bg-slate-50/60" data-testid={`campaign-row-${camp.id}`}>
                         <TableCell>
-                          <div className="font-medium text-[#1d293d]">
-                            {camp.name}
-                          </div>
-                          <div className="text-xs text-slate-400">
-                            {formatDate(camp.sent_at || camp.scheduled_at || camp.created_at)}
-                          </div>
+                          <div className="font-medium text-[#1d293d]">{camp.name}</div>
+                          <div className="text-xs text-slate-400">{formatDate(camp.sent_at || camp.scheduled_at || camp.created_at)}</div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -463,18 +614,10 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
                         <TableCell>
                           {camp.status === 'sent' ? (
                             <div className="flex items-center gap-3 text-xs">
-                              <span className="text-slate-600">
-                                <span className="font-bold">{camp.open_rate}%</span> Open
-                              </span>
-                              <span className="text-slate-600">
-                                <span className="font-bold">{camp.click_rate}%</span> Click
-                              </span>
+                              <span className="text-slate-600"><span className="font-bold">{camp.open_rate}%</span> Open</span>
+                              <span className="text-slate-600"><span className="font-bold">{camp.click_rate}%</span> Click</span>
                             </div>
-                          ) : (
-                            <span className="text-xs text-slate-400">
-                              No data yet
-                            </span>
-                          )}
+                          ) : <span className="text-xs text-slate-400">No data yet</span>}
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -513,10 +656,7 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem 
-                                className="text-rose-600 focus:text-rose-600"
-                                onClick={() => confirmDelete('campaign', camp.id)}
-                              >
+                              <DropdownMenuItem className="text-rose-600 focus:text-rose-600" onClick={() => confirmDelete('campaign', camp.id)}>
                                 <Trash2 className="mr-2 h-4 w-4" /> Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -555,13 +695,41 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
         </div>
       </TabsContent>
 
+      {/* Tab 3: Audience Segments */}
+      <TabsContent value="segments" className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {segments.map((segment) => (
+            <SegmentCard 
+              key={segment.id}
+              segment={segment}
+              onEdit={() => handleEditSegment(segment)}
+              onRefresh={() => handleRefreshSegment(segment.id)}
+              onDelete={() => confirmDelete('segment', segment.id)}
+            />
+          ))}
+          <div
+            className="border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center p-6 hover:bg-slate-50 cursor-pointer text-slate-400 flex-col gap-2"
+            onClick={() => { setSelectedSegment(null); setViewMode('create-segment'); }}
+            data-testid="create-segment-btn"
+          >
+            <Plus size={24} />
+            <span className="font-medium">Create Segment</span>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Tab 4: Settings */}
+      <TabsContent value="settings" className="space-y-6">
+        <CommsSettings eventId={eventId} />
+      </TabsContent>
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-rose-500" />
-              Delete {deleteType === 'campaign' ? 'Campaign' : 'Template'}
+              Delete {deleteType.charAt(0).toUpperCase() + deleteType.slice(1)}
             </DialogTitle>
             <DialogDescription>
               Are you sure you want to delete this {deleteType}? This action cannot be undone.
@@ -571,11 +739,7 @@ export const EventCommunications: React.FC<EventCommunicationsProps> = ({ eventI
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button 
-              variant="destructive" 
-              onClick={deleteType === 'campaign' ? handleDeleteCampaign : handleDeleteTemplate}
-              disabled={isDeleting}
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Delete
             </Button>
