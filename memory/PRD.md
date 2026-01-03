@@ -232,6 +232,51 @@ A full-stack Event Management Admin System built with:
   - Track Clicks toggle
 - **Validation**: Email format, time format (HH:MM), validates settings before campaign send
 
+### 10. Event Detail Module - Reports Tab ✅ COMPLETE (Jan 3, 2026)
+- **Quick Insights Section**: 5 standard report cards displayed in a responsive grid
+  - Registration Funnel (line chart) - Conversion rates from page view to payment
+  - Ticket Sales Breakdown (pie chart) - Sales volume by ticket type and category
+  - Revenue Over Time (line chart) - Daily gross revenue and transaction count
+  - Attendance & Check-in (bar chart) - Real-time check-in stats vs total registrations
+  - Geographic Distribution (map) - Attendee breakdown by country and city
+- **Saved Reports Section**: Table with custom reports
+  - Columns: Report Name, Type (category badge), Visualization (icon + type), Visibility, Created date, Actions
+  - **Report CRUD**:
+    - **Create**: Open Report Builder form with name, description, category, visualization type, field selection
+    - **Run**: Execute report and display results in data table
+    - **Duplicate**: Create copy with "(Copy)" suffix
+    - **Export**: Download report data as CSV file
+    - **Delete**: Soft delete with confirmation dialog
+- **Report Builder Form**:
+  - Report Name (required)
+  - Description (optional)
+  - Category dropdown: Registrations, Ticket Sales, Revenue & Finance, Attendance
+  - Visualization Type buttons: Table, Bar, Line, Pie
+  - Data Source Field Selection: 4 data sources with checkboxes:
+    - Event Data: Event Name, Event Date, Location, Category, Status
+    - Ticket Data: Ticket Type, Price, Quantity Sold, Capacity
+    - Registration Data: Registrant Name, Email, Status, Registration Date, Amount Paid
+    - Check-in Logs: Attendee Name, Check-in Status, Check-in Time, Email
+  - Data Scope dropdown: This Event Only, Event Series, Multiple Events
+  - Visibility dropdown: Private (Only Me), Team, Organization
+- **Report Viewer**:
+  - Header: Report name, description, Back/Refresh/Export buttons
+  - Stats Cards: Total Records, plus contextual stats (Total Revenue for finance, Total Sold for tickets)
+  - Data Table: Dynamic columns based on report type, sortable/scrollable
+- **APIs Implemented**:
+  - GET /events/:eventId/reports - List all reports
+  - POST /events/:eventId/reports - Create new report
+  - GET /events/:eventId/reports/:id - Get single report
+  - PUT /events/:eventId/reports/:id - Update report
+  - DELETE /events/:eventId/reports/:id - Soft delete report
+  - POST /events/:eventId/reports/:id/run - Execute report and get data
+  - GET /events/:eventId/reports/:id/export - Export as CSV
+  - GET /events/:eventId/reports/:id/runs - Get execution history
+  - GET /events/:eventId/reports/data-sources - Get available data sources
+  - GET /events/:eventId/reports/standard - Get standard report templates
+  - POST /events/:eventId/reports/standard/:id/run - Run standard report
+- **Database Tables**: reports, report_fields, report_filters, report_runs
+
 ## Technical Architecture
 
 ### Frontend Structure
