@@ -361,8 +361,8 @@ export class ReportsService {
             'e.name as event_name',
             't.name as ticket_type',
             't.price',
-            't.sold as quantity_sold',
-            db.raw('t.price * t.sold as total_revenue'),
+            't.sold_count as quantity_sold',
+            db.raw('t.price * t.sold_count as total_revenue'),
             't.created_at as date'
           );
         if (eventId) query = query.where('t.event_id', eventId);
