@@ -7,6 +7,8 @@ import { PromoCodesController } from '../controllers/promo-codes.controller';
 import { EventSettingsController } from '../controllers/event-settings.controller';
 import { RegistrationsController } from '../controllers/registrations.controller';
 import { AttendeesController } from '../controllers/attendees.controller';
+import { CampaignsController } from '../controllers/campaigns.controller';
+import { TemplatesController } from '../controllers/templates.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -20,6 +22,8 @@ const promoCodesController = new PromoCodesController();
 const eventSettingsController = new EventSettingsController();
 const registrationsController = new RegistrationsController();
 const attendeesController = new AttendeesController();
+const campaignsController = new CampaignsController();
+const templatesController = new TemplatesController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
