@@ -349,6 +349,88 @@ export interface UpdateRegistrationInput {
   total_amount?: number;
 }
 
+// Attendees & Check-in interfaces
+export interface Attendee {
+  id: number;
+  event_id: number;
+  registration_id?: number;
+  ticket_id?: number;
+  attendee_name: string;
+  attendee_email?: string;
+  qr_code_value: string;
+  checkin_status: string;
+  checkin_time?: string;
+  checkin_source?: string;
+  checkin_location?: string;
+  checkin_device_id?: number;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+  ticket_name?: string;
+  device_name?: string;
+}
+
+export interface AttendeeListParams {
+  checkin_status?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface AttendeeListResponse {
+  attendees: Attendee[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface CheckinMetrics {
+  total_registrations: number;
+  total_checked_in: number;
+  total_not_checked_in: number;
+  no_show_count: number;
+  no_show_rate: number;
+  checkin_percentage: number;
+  peak_checkin_time?: string;
+  last_checkin_time?: string;
+  last_checkin_ago?: string;
+}
+
+export interface CheckinDevice {
+  id: number;
+  event_id: number;
+  device_name: string;
+  device_type?: string;
+  location?: string;
+  total_scans: number;
+  last_seen_at?: string;
+  battery_level?: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface LocationStats {
+  location: string;
+  checkin_count: number;
+  last_checkin?: string;
+  last_checkin_ago?: string;
+}
+
+export interface QRCheckinInput {
+  qr_code: string;
+  device_id?: number;
+  device_name?: string;
+  location?: string;
+}
+
+export interface CheckinResult {
+  success: boolean;
+  message: string;
+  attendee?: Attendee;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
