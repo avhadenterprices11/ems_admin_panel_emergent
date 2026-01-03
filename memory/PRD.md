@@ -172,6 +172,26 @@ A full-stack Event Management Admin System built with:
 - `POST /api/events/:eventId/tickets/:ticketId/end-sales` - End ticket sales permanently
 - `POST /api/events/:eventId/tickets/:ticketId/duplicate` - Duplicate ticket
 
+### Event Detail - Add-ons API (NEW - Jan 3, 2026)
+- `GET /api/events/:eventId/addons` - List all add-ons for an event
+- `POST /api/events/:eventId/addons` - Create new add-on
+- `GET /api/events/:eventId/addons/:addonId` - Get single add-on by ID
+- `PUT /api/events/:eventId/addons/:addonId` - Update add-on
+- `DELETE /api/events/:eventId/addons/:addonId` - Delete add-on (soft delete)
+- `POST /api/events/:eventId/addons/:addonId/toggle` - Toggle add-on status (active/inactive)
+
+### Event Detail - Promo Codes API (NEW - Jan 3, 2026)
+- `GET /api/events/:eventId/promo-codes` - List all promo codes for an event
+- `POST /api/events/:eventId/promo-codes` - Create new promo code
+- `GET /api/events/:eventId/promo-codes/:promoId` - Get single promo code by ID
+- `PUT /api/events/:eventId/promo-codes/:promoId` - Update promo code
+- `DELETE /api/events/:eventId/promo-codes/:promoId` - Delete promo code (soft delete)
+- `POST /api/events/:eventId/promo-codes/:promoId/toggle` - Toggle promo code status (active/inactive)
+
+### Event Detail - Settings API (NEW - Jan 3, 2026)
+- `GET /api/events/:eventId/settings` - Get all event settings
+- `PUT /api/events/:eventId/settings` - Update event settings
+
 ### File Upload
 - `POST /api/upload/single` - Upload single file
 - `POST /api/upload/multiple` - Upload multiple files
