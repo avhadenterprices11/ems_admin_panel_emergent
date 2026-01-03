@@ -332,6 +332,240 @@ export const EventTickets = ({ eventId }: EventTicketsProps) => {
     }
   };
 
+  // ==================== ADD-ONS HANDLERS ====================
+  
+  const resetAddonForm = () => {
+    setAddonForm({
+      name: '',
+      description: '',
+      addon_type: 'general',
+      price: 0,
+      currency: 'USD',
+      unlimited_quantity: false,
+      quantity_limit: 100,
+      per_order_limit: 5,
+      is_active: true,
+      is_visible: true,
+    });
+    setSelectedAddon(null);
+  };
+
+  const handleCreateAddon = async () => {
+    if (!addonForm.name) {
+      toast.error('Add-on name is required');
+      return;
+    }
+    if (addonForm.price < 0) {
+      toast.error('Price cannot be negative');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.createAddon(eventId, addonForm);
+      toast.success('Add-on created successfully');
+      setIsAddonDialogOpen(false);
+      resetAddonForm();
+      fetchAddons();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to create add-on');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateAddon = async () => {
+    if (!selectedAddon) return;
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.updateAddon(eventId, selectedAddon.id, addonForm as UpdateAddonInput);
+      toast.success('Add-on updated successfully');
+      setIsEditAddonDialogOpen(false);
+      resetAddonForm();
+      fetchAddons();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update add-on');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteAddon = async () => {
+    if (!addonToDelete) return;
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.deleteAddon(eventId, addonToDelete);
+      toast.success('Add-on deleted successfully');
+      setDeleteAddonConfirmationOpen(false);
+      setAddonToDelete(null);
+      fetchAddons();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete add-on');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleToggleAddonStatus = async (addonId: number) => {
+    try {
+      await eventsAPI.toggleAddonStatus(eventId, addonId);
+      toast.success('Add-on status updated');
+      fetchAddons();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to toggle add-on status');
+    }
+  };
+
+  const openEditAddonDialog = (addon: Addon) => {
+    setSelectedAddon(addon);
+    setAddonForm({
+      name: addon.name,
+      description: addon.description || '',
+      addon_type: addon.addon_type,
+      price: parseFloat(addon.price.toString()),
+      currency: addon.currency,
+      unlimited_quantity: addon.unlimited_quantity,
+      quantity_limit: addon.quantity_limit || 100,
+      per_order_limit: addon.per_order_limit || 5,
+      is_active: addon.is_active,
+      is_visible: addon.is_visible,
+    });
+    setIsEditAddonDialogOpen(true);
+  };
+
+  // ==================== PROMO CODES HANDLERS ====================
+  
+  const resetPromoForm = () => {
+    setPromoForm({
+      code: '',
+      discount_type: 'percentage',
+      discount_value: 10,
+      max_discount_amount: undefined,
+      min_order_value: undefined,
+      applicable_to: 'all',
+      usage_limit: undefined,
+      valid_from: '',
+      valid_until: '',
+      is_active: true,
+    });
+    setSelectedPromo(null);
+  };
+
+  const generatePromoCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setPromoForm({ ...promoForm, code });
+  };
+
+  const handleCreatePromo = async () => {
+    if (!promoForm.code) {
+      toast.error('Promo code is required');
+      return;
+    }
+    if (promoForm.discount_value <= 0) {
+      toast.error('Discount value must be greater than 0');
+      return;
+    }
+    if (promoForm.discount_type === 'percentage' && promoForm.discount_value > 100) {
+      toast.error('Percentage discount cannot exceed 100%');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.createPromoCode(eventId, promoForm);
+      toast.success('Promo code created successfully');
+      setIsPromoDialogOpen(false);
+      resetPromoForm();
+      fetchPromoCodes();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to create promo code');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdatePromo = async () => {
+    if (!selectedPromo) return;
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.updatePromoCode(eventId, selectedPromo.id, promoForm as UpdatePromoCodeInput);
+      toast.success('Promo code updated successfully');
+      setIsEditPromoDialogOpen(false);
+      resetPromoForm();
+      fetchPromoCodes();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update promo code');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeletePromo = async () => {
+    if (!promoToDelete) return;
+
+    try {
+      setIsSubmitting(true);
+      await eventsAPI.deletePromoCode(eventId, promoToDelete);
+      toast.success('Promo code deleted successfully');
+      setDeletePromoConfirmationOpen(false);
+      setPromoToDelete(null);
+      fetchPromoCodes();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete promo code');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleTogglePromoStatus = async (promoId: number) => {
+    try {
+      await eventsAPI.togglePromoCodeStatus(eventId, promoId);
+      toast.success('Promo code status updated');
+      fetchPromoCodes();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to toggle promo code status');
+    }
+  };
+
+  const openEditPromoDialog = (promo: PromoCode) => {
+    setSelectedPromo(promo);
+    setPromoForm({
+      code: promo.code,
+      discount_type: promo.discount_type,
+      discount_value: parseFloat(promo.discount_value.toString()),
+      max_discount_amount: promo.max_discount_amount ? parseFloat(promo.max_discount_amount.toString()) : undefined,
+      min_order_value: promo.min_order_value ? parseFloat(promo.min_order_value.toString()) : undefined,
+      applicable_to: promo.applicable_to,
+      usage_limit: promo.usage_limit || undefined,
+      valid_from: promo.valid_from ? new Date(promo.valid_from).toISOString().slice(0, 16) : '',
+      valid_until: promo.valid_until ? new Date(promo.valid_until).toISOString().slice(0, 16) : '',
+      is_active: promo.is_active,
+    });
+    setIsEditPromoDialogOpen(true);
+  };
+
+  // ==================== SETTINGS HANDLERS ====================
+  
+  const handleUpdateSettings = async (updates: UpdateEventSettingsInput) => {
+    try {
+      setSettingsSaving(true);
+      const updatedSettings = await eventsAPI.updateEventSettings(eventId, updates);
+      setSettings(updatedSettings);
+      toast.success('Settings saved successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save settings');
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
   // Open edit dialog
   const openEditDialog = (ticket: Ticket) => {
     setSelectedTicket(ticket);
