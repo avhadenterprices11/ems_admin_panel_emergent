@@ -143,6 +143,52 @@ export const eventsAPI = {
     const response = await apiClient.post('/events/bulk-delete', { eventIds });
     return response.data;
   },
+
+  // Tickets Tab APIs (CRUD)
+  getTickets: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/tickets`);
+    return response.data as Ticket[];
+  },
+
+  getTicketStats: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/tickets/stats`);
+    return response.data as TicketStats;
+  },
+
+  getTicketById: async (eventId: number | string, ticketId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/tickets/${ticketId}`);
+    return response.data as Ticket;
+  },
+
+  createTicket: async (eventId: number | string, ticketData: CreateTicketInput) => {
+    const response = await apiClient.post(`/events/${eventId}/tickets`, ticketData);
+    return response.data as Ticket;
+  },
+
+  updateTicket: async (eventId: number | string, ticketId: number | string, ticketData: UpdateTicketInput) => {
+    const response = await apiClient.put(`/events/${eventId}/tickets/${ticketId}`, ticketData);
+    return response.data as Ticket;
+  },
+
+  deleteTicket: async (eventId: number | string, ticketId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/tickets/${ticketId}`);
+    return response.data;
+  },
+
+  toggleTicketSales: async (eventId: number | string, ticketId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/tickets/${ticketId}/toggle-sales`);
+    return response.data as Ticket;
+  },
+
+  endTicketSales: async (eventId: number | string, ticketId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/tickets/${ticketId}/end-sales`);
+    return response.data as Ticket;
+  },
+
+  duplicateTicket: async (eventId: number | string, ticketId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/tickets/${ticketId}/duplicate`);
+    return response.data as Ticket;
+  },
 };
 
 export const savedViewsAPI = {
