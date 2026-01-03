@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { EventsController } from '../controllers/events.controller';
 import { EventOverviewController } from '../controllers/event-overview.controller';
+import { TicketsController } from '../controllers/tickets.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -8,6 +9,7 @@ import { CreateEventDTO } from '../dtos/create-event.dto';
 const router = Router();
 const eventsController = new EventsController();
 const eventOverviewController = new EventOverviewController();
+const ticketsController = new TicketsController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
@@ -26,5 +28,16 @@ router.get('/:eventId/overview/funnel', (req, res) => eventOverviewController.ge
 router.get('/:eventId/overview/tickets', (req, res) => eventOverviewController.getTicketInventory(req, res));
 router.get('/:eventId/overview/alerts', (req, res) => eventOverviewController.getAlerts(req, res));
 router.get('/:eventId/overview/activity', (req, res) => eventOverviewController.getActivityTimeline(req, res));
+
+// Event Detail - Tickets Tab APIs (CRUD)
+router.get('/:eventId/tickets', (req, res) => ticketsController.getTickets(req, res));
+router.get('/:eventId/tickets/stats', (req, res) => ticketsController.getTicketStats(req, res));
+router.post('/:eventId/tickets', (req, res) => ticketsController.createTicket(req, res));
+router.get('/:eventId/tickets/:ticketId', (req, res) => ticketsController.getTicketById(req, res));
+router.put('/:eventId/tickets/:ticketId', (req, res) => ticketsController.updateTicket(req, res));
+router.delete('/:eventId/tickets/:ticketId', (req, res) => ticketsController.deleteTicket(req, res));
+router.post('/:eventId/tickets/:ticketId/toggle-sales', (req, res) => ticketsController.toggleSales(req, res));
+router.post('/:eventId/tickets/:ticketId/end-sales', (req, res) => ticketsController.endSales(req, res));
+router.post('/:eventId/tickets/:ticketId/duplicate', (req, res) => ticketsController.duplicateTicket(req, res));
 
 export default router;
