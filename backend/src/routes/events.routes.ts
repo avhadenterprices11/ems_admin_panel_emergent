@@ -68,4 +68,14 @@ router.post('/:eventId/promo-codes/:promoId/toggle', (req, res) => promoCodesCon
 router.get('/:eventId/settings', (req, res) => eventSettingsController.getSettings(req, res));
 router.put('/:eventId/settings', (req, res) => eventSettingsController.updateSettings(req, res));
 
+// Event Detail - Registrations Tab APIs
+router.get('/:eventId/registrations', (req, res) => registrationsController.getRegistrations(req, res));
+router.get('/:eventId/registrations/stats', (req, res) => registrationsController.getRegistrationStats(req, res));
+router.post('/:eventId/registrations', (req, res) => registrationsController.createRegistration(req, res));
+router.get('/:eventId/registrations/:registrationId', (req, res) => registrationsController.getRegistrationById(req, res));
+router.put('/:eventId/registrations/:registrationId', (req, res) => registrationsController.updateRegistration(req, res));
+router.delete('/:eventId/registrations/:registrationId', (req, res) => registrationsController.deleteRegistration(req, res));
+router.post('/:eventId/registrations/:registrationId/status', (req, res) => registrationsController.updateRegistrationStatus(req, res));
+router.post('/:eventId/registrations/:registrationId/payment-status', (req, res) => registrationsController.updatePaymentStatus(req, res));
+
 export default router;
