@@ -170,8 +170,7 @@ export class AudienceSegmentsService {
         'a.attendee_email',
         't.name as ticket_name',
         'a.checkin_status',
-        'r.status as registration_status',
-        'r.city'
+        'r.status as registration_status'
       )
       .where('a.event_id', eventId)
       .andWhere('a.is_deleted', false);
