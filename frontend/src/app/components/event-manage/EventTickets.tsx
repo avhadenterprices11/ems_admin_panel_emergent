@@ -1619,6 +1619,568 @@ export const EventTickets = ({ eventId }: EventTicketsProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* ==================== ADD-ON DIALOGS ==================== */}
+      
+      {/* Create Add-on Dialog */}
+      <Dialog open={isAddonDialogOpen} onOpenChange={setIsAddonDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create New Add-on</DialogTitle>
+            <DialogDescription>Add merchandise, extras, or upgrades for attendees</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="addon-name">Add-on Name *</Label>
+              <Input
+                id="addon-name"
+                placeholder="e.g., Event T-Shirt, Parking Pass"
+                value={addonForm.name}
+                onChange={(e) => setAddonForm({ ...addonForm, name: e.target.value })}
+                data-testid="addon-name-input"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addon-description">Description</Label>
+              <Textarea
+                id="addon-description"
+                placeholder="Brief description of the add-on"
+                value={addonForm.description}
+                onChange={(e) => setAddonForm({ ...addonForm, description: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="addon-price">Price ($)</Label>
+                <Input
+                  id="addon-price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={addonForm.price}
+                  onChange={(e) => setAddonForm({ ...addonForm, price: parseFloat(e.target.value) || 0 })}
+                  data-testid="addon-price-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="addon-type">Type</Label>
+                <Select
+                  value={addonForm.addon_type}
+                  onValueChange={(value) => setAddonForm({ ...addonForm, addon_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="merchandise">Merchandise</SelectItem>
+                    <SelectItem value="food">Food & Beverage</SelectItem>
+                    <SelectItem value="access">Access/Upgrade</SelectItem>
+                    <SelectItem value="parking">Parking</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <Label>Unlimited Quantity</Label>
+                <p className="text-xs text-slate-500">No limit on available add-ons</p>
+              </div>
+              <Switch
+                checked={addonForm.unlimited_quantity}
+                onCheckedChange={(checked) => setAddonForm({ ...addonForm, unlimited_quantity: checked })}
+              />
+            </div>
+            {!addonForm.unlimited_quantity && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="addon-quantity">Quantity Limit</Label>
+                  <Input
+                    id="addon-quantity"
+                    type="number"
+                    min="1"
+                    value={addonForm.quantity_limit}
+                    onChange={(e) => setAddonForm({ ...addonForm, quantity_limit: parseInt(e.target.value) || 100 })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="addon-per-order">Per Order Limit</Label>
+                  <Input
+                    id="addon-per-order"
+                    type="number"
+                    min="1"
+                    value={addonForm.per_order_limit}
+                    onChange={(e) => setAddonForm({ ...addonForm, per_order_limit: parseInt(e.target.value) || 5 })}
+                  />
+                </div>
+              </div>
+            )}
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <Label>Active</Label>
+                <p className="text-xs text-slate-500">Add-on is available for purchase</p>
+              </div>
+              <Switch
+                checked={addonForm.is_active}
+                onCheckedChange={(checked) => setAddonForm({ ...addonForm, is_active: checked })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleCreateAddon} disabled={isSubmitting} data-testid="create-addon-submit">
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Create Add-on
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Add-on Dialog */}
+      <Dialog open={isEditAddonDialogOpen} onOpenChange={setIsEditAddonDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Add-on</DialogTitle>
+            <DialogDescription>Update add-on details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-addon-name">Add-on Name *</Label>
+              <Input
+                id="edit-addon-name"
+                value={addonForm.name}
+                onChange={(e) => setAddonForm({ ...addonForm, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-addon-description">Description</Label>
+              <Textarea
+                id="edit-addon-description"
+                value={addonForm.description}
+                onChange={(e) => setAddonForm({ ...addonForm, description: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-addon-price">Price ($)</Label>
+                <Input
+                  id="edit-addon-price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={addonForm.price}
+                  onChange={(e) => setAddonForm({ ...addonForm, price: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={addonForm.addon_type}
+                  onValueChange={(value) => setAddonForm({ ...addonForm, addon_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="merchandise">Merchandise</SelectItem>
+                    <SelectItem value="food">Food & Beverage</SelectItem>
+                    <SelectItem value="access">Access/Upgrade</SelectItem>
+                    <SelectItem value="parking">Parking</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <Label>Unlimited Quantity</Label>
+                <p className="text-xs text-slate-500">No limit on available add-ons</p>
+              </div>
+              <Switch
+                checked={addonForm.unlimited_quantity}
+                onCheckedChange={(checked) => setAddonForm({ ...addonForm, unlimited_quantity: checked })}
+              />
+            </div>
+            {!addonForm.unlimited_quantity && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Quantity Limit</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={addonForm.quantity_limit}
+                    onChange={(e) => setAddonForm({ ...addonForm, quantity_limit: parseInt(e.target.value) || 100 })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Per Order Limit</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={addonForm.per_order_limit}
+                    onChange={(e) => setAddonForm({ ...addonForm, per_order_limit: parseInt(e.target.value) || 5 })}
+                  />
+                </div>
+              </div>
+            )}
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <Label>Active</Label>
+                <p className="text-xs text-slate-500">Add-on is available for purchase</p>
+              </div>
+              <Switch
+                checked={addonForm.is_active}
+                onCheckedChange={(checked) => setAddonForm({ ...addonForm, is_active: checked })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleUpdateAddon} disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Add-on Confirmation Dialog */}
+      <AlertDialog open={deleteAddonConfirmationOpen} onOpenChange={setDeleteAddonConfirmationOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Add-on</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this add-on? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAddon} className="bg-rose-600 hover:bg-rose-700">
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ==================== PROMO CODE DIALOGS ==================== */}
+      
+      {/* Create Promo Code Dialog */}
+      <Dialog open={isPromoDialogOpen} onOpenChange={setIsPromoDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create New Promo Code</DialogTitle>
+            <DialogDescription>Create a discount code for your event</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="promo-code">Promo Code *</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="promo-code"
+                  placeholder="e.g., EARLYBIRD20"
+                  value={promoForm.code}
+                  onChange={(e) => setPromoForm({ ...promoForm, code: e.target.value.toUpperCase() })}
+                  className="font-mono"
+                  data-testid="promo-code-input"
+                />
+                <Button type="button" variant="outline" onClick={generatePromoCode}>
+                  Generate
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="discount-type">Discount Type</Label>
+                <Select
+                  value={promoForm.discount_type}
+                  onValueChange={(value) => setPromoForm({ ...promoForm, discount_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="percentage">Percentage (%)</SelectItem>
+                    <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="discount-value">
+                  Discount Value {promoForm.discount_type === 'percentage' ? '(%)' : '($)'}
+                </Label>
+                <Input
+                  id="discount-value"
+                  type="number"
+                  min="0"
+                  step={promoForm.discount_type === 'percentage' ? '1' : '0.01'}
+                  max={promoForm.discount_type === 'percentage' ? '100' : undefined}
+                  value={promoForm.discount_value}
+                  onChange={(e) => setPromoForm({ ...promoForm, discount_value: parseFloat(e.target.value) || 0 })}
+                  data-testid="promo-discount-input"
+                />
+              </div>
+            </div>
+            {promoForm.discount_type === 'percentage' && (
+              <div className="space-y-2">
+                <Label htmlFor="max-discount">Max Discount Amount ($) - Optional</Label>
+                <Input
+                  id="max-discount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="No limit"
+                  value={promoForm.max_discount_amount || ''}
+                  onChange={(e) => setPromoForm({ ...promoForm, max_discount_amount: e.target.value ? parseFloat(e.target.value) : undefined })}
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="min-order">Min Order Value ($) - Optional</Label>
+                <Input
+                  id="min-order"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="No minimum"
+                  value={promoForm.min_order_value || ''}
+                  onChange={(e) => setPromoForm({ ...promoForm, min_order_value: e.target.value ? parseFloat(e.target.value) : undefined })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="usage-limit">Usage Limit - Optional</Label>
+                <Input
+                  id="usage-limit"
+                  type="number"
+                  min="1"
+                  placeholder="Unlimited"
+                  value={promoForm.usage_limit || ''}
+                  onChange={(e) => setPromoForm({ ...promoForm, usage_limit: e.target.value ? parseInt(e.target.value) : undefined })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Applicable To</Label>
+              <Select
+                value={promoForm.applicable_to}
+                onValueChange={(value) => setPromoForm({ ...promoForm, applicable_to: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Items</SelectItem>
+                  <SelectItem value="tickets">Tickets Only</SelectItem>
+                  <SelectItem value="addons">Add-ons Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="valid-from">Valid From - Optional</Label>
+                <Input
+                  id="valid-from"
+                  type="datetime-local"
+                  value={promoForm.valid_from}
+                  onChange={(e) => setPromoForm({ ...promoForm, valid_from: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="valid-until">Valid Until - Optional</Label>
+                <Input
+                  id="valid-until"
+                  type="datetime-local"
+                  value={promoForm.valid_until}
+                  onChange={(e) => setPromoForm({ ...promoForm, valid_until: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <Label>Active</Label>
+                <p className="text-xs text-slate-500">Promo code can be used immediately</p>
+              </div>
+              <Switch
+                checked={promoForm.is_active}
+                onCheckedChange={(checked) => setPromoForm({ ...promoForm, is_active: checked })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleCreatePromo} disabled={isSubmitting} data-testid="create-promo-submit">
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Create Promo Code
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Promo Code Dialog */}
+      <Dialog open={isEditPromoDialogOpen} onOpenChange={setIsEditPromoDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Promo Code</DialogTitle>
+            <DialogDescription>Update promo code details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-promo-code">Promo Code *</Label>
+              <Input
+                id="edit-promo-code"
+                value={promoForm.code}
+                onChange={(e) => setPromoForm({ ...promoForm, code: e.target.value.toUpperCase() })}
+                className="font-mono"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Discount Type</Label>
+                <Select
+                  value={promoForm.discount_type}
+                  onValueChange={(value) => setPromoForm({ ...promoForm, discount_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="percentage">Percentage (%)</SelectItem>
+                    <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>
+                  Discount Value {promoForm.discount_type === 'percentage' ? '(%)' : '($)'}
+                </Label>
+                <Input
+                  type="number"
+                  min="0"
+                  step={promoForm.discount_type === 'percentage' ? '1' : '0.01'}
+                  max={promoForm.discount_type === 'percentage' ? '100' : undefined}
+                  value={promoForm.discount_value}
+                  onChange={(e) => setPromoForm({ ...promoForm, discount_value: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+            </div>
+            {promoForm.discount_type === 'percentage' && (
+              <div className="space-y-2">
+                <Label>Max Discount Amount ($) - Optional</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="No limit"
+                  value={promoForm.max_discount_amount || ''}
+                  onChange={(e) => setPromoForm({ ...promoForm, max_discount_amount: e.target.value ? parseFloat(e.target.value) : undefined })}
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Min Order Value ($) - Optional</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="No minimum"
+                  value={promoForm.min_order_value || ''}
+                  onChange={(e) => setPromoForm({ ...promoForm, min_order_value: e.target.value ? parseFloat(e.target.value) : undefined })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Usage Limit - Optional</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="Unlimited"
+                  value={promoForm.usage_limit || ''}
+                  onChange={(e) => setPromoForm({ ...promoForm, usage_limit: e.target.value ? parseInt(e.target.value) : undefined })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Applicable To</Label>
+              <Select
+                value={promoForm.applicable_to}
+                onValueChange={(value) => setPromoForm({ ...promoForm, applicable_to: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Items</SelectItem>
+                  <SelectItem value="tickets">Tickets Only</SelectItem>
+                  <SelectItem value="addons">Add-ons Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Valid From - Optional</Label>
+                <Input
+                  type="datetime-local"
+                  value={promoForm.valid_from}
+                  onChange={(e) => setPromoForm({ ...promoForm, valid_from: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Valid Until - Optional</Label>
+                <Input
+                  type="datetime-local"
+                  value={promoForm.valid_until}
+                  onChange={(e) => setPromoForm({ ...promoForm, valid_until: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <Label>Active</Label>
+                <p className="text-xs text-slate-500">Promo code can be used</p>
+              </div>
+              <Switch
+                checked={promoForm.is_active}
+                onCheckedChange={(checked) => setPromoForm({ ...promoForm, is_active: checked })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleUpdatePromo} disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Promo Code Confirmation Dialog */}
+      <AlertDialog open={deletePromoConfirmationOpen} onOpenChange={setDeletePromoConfirmationOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Promo Code</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this promo code? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeletePromo} className="bg-rose-600 hover:bg-rose-700">
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
