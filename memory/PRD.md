@@ -267,6 +267,19 @@ A full-stack Event Management Admin System built with:
 - `POST /api/events/:eventId/registrations/:registrationId/status` - Update registration status (started, pending, completed, approved, cancelled, refunded, expired)
 - `POST /api/events/:eventId/registrations/:registrationId/payment-status` - Update payment status (pending, paid, free, failed, refunded)
 
+### Event Detail - Attendees & Check-in API (NEW - Jan 3, 2026)
+- `GET /api/events/:eventId/attendees` - List attendees with filters (checkin_status, search), pagination
+- `GET /api/events/:eventId/attendees/metrics` - Get live check-in metrics (total_registrations, total_checked_in, no_show_rate, checkin_percentage, peak_checkin_time, last_checkin_ago)
+- `GET /api/events/:eventId/attendees/devices` - Get active devices list (device_name, total_scans, status, battery_level)
+- `GET /api/events/:eventId/attendees/locations` - Get location stats (location, checkin_count, last_checkin_ago)
+- `POST /api/events/:eventId/attendees` - Create attendee manually (auto-generates QR code)
+- `POST /api/events/:eventId/attendees/sync` - Sync attendees from completed registrations
+- `POST /api/events/:eventId/attendees/qr-checkin` - QR check-in with validation (qr_code, device_name, location)
+- `GET /api/events/:eventId/attendees/:attendeeId` - Get single attendee by ID
+- `POST /api/events/:eventId/attendees/:attendeeId/checkin` - Manual check-in by admin
+- `POST /api/events/:eventId/attendees/:attendeeId/undo-checkin` - Undo check-in (revert to not_checked_in)
+- `PUT /api/events/devices/:deviceId/status` - Update device status and battery level
+
 ### File Upload
 - `POST /api/upload/single` - Upload single file
 - `POST /api/upload/multiple` - Upload multiple files
