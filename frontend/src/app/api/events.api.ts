@@ -623,6 +623,98 @@ export interface UpdateCommunicationSettingsInput {
   unsubscribe_page_url?: string;
 }
 
+// Reports interfaces
+export interface Report {
+  id: number;
+  event_id?: number;
+  name: string;
+  description?: string;
+  category?: string;
+  data_scope: string;
+  visualization_type: string;
+  config_json?: any;
+  visibility: string;
+  schedule_enabled: boolean;
+  schedule_frequency?: string;
+  schedule_recipients?: string;
+  created_by?: number;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface ReportField {
+  id: string;
+  name: string;
+  column: string;
+  type: string;
+}
+
+export interface ReportDataSource {
+  id: string;
+  name: string;
+  table: string;
+  alias: string;
+  fields: ReportField[];
+}
+
+export interface StandardReport {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  visualization: string;
+}
+
+export interface ReportRun {
+  id: number;
+  report_id: number;
+  executed_at: string;
+  status: string;
+  result_snapshot_json?: any;
+  row_count: number;
+  execution_time_ms?: number;
+  error_message?: string;
+  executed_by?: number;
+}
+
+export interface ReportRunResult {
+  success: boolean;
+  data: Record<string, any>[];
+  total: number;
+  execution_time_ms: number;
+  run_id: number;
+}
+
+export interface CreateReportInput {
+  name: string;
+  description?: string;
+  category?: string;
+  data_scope?: string;
+  visualization_type?: string;
+  config_json?: any;
+  visibility?: string;
+  schedule_enabled?: boolean;
+  schedule_frequency?: string;
+  schedule_recipients?: string;
+  selected_fields?: string[];
+  filters?: { field: string; operator: string; value?: string; logic_operator?: string }[];
+  group_by?: string;
+}
+
+export interface UpdateReportInput {
+  name?: string;
+  description?: string;
+  category?: string;
+  data_scope?: string;
+  visualization_type?: string;
+  config_json?: any;
+  visibility?: string;
+  schedule_enabled?: boolean;
+  schedule_frequency?: string;
+  schedule_recipients?: string;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
