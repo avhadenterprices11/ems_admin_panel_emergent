@@ -132,6 +132,152 @@ export interface UpdateTicketInput {
   status?: string;
 }
 
+// Add-on interfaces
+export interface Addon {
+  id: number;
+  event_id: number;
+  name: string;
+  description?: string;
+  addon_type: string;
+  price: number;
+  currency: string;
+  unlimited_quantity: boolean;
+  quantity_limit?: number;
+  quantity_sold: number;
+  per_order_limit?: number;
+  is_active: boolean;
+  is_visible: boolean;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface CreateAddonInput {
+  name: string;
+  description?: string;
+  addon_type?: string;
+  price: number;
+  currency?: string;
+  unlimited_quantity?: boolean;
+  quantity_limit?: number;
+  per_order_limit?: number;
+  is_active?: boolean;
+  is_visible?: boolean;
+}
+
+export interface UpdateAddonInput {
+  name?: string;
+  description?: string;
+  addon_type?: string;
+  price?: number;
+  currency?: string;
+  unlimited_quantity?: boolean;
+  quantity_limit?: number;
+  per_order_limit?: number;
+  is_active?: boolean;
+  is_visible?: boolean;
+}
+
+// Promo Code interfaces
+export interface PromoCode {
+  id: number;
+  event_id: number;
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  max_discount_amount?: number;
+  min_order_value?: number;
+  applicable_to: string;
+  applicable_items?: number[];
+  usage_limit?: number;
+  usage_count: number;
+  valid_from?: string;
+  valid_until?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface CreatePromoCodeInput {
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  max_discount_amount?: number;
+  min_order_value?: number;
+  applicable_to?: string;
+  applicable_items?: number[];
+  usage_limit?: number;
+  valid_from?: string;
+  valid_until?: string;
+  is_active?: boolean;
+}
+
+export interface UpdatePromoCodeInput {
+  code?: string;
+  discount_type?: string;
+  discount_value?: number;
+  max_discount_amount?: number;
+  min_order_value?: number;
+  applicable_to?: string;
+  applicable_items?: number[];
+  usage_limit?: number;
+  valid_from?: string;
+  valid_until?: string;
+  is_active?: boolean;
+}
+
+// Event Settings interfaces
+export interface EventSettings {
+  id: number;
+  event_id: number;
+  pass_fees_to_attendees: boolean;
+  charge_tax: boolean;
+  tax_type?: string;
+  tax_rate?: number;
+  refund_policy: string;
+  refund_deadline_days?: number;
+  refund_percentage?: number;
+  allow_transfers: boolean;
+  allow_cancellations: boolean;
+  lock_changes_after_event_start: boolean;
+  hide_sold_out_tickets: boolean;
+  auto_hide_past_tickets: boolean;
+  approval_mode: string;
+  pending_approval_expiry_hours?: number;
+  auto_send_confirmation: boolean;
+  attach_invoice: boolean;
+  show_tax_breakdown: boolean;
+  stop_sales_when_full: boolean;
+  allow_admin_overselling: boolean;
+  auto_enable_waitlist: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateEventSettingsInput {
+  pass_fees_to_attendees?: boolean;
+  charge_tax?: boolean;
+  tax_type?: string;
+  tax_rate?: number;
+  refund_policy?: string;
+  refund_deadline_days?: number;
+  refund_percentage?: number;
+  allow_transfers?: boolean;
+  allow_cancellations?: boolean;
+  lock_changes_after_event_start?: boolean;
+  hide_sold_out_tickets?: boolean;
+  auto_hide_past_tickets?: boolean;
+  approval_mode?: string;
+  pending_approval_expiry_hours?: number;
+  auto_send_confirmation?: boolean;
+  attach_invoice?: boolean;
+  show_tax_breakdown?: boolean;
+  stop_sales_when_full?: boolean;
+  allow_admin_overselling?: boolean;
+  auto_enable_waitlist?: boolean;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
