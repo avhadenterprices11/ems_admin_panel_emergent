@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { EventsController } from '../controllers/events.controller';
 import { EventOverviewController } from '../controllers/event-overview.controller';
 import { TicketsController } from '../controllers/tickets.controller';
+import { AddonsController } from '../controllers/addons.controller';
+import { PromoCodesController } from '../controllers/promo-codes.controller';
+import { EventSettingsController } from '../controllers/event-settings.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -10,6 +13,9 @@ const router = Router();
 const eventsController = new EventsController();
 const eventOverviewController = new EventOverviewController();
 const ticketsController = new TicketsController();
+const addonsController = new AddonsController();
+const promoCodesController = new PromoCodesController();
+const eventSettingsController = new EventSettingsController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
