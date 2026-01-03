@@ -672,25 +672,50 @@ export const EventTickets = ({ eventId }: EventTicketsProps) => {
             <TabsTrigger value="promos" className="rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               Promo Codes
             </TabsTrigger>
+            <TabsTrigger value="settings" className="rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              Settings
+            </TabsTrigger>
           </TabsList>
 
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={16} />
-              <Input
-                placeholder="Search tickets..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-64"
-              />
-            </div>
-            <Button
-              onClick={() => { resetForm(); setIsTicketDialogOpen(true); }}
-              className="bg-[#0f172b] hover:bg-[#1d293d]"
-              data-testid="add-ticket-btn"
-            >
-              <Plus size={16} className="mr-2" /> Add Ticket
-            </Button>
+            {activeTab === 'inventory' && (
+              <>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={16} />
+                  <Input
+                    placeholder="Search tickets..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 w-64"
+                  />
+                </div>
+                <Button
+                  onClick={() => { resetForm(); setIsTicketDialogOpen(true); }}
+                  className="bg-[#0f172b] hover:bg-[#1d293d]"
+                  data-testid="add-ticket-btn"
+                >
+                  <Plus size={16} className="mr-2" /> Add Ticket
+                </Button>
+              </>
+            )}
+            {activeTab === 'addons' && (
+              <Button
+                onClick={() => { resetAddonForm(); setIsAddonDialogOpen(true); }}
+                className="bg-[#0f172b] hover:bg-[#1d293d]"
+                data-testid="add-addon-btn"
+              >
+                <Plus size={16} className="mr-2" /> Add Add-on
+              </Button>
+            )}
+            {activeTab === 'promos' && (
+              <Button
+                onClick={() => { resetPromoForm(); setIsPromoDialogOpen(true); }}
+                className="bg-[#0f172b] hover:bg-[#1d293d]"
+                data-testid="add-promo-btn"
+              >
+                <Plus size={16} className="mr-2" /> Add Promo Code
+              </Button>
+            )}
           </div>
         </div>
 
