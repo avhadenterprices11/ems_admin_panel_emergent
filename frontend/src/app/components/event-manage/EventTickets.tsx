@@ -81,6 +81,51 @@ export const EventTickets = ({ eventId }: EventTicketsProps) => {
     sales_end_at: '',
   });
 
+  // Add-ons State
+  const [addons, setAddons] = useState<Addon[]>([]);
+  const [isAddonDialogOpen, setIsAddonDialogOpen] = useState(false);
+  const [isEditAddonDialogOpen, setIsEditAddonDialogOpen] = useState(false);
+  const [deleteAddonConfirmationOpen, setDeleteAddonConfirmationOpen] = useState(false);
+  const [addonToDelete, setAddonToDelete] = useState<number | null>(null);
+  const [selectedAddon, setSelectedAddon] = useState<Addon | null>(null);
+  const [addonForm, setAddonForm] = useState<CreateAddonInput>({
+    name: '',
+    description: '',
+    addon_type: 'general',
+    price: 0,
+    currency: 'USD',
+    unlimited_quantity: false,
+    quantity_limit: 100,
+    per_order_limit: 5,
+    is_active: true,
+    is_visible: true,
+  });
+
+  // Promo Codes State
+  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
+  const [isPromoDialogOpen, setIsPromoDialogOpen] = useState(false);
+  const [isEditPromoDialogOpen, setIsEditPromoDialogOpen] = useState(false);
+  const [deletePromoConfirmationOpen, setDeletePromoConfirmationOpen] = useState(false);
+  const [promoToDelete, setPromoToDelete] = useState<number | null>(null);
+  const [selectedPromo, setSelectedPromo] = useState<PromoCode | null>(null);
+  const [promoForm, setPromoForm] = useState<CreatePromoCodeInput>({
+    code: '',
+    discount_type: 'percentage',
+    discount_value: 10,
+    max_discount_amount: undefined,
+    min_order_value: undefined,
+    applicable_to: 'all',
+    usage_limit: undefined,
+    valid_from: '',
+    valid_until: '',
+    is_active: true,
+  });
+
+  // Settings State
+  const [settings, setSettings] = useState<EventSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+
   // Fetch tickets
   const fetchTickets = async () => {
     try {
