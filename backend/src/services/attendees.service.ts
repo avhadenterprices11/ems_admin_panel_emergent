@@ -195,8 +195,8 @@ export class AttendeesService {
       return { success: false, message: 'Invalid QR code' };
     }
 
-    // Verify event matches
-    if (attendee.event_id !== event_id) {
+    // Verify event matches (compare as integers)
+    if (parseInt(attendee.event_id.toString(), 10) !== parseInt(event_id.toString(), 10)) {
       return { success: false, message: 'QR code does not belong to this event' };
     }
 
