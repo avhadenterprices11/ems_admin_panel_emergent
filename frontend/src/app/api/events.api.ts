@@ -668,6 +668,62 @@ export const eventsAPI = {
     const response = await apiClient.delete(`/events/${eventId}/registrations/${registrationId}`);
     return response.data;
   },
+
+  // Attendees & Check-in Tab APIs
+  getAttendees: async (eventId: number | string, params?: AttendeeListParams) => {
+    const response = await apiClient.get(`/events/${eventId}/attendees`, { params });
+    return response.data as AttendeeListResponse;
+  },
+
+  getAttendeeById: async (eventId: number | string, attendeeId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/attendees/${attendeeId}`);
+    return response.data as Attendee;
+  },
+
+  getCheckinMetrics: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/attendees/metrics`);
+    return response.data as CheckinMetrics;
+  },
+
+  getActiveDevices: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/attendees/devices`);
+    return response.data as CheckinDevice[];
+  },
+
+  getLocationStats: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/attendees/locations`);
+    return response.data as LocationStats[];
+  },
+
+  createAttendee: async (eventId: number | string, attendee_name: string, attendee_email?: string, ticket_id?: number) => {
+    const response = await apiClient.post(`/events/${eventId}/attendees`, { attendee_name, attendee_email, ticket_id });
+    return response.data as Attendee;
+  },
+
+  syncAttendees: async (eventId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/attendees/sync`);
+    return response.data as { message: string; count: number };
+  },
+
+  qrCheckin: async (eventId: number | string, input: QRCheckinInput) => {
+    const response = await apiClient.post(`/events/${eventId}/attendees/qr-checkin`, input);
+    return response.data as CheckinResult;
+  },
+
+  manualCheckin: async (eventId: number | string, attendeeId: number | string, location?: string) => {
+    const response = await apiClient.post(`/events/${eventId}/attendees/${attendeeId}/checkin`, { location });
+    return response.data as CheckinResult;
+  },
+
+  undoCheckin: async (eventId: number | string, attendeeId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/attendees/${attendeeId}/undo-checkin`);
+    return response.data as CheckinResult;
+  },
+
+  updateDeviceStatus: async (deviceId: number | string, status: string, battery_level?: number) => {
+    const response = await apiClient.put(`/events/devices/${deviceId}/status`, { status, battery_level });
+    return response.data as CheckinDevice;
+  },
 };
 
 export const savedViewsAPI = {
