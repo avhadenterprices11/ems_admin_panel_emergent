@@ -11,6 +11,9 @@ import {
   Tag,
   ShoppingBag,
   Percent,
+  Settings,
+  Copy,
+  Calendar,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -24,7 +27,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { eventsAPI, Ticket, TicketStats, CreateTicketInput, UpdateTicketInput } from '../../api/events.api';
+import { 
+  eventsAPI, 
+  Ticket, 
+  TicketStats, 
+  CreateTicketInput, 
+  UpdateTicketInput,
+  Addon,
+  CreateAddonInput,
+  UpdateAddonInput,
+  PromoCode,
+  CreatePromoCodeInput,
+  UpdatePromoCodeInput,
+  EventSettings,
+  UpdateEventSettingsInput,
+} from '../../api/events.api';
 import { toast } from 'sonner';
 import { cn } from '../ui/utils';
 
