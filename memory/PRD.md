@@ -90,6 +90,23 @@ A full-stack Event Management Admin System built with:
 - **Capacity Rules**: Stop sales when full, allow admin overselling, auto-enable waitlist toggles
 - **Confirmation & Invoices**: Auto-send confirmation, attach invoice, show tax breakdown toggles
 
+### 7. Event Detail Module - Registrations Tab ✅ COMPLETE (Jan 3, 2026)
+- **Filter Badges**: All Registrations, Pending Approval, Incomplete, Cancelled (with counts from stats API)
+- **Search**: Filter by name, email, or registration code
+- **Pagination**: 20 items per page with Previous/Next navigation
+- **Registrations Table**: Registrant (name + email), Ticket Type, Date, Payment Status, Registration Status, Actions
+- **Status Display**:
+  - **Registration Status**: Approved (green), Pending (amber), Cancelled (gray)
+  - **Payment Status**: Paid/Free (green), Pending (amber), Failed (red)
+- **Actions Dropdown**:
+  - Approve Registration / Mark as Pending / Cancel Registration
+  - Mark as Paid / Mark Payment Pending / Mark Payment Failed
+- **Add Registration Modal**:
+  - **Registrant Details**: Full name (required), Email (required, validated), Phone (optional)
+  - **Ticket Details**: Ticket type dropdown, Quantity input
+  - **Payment & Status**: Payment status (Paid/Free/Pending), Payment method (Manual/Cash/Bank Transfer/Other), Registration status (Approved/Pending/Cancelled)
+- **Activity Logging**: All registration actions logged to event_activity_logs
+
 ## Technical Architecture
 
 ### Frontend Structure
