@@ -1182,6 +1182,65 @@ export const eventsAPI = {
     const response = await apiClient.post(`/events/${eventId}/communication-settings/reset`);
     return response.data as CommunicationSettings;
   },
+
+  // Reports APIs
+  getReports: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/reports`);
+    return response.data as Report[];
+  },
+
+  getReportById: async (eventId: number | string, reportId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/reports/${reportId}`);
+    return response.data as Report;
+  },
+
+  createReport: async (eventId: number | string, data: CreateReportInput) => {
+    const response = await apiClient.post(`/events/${eventId}/reports`, data);
+    return response.data as Report;
+  },
+
+  updateReport: async (eventId: number | string, reportId: number | string, data: UpdateReportInput) => {
+    const response = await apiClient.put(`/events/${eventId}/reports/${reportId}`, data);
+    return response.data as Report;
+  },
+
+  deleteReport: async (eventId: number | string, reportId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/reports/${reportId}`);
+    return response.data;
+  },
+
+  runReport: async (eventId: number | string, reportId: number | string, options?: { date_from?: string; date_to?: string; limit?: number; offset?: number }) => {
+    const response = await apiClient.post(`/events/${eventId}/reports/${reportId}/run`, null, { params: options });
+    return response.data as ReportRunResult;
+  },
+
+  exportReportCSV: async (eventId: number | string, reportId: number | string, options?: { date_from?: string; date_to?: string }) => {
+    const response = await apiClient.get(`/events/${eventId}/reports/${reportId}/export`, { 
+      params: options,
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  getReportRuns: async (eventId: number | string, reportId: number | string, limit?: number) => {
+    const response = await apiClient.get(`/events/${eventId}/reports/${reportId}/runs`, { params: { limit } });
+    return response.data as ReportRun[];
+  },
+
+  getDataSources: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/reports/data-sources`);
+    return response.data as ReportDataSource[];
+  },
+
+  getStandardReports: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/reports/standard`);
+    return response.data as StandardReport[];
+  },
+
+  runStandardReport: async (eventId: number | string, standardReportId: string, options?: { date_from?: string; date_to?: string }) => {
+    const response = await apiClient.post(`/events/${eventId}/reports/standard/${standardReportId}/run`, null, { params: options });
+    return response.data as { success: boolean; data: Record<string, any>[] };
+  },
 };
 
 export const savedViewsAPI = {
