@@ -107,6 +107,54 @@ A full-stack Event Management Admin System built with:
   - **Payment & Status**: Payment status (Paid/Free/Pending), Payment method (Manual/Cash/Bank Transfer/Other), Registration status (Approved/Pending/Cancelled)
 - **Activity Logging**: All registration actions logged to event_activity_logs
 
+### 8. Event Detail Module - Attendees & Check-in Tab ✅ COMPLETE (Jan 3, 2026)
+- **Live Check-in Metrics** (4 cards):
+  - **Checked In**: X / Y total, percentage checked in
+  - **Peak Check-in Time**: Hour range with most check-ins
+  - **Last Check-in**: Time ago + exact time
+  - **No-Show Rate**: Percentage + count
+- **Attendees Table**:
+  - Columns: Attendee (name + email/QR), Ticket Type, Check-in Time + Location, Status, Actions
+  - **Status Badges**: Checked In (green), Not Here (gray), No Show (red)
+  - **Search**: Filter by name or QR code
+  - **Filter**: Checked-in only checkbox
+  - **Pagination**: 20 per page with Previous/Next
+- **Actions Dropdown**:
+  - Manual Check-in (for not checked-in)
+  - Undo Check-in (for checked-in)
+  - Print Badge (placeholder)
+  - View QR Code
+- **Quick Actions Bar**:
+  - Sync from Registrations button (creates attendees from completed registrations)
+  - Launch Scanner button (opens QR Scanner dialog)
+  - Add Attendee button (opens Add Attendee modal)
+- **QR Scanner Dialog**:
+  - QR Code Value input
+  - Location dropdown (Main Gate, VIP Entrance, Side Entrance, Registration Desk)
+  - Check In button
+- **Add Attendee Modal**:
+  - Full Name (required)
+  - Email (optional)
+  - Ticket Type dropdown (optional)
+- **Sidebar - Active Devices**:
+  - Device name, scan count, online/offline status, battery level
+- **Sidebar - Check-in Locations**:
+  - Location name, check-in count, last check-in time ago
+- **QR Check-in Flow**:
+  - Unique QR code generated at attendee creation (QR-{UUID})
+  - QR validation: Invalid QR → error, Wrong event → error, Already checked in → error
+  - Device tracking: Creates/updates device record with scan count
+  - Location tracking: Logs check-in location for stats
+  - Activity logging: All check-in actions logged
+- **Actions Dropdown**:
+  - Approve Registration / Mark as Pending / Cancel Registration
+  - Mark as Paid / Mark Payment Pending / Mark Payment Failed
+- **Add Registration Modal**:
+  - **Registrant Details**: Full name (required), Email (required, validated), Phone (optional)
+  - **Ticket Details**: Ticket type dropdown, Quantity input
+  - **Payment & Status**: Payment status (Paid/Free/Pending), Payment method (Manual/Cash/Bank Transfer/Other), Registration status (Approved/Pending/Cancelled)
+- **Activity Logging**: All registration actions logged to event_activity_logs
+
 ## Technical Architecture
 
 ### Frontend Structure
