@@ -401,6 +401,79 @@ export const eventsAPI = {
     const response = await apiClient.post(`/events/${eventId}/tickets/${ticketId}/duplicate`);
     return response.data as Ticket;
   },
+
+  // Add-ons Tab APIs
+  getAddons: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/addons`);
+    return response.data as Addon[];
+  },
+
+  getAddonById: async (eventId: number | string, addonId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/addons/${addonId}`);
+    return response.data as Addon;
+  },
+
+  createAddon: async (eventId: number | string, addonData: CreateAddonInput) => {
+    const response = await apiClient.post(`/events/${eventId}/addons`, addonData);
+    return response.data as Addon;
+  },
+
+  updateAddon: async (eventId: number | string, addonId: number | string, addonData: UpdateAddonInput) => {
+    const response = await apiClient.put(`/events/${eventId}/addons/${addonId}`, addonData);
+    return response.data as Addon;
+  },
+
+  deleteAddon: async (eventId: number | string, addonId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/addons/${addonId}`);
+    return response.data;
+  },
+
+  toggleAddonStatus: async (eventId: number | string, addonId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/addons/${addonId}/toggle`);
+    return response.data as Addon;
+  },
+
+  // Promo Codes Tab APIs
+  getPromoCodes: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/promo-codes`);
+    return response.data as PromoCode[];
+  },
+
+  getPromoCodeById: async (eventId: number | string, promoId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/promo-codes/${promoId}`);
+    return response.data as PromoCode;
+  },
+
+  createPromoCode: async (eventId: number | string, promoData: CreatePromoCodeInput) => {
+    const response = await apiClient.post(`/events/${eventId}/promo-codes`, promoData);
+    return response.data as PromoCode;
+  },
+
+  updatePromoCode: async (eventId: number | string, promoId: number | string, promoData: UpdatePromoCodeInput) => {
+    const response = await apiClient.put(`/events/${eventId}/promo-codes/${promoId}`, promoData);
+    return response.data as PromoCode;
+  },
+
+  deletePromoCode: async (eventId: number | string, promoId: number | string) => {
+    const response = await apiClient.delete(`/events/${eventId}/promo-codes/${promoId}`);
+    return response.data;
+  },
+
+  togglePromoCodeStatus: async (eventId: number | string, promoId: number | string) => {
+    const response = await apiClient.post(`/events/${eventId}/promo-codes/${promoId}/toggle`);
+    return response.data as PromoCode;
+  },
+
+  // Event Settings Tab APIs
+  getEventSettings: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/settings`);
+    return response.data as EventSettings;
+  },
+
+  updateEventSettings: async (eventId: number | string, settingsData: UpdateEventSettingsInput) => {
+    const response = await apiClient.put(`/events/${eventId}/settings`, settingsData);
+    return response.data as EventSettings;
+  },
 };
 
 export const savedViewsAPI = {
