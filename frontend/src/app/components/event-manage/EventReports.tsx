@@ -72,8 +72,13 @@ import {
 
 type ViewMode = 'dashboard' | 'builder' | 'view';
 
-export function EventReports() {
-  const { eventId } = useParams<{ eventId: string }>();
+interface EventReportsProps {
+  eventId?: number | string;
+}
+
+export function EventReports({ eventId: propEventId }: EventReportsProps) {
+  const { id: paramId } = useParams<{ id: string }>();
+  const eventId = propEventId?.toString() || paramId;
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
