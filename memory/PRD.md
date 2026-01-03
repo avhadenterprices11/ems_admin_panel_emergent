@@ -134,6 +134,17 @@ A full-stack Event Management Admin System built with:
 - `GET /api/events/:eventId/overview/alerts` - Get attention needed alerts
 - `GET /api/events/:eventId/overview/activity` - Get event activity timeline
 
+### Event Detail - Tickets Tab (NEW - Jan 3, 2026)
+- `GET /api/events/:eventId/tickets` - List all tickets for an event
+- `GET /api/events/:eventId/tickets/stats` - Get ticket statistics
+- `POST /api/events/:eventId/tickets` - Create new ticket
+- `GET /api/events/:eventId/tickets/:ticketId` - Get single ticket by ID
+- `PUT /api/events/:eventId/tickets/:ticketId` - Update ticket
+- `DELETE /api/events/:eventId/tickets/:ticketId` - Delete ticket (soft delete)
+- `POST /api/events/:eventId/tickets/:ticketId/toggle-sales` - Toggle ticket sales (pause/resume)
+- `POST /api/events/:eventId/tickets/:ticketId/end-sales` - End ticket sales permanently
+- `POST /api/events/:eventId/tickets/:ticketId/duplicate` - Duplicate ticket
+
 ### File Upload
 - `POST /api/upload/single` - Upload single file
 - `POST /api/upload/multiple` - Upload multiple files
