@@ -50,7 +50,7 @@ A full-stack Event Management Admin System built with:
 
 ### 5. Event Detail Module - Tickets Tab ✅ COMPLETE (Jan 3, 2026)
 - **Stats Cards**: Total Sales, Tickets Sold / Total Capacity, Add-on Revenue, Avg Order Value
-- **Sub-tabs**: Ticket Inventory (active), Add-ons (placeholder), Promo Codes (placeholder)
+- **Sub-tabs**: Ticket Inventory, Add-ons, Promo Codes, Settings
 - **Ticket CRUD**:
   - **Create Ticket**: Name, description, price, capacity, category, min/max per order, sales dates, visibility, on-sale toggle
   - **Edit Ticket**: Update all ticket fields via dialog
@@ -62,6 +62,33 @@ A full-stack Event Management Admin System built with:
 - **Ticket Table**: Name, Type (paid/free), Price, Sold/Capacity with progress bar, Status badge, Sales Period, Actions dropdown
 - **Search**: Filter tickets by name or category
 - **Inventory Management**: Status auto-updates based on capacity, sales dates, and is_on_sale flag
+
+### 6. Event Detail Module - Tickets Tab Sub-tabs ✅ COMPLETE (Jan 3, 2026)
+
+#### 6.1 Add-ons Sub-tab
+- **Add-on CRUD**:
+  - **Create**: Name, description, type (general/merchandise/food/access/parking), price, quantity limit, per order limit, active toggle
+  - **Edit**: Update all add-on fields via dialog
+  - **Delete**: Soft delete (disabled if quantity_sold > 0)
+- **Toggle Status**: Activate/Deactivate add-ons
+- **Add-on Table**: Name, Type, Price, Sold/Limit with progress bar, Status badge, Actions dropdown
+
+#### 6.2 Promo Codes Sub-tab
+- **Promo Code CRUD**:
+  - **Create**: Code (with Generate button), discount type (percentage/fixed), discount value, max discount amount, min order value, usage limit, applicable to (all/tickets/addons), valid from/until dates, active toggle
+  - **Edit**: Update all promo code fields via dialog
+  - **Delete**: Soft delete
+- **Toggle Status**: Activate/Deactivate promo codes
+- **Copy to Clipboard**: Copy promo code with toast notification
+- **Promo Table**: Code, Discount, Usage count/limit, Validity period, Status badge, Actions dropdown
+
+#### 6.3 Settings Sub-tab
+- **Tax & Fees**: Pass fees to attendees toggle, charge tax toggle with type/rate inputs
+- **Refund Policy**: Policy type dropdown (No Refunds, Full Refund, Partial Refund, Custom) with deadline days and percentage inputs
+- **Ticket Sales Rules**: Allow transfers, allow cancellations, lock changes after event start toggles
+- **Visibility Rules**: Hide sold out tickets, auto-hide past tickets toggles
+- **Capacity Rules**: Stop sales when full, allow admin overselling, auto-enable waitlist toggles
+- **Confirmation & Invoices**: Auto-send confirmation, attach invoice, show tax breakdown toggles
 
 ## Technical Architecture
 
