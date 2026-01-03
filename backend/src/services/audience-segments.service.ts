@@ -311,8 +311,7 @@ export class AudienceSegmentsService {
         'a.attendee_email',
         't.name as ticket_name',
         'a.checkin_status',
-        'r.status as registration_status',
-        'r.city'
+        'r.status as registration_status'
       )
       .where('sm.segment_id', segmentId)
       .orderBy('a.attendee_name', 'asc')
