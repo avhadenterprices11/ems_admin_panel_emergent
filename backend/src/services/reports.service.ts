@@ -124,8 +124,8 @@ export const DATA_SOURCES = [
     table: 'event_registrations',
     alias: 'r',
     fields: [
-      { id: 'reg_name', name: 'Registrant Name', column: 'attendee_name', type: 'text' },
-      { id: 'reg_email', name: 'Email', column: 'attendee_email', type: 'text' },
+      { id: 'reg_name', name: 'Registrant Name', column: 'registrant_name', type: 'text' },
+      { id: 'reg_email', name: 'Email', column: 'registrant_email', type: 'text' },
       { id: 'reg_status', name: 'Status', column: 'status', type: 'text' },
       { id: 'reg_date', name: 'Registration Date', column: 'created_at', type: 'date' },
       { id: 'reg_amount', name: 'Amount Paid', column: 'total_amount', type: 'number' },
