@@ -126,4 +126,22 @@ router.put('/:eventId/templates/:templateId', (req, res) => templatesController.
 router.delete('/:eventId/templates/:templateId', (req, res) => templatesController.deleteTemplate(req, res));
 router.post('/:eventId/templates/:templateId/duplicate', (req, res) => templatesController.duplicateTemplate(req, res));
 
+// Event Detail - Communications Tab - Audience Segments APIs
+router.get('/:eventId/segments', (req, res) => audienceSegmentsController.getSegments(req, res));
+router.get('/:eventId/segments/filter-fields', (req, res) => audienceSegmentsController.getFilterFields(req, res));
+router.post('/:eventId/segments/preview', (req, res) => audienceSegmentsController.previewSegment(req, res));
+router.post('/:eventId/segments', (req, res) => audienceSegmentsController.createSegment(req, res));
+router.get('/:eventId/segments/:segmentId', (req, res) => audienceSegmentsController.getSegmentById(req, res));
+router.put('/:eventId/segments/:segmentId', (req, res) => audienceSegmentsController.updateSegment(req, res));
+router.delete('/:eventId/segments/:segmentId', (req, res) => audienceSegmentsController.deleteSegment(req, res));
+router.get('/:eventId/segments/:segmentId/members', (req, res) => audienceSegmentsController.getSegmentMembers(req, res));
+router.post('/:eventId/segments/:segmentId/refresh', (req, res) => audienceSegmentsController.refreshSegment(req, res));
+
+// Event Detail - Communications Tab - Communication Settings APIs
+router.get('/:eventId/communication-settings', (req, res) => communicationSettingsController.getSettings(req, res));
+router.put('/:eventId/communication-settings', (req, res) => communicationSettingsController.updateSettings(req, res));
+router.post('/:eventId/communication-settings/validate', (req, res) => communicationSettingsController.validateSettings(req, res));
+router.get('/:eventId/communication-settings/quiet-hours', (req, res) => communicationSettingsController.getQuietHoursStatus(req, res));
+router.post('/:eventId/communication-settings/reset', (req, res) => communicationSettingsController.resetSettings(req, res));
+
 export default router;
