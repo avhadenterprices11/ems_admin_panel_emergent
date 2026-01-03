@@ -11,6 +11,7 @@ import { CampaignsController } from '../controllers/campaigns.controller';
 import { TemplatesController } from '../controllers/templates.controller';
 import { AudienceSegmentsController } from '../controllers/audience-segments.controller';
 import { CommunicationSettingsController } from '../controllers/communication-settings.controller';
+import { ReportsController } from '../controllers/reports.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -28,6 +29,7 @@ const campaignsController = new CampaignsController();
 const templatesController = new TemplatesController();
 const audienceSegmentsController = new AudienceSegmentsController();
 const communicationSettingsController = new CommunicationSettingsController();
+const reportsController = new ReportsController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
@@ -143,5 +145,18 @@ router.put('/:eventId/communication-settings', (req, res) => communicationSettin
 router.post('/:eventId/communication-settings/validate', (req, res) => communicationSettingsController.validateSettings(req, res));
 router.get('/:eventId/communication-settings/quiet-hours', (req, res) => communicationSettingsController.getQuietHoursStatus(req, res));
 router.post('/:eventId/communication-settings/reset', (req, res) => communicationSettingsController.resetSettings(req, res));
+
+// Event Detail - Reports Tab APIs
+router.get('/:eventId/reports', (req, res) => reportsController.getReports(req, res));
+router.get('/:eventId/reports/data-sources', (req, res) => reportsController.getDataSources(req, res));
+router.get('/:eventId/reports/standard', (req, res) => reportsController.getStandardReports(req, res));
+router.post('/:eventId/reports', (req, res) => reportsController.createReport(req, res));
+router.get('/:eventId/reports/:reportId', (req, res) => reportsController.getReportById(req, res));
+router.put('/:eventId/reports/:reportId', (req, res) => reportsController.updateReport(req, res));
+router.delete('/:eventId/reports/:reportId', (req, res) => reportsController.deleteReport(req, res));
+router.post('/:eventId/reports/:reportId/run', (req, res) => reportsController.runReport(req, res));
+router.get('/:eventId/reports/:reportId/export', (req, res) => reportsController.exportReportCSV(req, res));
+router.get('/:eventId/reports/:reportId/runs', (req, res) => reportsController.getReportRuns(req, res));
+router.post('/:eventId/reports/standard/:standardReportId/run', (req, res) => reportsController.runStandardReport(req, res));
 
 export default router;
