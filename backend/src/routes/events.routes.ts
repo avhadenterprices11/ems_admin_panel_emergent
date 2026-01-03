@@ -9,6 +9,8 @@ import { RegistrationsController } from '../controllers/registrations.controller
 import { AttendeesController } from '../controllers/attendees.controller';
 import { CampaignsController } from '../controllers/campaigns.controller';
 import { TemplatesController } from '../controllers/templates.controller';
+import { AudienceSegmentsController } from '../controllers/audience-segments.controller';
+import { CommunicationSettingsController } from '../controllers/communication-settings.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -24,6 +26,8 @@ const registrationsController = new RegistrationsController();
 const attendeesController = new AttendeesController();
 const campaignsController = new CampaignsController();
 const templatesController = new TemplatesController();
+const audienceSegmentsController = new AudienceSegmentsController();
+const communicationSettingsController = new CommunicationSettingsController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
