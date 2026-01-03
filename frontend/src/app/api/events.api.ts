@@ -278,6 +278,77 @@ export interface UpdateEventSettingsInput {
   auto_enable_waitlist?: boolean;
 }
 
+// Registration interfaces
+export interface Registration {
+  id: number;
+  event_id: number;
+  user_id?: number;
+  registrant_name?: string;
+  registrant_email?: string;
+  registrant_phone?: string;
+  ticket_id?: number;
+  quantity: number;
+  status: string;
+  registration_source: string;
+  payment_status?: string;
+  payment_method?: string;
+  total_amount: number;
+  currency: string;
+  registration_code?: string;
+  metadata?: any;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+  ticket_name?: string;
+}
+
+export interface RegistrationListParams {
+  status?: string;
+  payment_status?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface RegistrationListResponse {
+  registrations: Registration[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface RegistrationStats {
+  total: number;
+  pending: number;
+  incomplete: number;
+  cancelled: number;
+  approved: number;
+}
+
+export interface CreateRegistrationInput {
+  registrant_name: string;
+  registrant_email: string;
+  registrant_phone?: string;
+  ticket_id?: number;
+  quantity?: number;
+  status?: string;
+  payment_status?: string;
+  payment_method?: string;
+  total_amount?: number;
+}
+
+export interface UpdateRegistrationInput {
+  registrant_name?: string;
+  registrant_email?: string;
+  registrant_phone?: string;
+  ticket_id?: number;
+  quantity?: number;
+  status?: string;
+  payment_status?: string;
+  payment_method?: string;
+  total_amount?: number;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
