@@ -214,8 +214,6 @@ export class AudienceSegmentsService {
       checkin_status: 'a.checkin_status',
       registration_status: 'r.status',
       registration_date: 'r.created_at',
-      city: 'r.city',
-      tags: 'a.tags',
       attendee_email: 'a.attendee_email',
       attendee_name: 'a.attendee_name',
     };
