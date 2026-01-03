@@ -80,4 +80,17 @@ router.delete('/:eventId/registrations/:registrationId', (req, res) => registrat
 router.post('/:eventId/registrations/:registrationId/status', (req, res) => registrationsController.updateRegistrationStatus(req, res));
 router.post('/:eventId/registrations/:registrationId/payment-status', (req, res) => registrationsController.updatePaymentStatus(req, res));
 
+// Event Detail - Attendees & Check-in Tab APIs
+router.get('/:eventId/attendees', (req, res) => attendeesController.getAttendees(req, res));
+router.get('/:eventId/attendees/metrics', (req, res) => attendeesController.getCheckinMetrics(req, res));
+router.get('/:eventId/attendees/devices', (req, res) => attendeesController.getActiveDevices(req, res));
+router.get('/:eventId/attendees/locations', (req, res) => attendeesController.getLocationStats(req, res));
+router.post('/:eventId/attendees', (req, res) => attendeesController.createAttendee(req, res));
+router.post('/:eventId/attendees/sync', (req, res) => attendeesController.syncAttendees(req, res));
+router.post('/:eventId/attendees/qr-checkin', (req, res) => attendeesController.qrCheckin(req, res));
+router.get('/:eventId/attendees/:attendeeId', (req, res) => attendeesController.getAttendeeById(req, res));
+router.post('/:eventId/attendees/:attendeeId/checkin', (req, res) => attendeesController.manualCheckin(req, res));
+router.post('/:eventId/attendees/:attendeeId/undo-checkin', (req, res) => attendeesController.undoCheckin(req, res));
+router.put('/devices/:deviceId/status', (req, res) => attendeesController.updateDeviceStatus(req, res));
+
 export default router;
