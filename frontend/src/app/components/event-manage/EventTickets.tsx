@@ -825,22 +825,485 @@ export const EventTickets = ({ eventId }: EventTicketsProps) => {
           </div>
         </TabsContent>
 
-        {/* Add-ons Tab (Placeholder) */}
+        {/* Add-ons Tab */}
         <TabsContent value="addons" className="mt-0">
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-12 text-center">
-            <ShoppingBag size={48} className="mx-auto mb-4 text-slate-300" />
-            <p className="text-lg font-medium text-slate-600">Add-ons coming soon</p>
-            <p className="text-sm text-slate-400">Offer merchandise, parking, or extras with ticket purchases</p>
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            {addons.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                <ShoppingBag size={48} className="mb-4" />
+                <p className="text-lg font-medium">No add-ons found</p>
+                <p className="text-sm">Create add-ons to offer merchandise, parking, or extras</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50/50">
+                    <TableHead className="font-semibold">Add-on Name</TableHead>
+                    <TableHead className="font-semibold">Type</TableHead>
+                    <TableHead className="font-semibold">Price</TableHead>
+                    <TableHead className="font-semibold">Sold / Limit</TableHead>
+                    <TableHead className="font-semibold">Status</TableHead>
+                    <TableHead className="font-semibold text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {addons.map((addon) => (
+                    <TableRow key={addon.id} className="hover:bg-slate-50/50" data-testid={`addon-row-${addon.id}`}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium text-[#1d293d]">{addon.name}</div>
+                          {addon.description && (
+                            <div className="text-xs text-slate-500 truncate max-w-[200px]">{addon.description}</div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {addon.addon_type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatCurrency(parseFloat(addon.price.toString()))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {addon.unlimited_quantity ? (
+                            <span className="text-sm text-slate-600">{addon.quantity_sold} / ∞</span>
+                          ) : (
+                            <>
+                              <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div
+                                  className={cn(
+                                    'h-full rounded-full',
+                                    addon.quantity_limit && addon.quantity_sold >= addon.quantity_limit ? 'bg-rose-500' :
+                                    addon.quantity_limit && addon.quantity_sold / addon.quantity_limit > 0.8 ? 'bg-amber-500' : 'bg-emerald-500'
+                                  )}
+                                  style={{ width: `${addon.quantity_limit ? Math.min((addon.quantity_sold / addon.quantity_limit) * 100, 100) : 0}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-slate-600">
+                                {addon.quantity_sold} / {addon.quantity_limit}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={cn('font-medium', addon.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700')}>
+                          {addon.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" data-testid={`addon-actions-${addon.id}`}>
+                              <MoreHorizontal size={16} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => openEditAddonDialog(addon)}>
+                              Edit Add-on
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleToggleAddonStatus(addon.id)}>
+                              {addon.is_active ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              onClick={() => { setAddonToDelete(addon.id); setDeleteAddonConfirmationOpen(true); }}
+                              className="text-rose-600"
+                              disabled={addon.quantity_sold > 0}
+                            >
+                              Delete Add-on
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </TabsContent>
 
-        {/* Promo Codes Tab (Placeholder) */}
+        {/* Promo Codes Tab */}
         <TabsContent value="promos" className="mt-0">
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-12 text-center">
-            <Percent size={48} className="mx-auto mb-4 text-slate-300" />
-            <p className="text-lg font-medium text-slate-600">Promo Codes coming soon</p>
-            <p className="text-sm text-slate-400">Create discount codes for your tickets</p>
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            {promoCodes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                <Percent size={48} className="mb-4" />
+                <p className="text-lg font-medium">No promo codes found</p>
+                <p className="text-sm">Create promo codes to offer discounts on tickets</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50/50">
+                    <TableHead className="font-semibold">Code</TableHead>
+                    <TableHead className="font-semibold">Discount</TableHead>
+                    <TableHead className="font-semibold">Usage</TableHead>
+                    <TableHead className="font-semibold">Validity</TableHead>
+                    <TableHead className="font-semibold">Status</TableHead>
+                    <TableHead className="font-semibold text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {promoCodes.map((promo) => (
+                    <TableRow key={promo.id} className="hover:bg-slate-50/50" data-testid={`promo-row-${promo.id}`}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <code className="font-mono font-semibold text-[#1d293d] bg-slate-100 px-2 py-1 rounded">
+                            {promo.code}
+                          </code>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => { navigator.clipboard.writeText(promo.code); toast.success('Code copied!'); }}
+                          >
+                            <Copy size={12} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">
+                          {promo.discount_type === 'percentage' 
+                            ? `${promo.discount_value}% off` 
+                            : formatCurrency(parseFloat(promo.discount_value.toString()))}
+                        </div>
+                        {promo.max_discount_amount && (
+                          <div className="text-xs text-slate-500">Max: {formatCurrency(parseFloat(promo.max_discount_amount.toString()))}</div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-slate-600">
+                          {promo.usage_count} / {promo.usage_limit || '∞'}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm text-slate-600">
+                        {promo.valid_from || promo.valid_until ? (
+                          <div>
+                            {formatDate(promo.valid_from)} - {formatDate(promo.valid_until)}
+                          </div>
+                        ) : (
+                          'No limit'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={cn('font-medium', promo.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700')}>
+                          {promo.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" data-testid={`promo-actions-${promo.id}`}>
+                              <MoreHorizontal size={16} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => openEditPromoDialog(promo)}>
+                              Edit Promo Code
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleTogglePromoStatus(promo.id)}>
+                              {promo.is_active ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              onClick={() => { setPromoToDelete(promo.id); setDeletePromoConfirmationOpen(true); }}
+                              className="text-rose-600"
+                            >
+                              Delete Promo Code
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="mt-0">
+          {settingsLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+            </div>
+          ) : settings ? (
+            <div className="space-y-6">
+              {/* Tax & Fees */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#1d293d] mb-4">Tax & Fees</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Pass Fees to Attendees</Label>
+                      <p className="text-xs text-slate-500">Add service fees on top of ticket price</p>
+                    </div>
+                    <Switch
+                      checked={settings.pass_fees_to_attendees}
+                      onCheckedChange={(checked) => handleUpdateSettings({ pass_fees_to_attendees: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Charge Tax</Label>
+                      <p className="text-xs text-slate-500">Apply tax to ticket sales</p>
+                    </div>
+                    <Switch
+                      checked={settings.charge_tax}
+                      onCheckedChange={(checked) => handleUpdateSettings({ charge_tax: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  {settings.charge_tax && (
+                    <div className="grid grid-cols-2 gap-4 pt-2">
+                      <div className="space-y-2">
+                        <Label>Tax Type</Label>
+                        <Select
+                          value={settings.tax_type || 'vat'}
+                          onValueChange={(value) => handleUpdateSettings({ tax_type: value })}
+                          disabled={settingsSaving}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="vat">VAT</SelectItem>
+                            <SelectItem value="gst">GST</SelectItem>
+                            <SelectItem value="sales_tax">Sales Tax</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Tax Rate (%)</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          value={settings.tax_rate || 0}
+                          onChange={(e) => handleUpdateSettings({ tax_rate: parseFloat(e.target.value) || 0 })}
+                          disabled={settingsSaving}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Refund Policy */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#1d293d] mb-4">Refund Policy</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Refund Policy</Label>
+                    <Select
+                      value={settings.refund_policy}
+                      onValueChange={(value) => handleUpdateSettings({ refund_policy: value })}
+                      disabled={settingsSaving}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no_refunds">No Refunds</SelectItem>
+                        <SelectItem value="full_refund">Full Refund</SelectItem>
+                        <SelectItem value="partial_refund">Partial Refund</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {(settings.refund_policy === 'partial_refund' || settings.refund_policy === 'custom') && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Deadline (days before event)</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={settings.refund_deadline_days || 0}
+                          onChange={(e) => handleUpdateSettings({ refund_deadline_days: parseInt(e.target.value) || 0 })}
+                          disabled={settingsSaving}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Refund Percentage (%)</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={settings.refund_percentage || 0}
+                          onChange={(e) => handleUpdateSettings({ refund_percentage: parseFloat(e.target.value) || 0 })}
+                          disabled={settingsSaving}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Ticket Sales Rules */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#1d293d] mb-4">Ticket Sales Rules</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Allow Transfers</Label>
+                      <p className="text-xs text-slate-500">Allow attendees to transfer tickets</p>
+                    </div>
+                    <Switch
+                      checked={settings.allow_transfers}
+                      onCheckedChange={(checked) => handleUpdateSettings({ allow_transfers: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Allow Cancellations</Label>
+                      <p className="text-xs text-slate-500">Allow attendees to cancel registrations</p>
+                    </div>
+                    <Switch
+                      checked={settings.allow_cancellations}
+                      onCheckedChange={(checked) => handleUpdateSettings({ allow_cancellations: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Lock Changes After Event Start</Label>
+                      <p className="text-xs text-slate-500">Prevent modifications once event begins</p>
+                    </div>
+                    <Switch
+                      checked={settings.lock_changes_after_event_start}
+                      onCheckedChange={(checked) => handleUpdateSettings({ lock_changes_after_event_start: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Visibility Rules */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#1d293d] mb-4">Visibility Rules</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Hide Sold Out Tickets</Label>
+                      <p className="text-xs text-slate-500">Don't show tickets with no availability</p>
+                    </div>
+                    <Switch
+                      checked={settings.hide_sold_out_tickets}
+                      onCheckedChange={(checked) => handleUpdateSettings({ hide_sold_out_tickets: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Auto-hide Past Tickets</Label>
+                      <p className="text-xs text-slate-500">Hide tickets after sales end date</p>
+                    </div>
+                    <Switch
+                      checked={settings.auto_hide_past_tickets}
+                      onCheckedChange={(checked) => handleUpdateSettings({ auto_hide_past_tickets: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Capacity Rules */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#1d293d] mb-4">Capacity Rules</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Stop Sales When Full</Label>
+                      <p className="text-xs text-slate-500">Automatically stop sales at capacity</p>
+                    </div>
+                    <Switch
+                      checked={settings.stop_sales_when_full}
+                      onCheckedChange={(checked) => handleUpdateSettings({ stop_sales_when_full: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Allow Admin Overselling</Label>
+                      <p className="text-xs text-slate-500">Let admins sell beyond capacity</p>
+                    </div>
+                    <Switch
+                      checked={settings.allow_admin_overselling}
+                      onCheckedChange={(checked) => handleUpdateSettings({ allow_admin_overselling: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Auto-enable Waitlist</Label>
+                      <p className="text-xs text-slate-500">Enable waitlist when sold out</p>
+                    </div>
+                    <Switch
+                      checked={settings.auto_enable_waitlist}
+                      onCheckedChange={(checked) => handleUpdateSettings({ auto_enable_waitlist: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Confirmation & Invoices */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#1d293d] mb-4">Confirmation & Invoices</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Auto-send Confirmation</Label>
+                      <p className="text-xs text-slate-500">Send email on successful registration</p>
+                    </div>
+                    <Switch
+                      checked={settings.auto_send_confirmation}
+                      onCheckedChange={(checked) => handleUpdateSettings({ auto_send_confirmation: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Attach Invoice</Label>
+                      <p className="text-xs text-slate-500">Include invoice PDF in confirmation</p>
+                    </div>
+                    <Switch
+                      checked={settings.attach_invoice}
+                      onCheckedChange={(checked) => handleUpdateSettings({ attach_invoice: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="font-medium">Show Tax Breakdown</Label>
+                      <p className="text-xs text-slate-500">Display tax details on invoice</p>
+                    </div>
+                    <Switch
+                      checked={settings.show_tax_breakdown}
+                      onCheckedChange={(checked) => handleUpdateSettings({ show_tax_breakdown: checked })}
+                      disabled={settingsSaving}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+              <Settings size={48} className="mb-4" />
+              <p className="text-lg font-medium">Unable to load settings</p>
+              <Button variant="outline" onClick={fetchSettings} className="mt-4">
+                Retry
+              </Button>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
