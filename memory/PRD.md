@@ -248,8 +248,8 @@ A full-stack Event Management Admin System built with:
 ### saved_views
 - id (primary key), name, module, configuration (jsonb), user_id (foreign key), created_at, updated_at, deleted_at
 
-### event_registrations (NEW - Jan 2, 2026)
-- id (bigint), event_id, user_id, status, registration_source, payment_status, total_amount, currency, metadata, created_at, updated_at, is_deleted
+### event_registrations (EXTENDED - Jan 3, 2026)
+- id (bigint), event_id, user_id, registrant_name, registrant_email, registrant_phone, ticket_id, quantity, status, registration_source, payment_status, payment_method, total_amount, currency, registration_code, metadata, created_at, updated_at, is_deleted
 
 ### tickets (NEW - Jan 2, 2026)
 - id (bigint), event_id, name, description, price, currency, capacity, sold_count, status, sales_start_at, sales_end_at, created_at, updated_at, is_deleted
