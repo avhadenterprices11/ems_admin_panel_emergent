@@ -302,7 +302,7 @@ A full-stack Event Management Admin System built with:
 ## Upcoming Tasks
 
 ### P1 - High Priority
-1. Event Detail Page - Remaining tabs (Registrations, Attendees & Check-in, Communications, Reports, Settings)
+1. Event Detail Page - Remaining tabs (Attendees & Check-in, Communications, Reports)
 2. Edit Event Page - UI and backend logic to edit existing events
 3. AWS S3 Production Configuration - Add real AWS credentials
 
@@ -328,6 +328,16 @@ A full-stack Event Management Admin System built with:
 5. ✅ Updated frontend EventTickets.tsx with all sub-tabs, dialogs, and handlers
 6. ✅ All 30 backend tests passed (100% success rate)
 7. ✅ Frontend fully functional with all CRUD operations working correctly
+8. ✅ **Implemented Registrations Tab**:
+   - Filter badges (All, Pending Approval, Incomplete, Cancelled) with counts
+   - Search by name, email, or registration code
+   - Pagination with 20 items per page
+   - Table with columns: Registrant, Ticket Type, Date, Payment, Status, Actions
+   - Add Registration modal with 3 sections (Registrant Details, Ticket Details, Payment & Status)
+   - Actions dropdown: Approve/Pending/Cancel registration, Mark payment status
+9. ✅ Extended event_registrations table with registrant_name, registrant_email, registrant_phone, ticket_id, quantity, payment_method, registration_code
+10. ✅ Built 8 new backend APIs for Registrations
+11. ✅ All 31 backend tests passed (100% success rate) for Registrations
 
 ### Test Credentials
 - **URL**: https://eventpanel-3.preview.emergentagent.com
@@ -337,7 +347,6 @@ A full-stack Event Management Admin System built with:
 
 ## Mocked APIs
 - **File Uploads**: Uses local `/app/uploads` directory instead of AWS S3
-9. Analytics Dashboard - Event performance metrics
 
 ## Environment Variables
 
