@@ -48,6 +48,21 @@ A full-stack Event Management Admin System built with:
 - **Event Timeline**: Chronological list of system and admin actions
 - **Recent Internal Activity**: Activity log feed with actor types and timestamps
 
+### 5. Event Detail Module - Tickets Tab ✅ COMPLETE (Jan 3, 2026)
+- **Stats Cards**: Total Sales, Tickets Sold / Total Capacity, Add-on Revenue, Avg Order Value
+- **Sub-tabs**: Ticket Inventory (active), Add-ons (placeholder), Promo Codes (placeholder)
+- **Ticket CRUD**:
+  - **Create Ticket**: Name, description, price, capacity, category, min/max per order, sales dates, visibility, on-sale toggle
+  - **Edit Ticket**: Update all ticket fields via dialog
+  - **Delete Ticket**: Soft delete (blocked if ticket has sales)
+- **Ticket Actions**:
+  - **Pause/Resume Sales**: Toggle is_on_sale status
+  - **End Sales**: Permanently end ticket sales (confirmation required)
+  - **Duplicate**: Create copy with "(Copy)" suffix
+- **Ticket Table**: Name, Type (paid/free), Price, Sold/Capacity with progress bar, Status badge, Sales Period, Actions dropdown
+- **Search**: Filter tickets by name or category
+- **Inventory Management**: Status auto-updates based on capacity, sales dates, and is_on_sale flag
+
 ## Technical Architecture
 
 ### Frontend Structure
