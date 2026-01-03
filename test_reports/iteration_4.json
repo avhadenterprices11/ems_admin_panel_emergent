@@ -1,0 +1,101 @@
+{
+  "summary": "Completed comprehensive testing of Tickets Tab sub-tabs: Add-ons, Promo Codes, and Settings. All 30 backend API tests passed (100%). Frontend UI fully functional with all CRUD operations working correctly for Add-ons and Promo Codes. Settings sub-tab displays all 6 sections with working toggles.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/tests/test_addons_promos_settings_api.py",
+    "/app/test_reports/pytest/pytest_addons_promos_settings.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All Add-ons APIs properly implemented with validation (name required, price >= 0)",
+    "All Promo Codes APIs properly implemented with validation (code required, discount_type must be percentage/fixed, percentage <= 100, discount_value > 0)",
+    "Event Settings API properly handles all 18 settings fields with proper type conversion",
+    "Frontend correctly displays all sub-tabs: Ticket Inventory, Add-ons, Promo Codes, Settings",
+    "Add-on dialog has all required fields: name, description, type, price, quantity limit, per order limit, active toggle",
+    "Promo Code dialog has Generate button for random code generation",
+    "Settings sub-tab has all 6 sections: Tax & Fees, Refund Policy, Ticket Sales Rules, Visibility Rules, Capacity Rules, Confirmation & Invoices",
+    "Toggle status functionality works for both Add-ons and Promo Codes",
+    "Copy to clipboard functionality works for promo codes"
+  ],
+  "updated_files": [
+    "/app/tests/test_addons_promos_settings_api.py"
+  ],
+  "success_rate": {
+    "backend": "100% (30/30 tests passed)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "api_base_url": "https://eventpanel-3.preview.emergentagent.com",
+    "test_event_id": 1,
+    "login_email": "admin@example.com",
+    "login_password": "admin123"
+  },
+  "seed_data_creation": "Test data created and cleaned up during testing. Event ID 1 has 1 add-on (Event T-Shirt) and 1 promo code (EARLYBIRD20)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Tickets Tab sub-tabs fully functional. Add-ons CRUD: GET/POST/PUT/DELETE /api/events/:eventId/addons + toggle status. Promo Codes CRUD: GET/POST/PUT/DELETE /api/events/:eventId/promo-codes + toggle status. Settings: GET/PUT /api/events/:eventId/settings with 18 configurable fields across 6 sections.",
+  "features_tested": {
+    "addons_api": {
+      "get_list": {"status": "PASS", "details": "GET /api/events/:eventId/addons returns list of non-deleted add-ons"},
+      "create": {"status": "PASS", "details": "POST /api/events/:eventId/addons creates add-on with validation"},
+      "get_by_id": {"status": "PASS", "details": "GET /api/events/:eventId/addons/:addonId returns single add-on, 404 for not found"},
+      "update": {"status": "PASS", "details": "PUT /api/events/:eventId/addons/:addonId updates add-on fields"},
+      "delete": {"status": "PASS", "details": "DELETE /api/events/:eventId/addons/:addonId soft deletes add-on"},
+      "toggle_status": {"status": "PASS", "details": "POST /api/events/:eventId/addons/:addonId/toggle toggles is_active"}
+    },
+    "promo_codes_api": {
+      "get_list": {"status": "PASS", "details": "GET /api/events/:eventId/promo-codes returns list of non-deleted promo codes"},
+      "create_percentage": {"status": "PASS", "details": "POST creates percentage discount promo code"},
+      "create_fixed": {"status": "PASS", "details": "POST creates fixed amount discount promo code"},
+      "validation": {"status": "PASS", "details": "Validates code required, discount_type, percentage <= 100, value > 0"},
+      "get_by_id": {"status": "PASS", "details": "GET /api/events/:eventId/promo-codes/:promoId returns single promo, 404 for not found"},
+      "update": {"status": "PASS", "details": "PUT /api/events/:eventId/promo-codes/:promoId updates promo code fields"},
+      "delete": {"status": "PASS", "details": "DELETE /api/events/:eventId/promo-codes/:promoId soft deletes promo code"},
+      "toggle_status": {"status": "PASS", "details": "POST /api/events/:eventId/promo-codes/:promoId/toggle toggles is_active"}
+    },
+    "settings_api": {
+      "get_settings": {"status": "PASS", "details": "GET /api/events/:eventId/settings returns all 18 settings fields"},
+      "update_tax_fees": {"status": "PASS", "details": "Updates pass_fees_to_attendees, charge_tax, tax_type, tax_rate"},
+      "update_refund_policy": {"status": "PASS", "details": "Updates refund_policy, refund_deadline_days, refund_percentage"},
+      "update_ticket_sales_rules": {"status": "PASS", "details": "Updates allow_transfers, allow_cancellations, lock_changes_after_event_start"},
+      "update_visibility_rules": {"status": "PASS", "details": "Updates hide_sold_out_tickets, auto_hide_past_tickets"},
+      "update_approval_mode": {"status": "PASS", "details": "Updates approval_mode, pending_approval_expiry_hours"},
+      "update_confirmation_invoices": {"status": "PASS", "details": "Updates auto_send_confirmation, attach_invoice, show_tax_breakdown"},
+      "update_capacity_rules": {"status": "PASS", "details": "Updates stop_sales_when_full, allow_admin_overselling, auto_enable_waitlist"}
+    },
+    "frontend_addons_tab": {
+      "table_display": {"status": "PASS", "details": "Table shows Add-on Name, Type, Price, Sold/Limit, Status, Actions columns"},
+      "add_addon_button": {"status": "PASS", "details": "Add Add-on button opens create dialog"},
+      "add_addon_dialog": {"status": "PASS", "details": "Dialog has all fields: name, description, type, price, quantity limit, per order limit, active toggle"},
+      "edit_addon": {"status": "PASS", "details": "Edit option opens dialog pre-filled with add-on data"},
+      "toggle_status": {"status": "PASS", "details": "Deactivate/Activate option toggles add-on status"},
+      "delete_addon": {"status": "PASS", "details": "Delete option removes add-on (disabled if quantity_sold > 0)"}
+    },
+    "frontend_promo_codes_tab": {
+      "table_display": {"status": "PASS", "details": "Table shows Code, Discount, Usage, Validity, Status, Actions columns"},
+      "add_promo_button": {"status": "PASS", "details": "Add Promo Code button opens create dialog"},
+      "generate_code": {"status": "PASS", "details": "Generate button creates random 8-character alphanumeric code"},
+      "add_promo_dialog": {"status": "PASS", "details": "Dialog has all fields: code, discount type, value, max discount, min order, usage limit, applicable to, validity dates, active toggle"},
+      "copy_to_clipboard": {"status": "PASS", "details": "Copy button copies promo code and shows success toast"},
+      "edit_promo": {"status": "PASS", "details": "Edit option opens dialog pre-filled with promo data"},
+      "toggle_status": {"status": "PASS", "details": "Deactivate/Activate option toggles promo status"},
+      "delete_promo": {"status": "PASS", "details": "Delete option removes promo code"}
+    },
+    "frontend_settings_tab": {
+      "tax_fees_section": {"status": "PASS", "details": "Shows Pass Fees to Attendees and Charge Tax toggles"},
+      "refund_policy_section": {"status": "PASS", "details": "Shows Refund Policy dropdown (No Refunds, Full Refund, Partial Refund)"},
+      "ticket_sales_rules_section": {"status": "PASS", "details": "Shows Allow Transfers, Allow Cancellations, Lock Changes After Event Start toggles"},
+      "visibility_rules_section": {"status": "PASS", "details": "Shows Hide Sold Out Tickets, Auto Hide Past Tickets toggles"},
+      "capacity_rules_section": {"status": "PASS", "details": "Shows Stop Sales When Full, Allow Admin Overselling, Auto Enable Waitlist toggles"},
+      "confirmation_invoices_section": {"status": "PASS", "details": "Shows Auto Send Confirmation, Attach Invoice, Show Tax Breakdown toggles"}
+    }
+  }
+}
