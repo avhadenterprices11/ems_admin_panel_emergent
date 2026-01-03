@@ -66,6 +66,72 @@ export interface ActivityLog {
   metadata: any;
 }
 
+// Ticket interfaces
+export interface Ticket {
+  id: number;
+  event_id: number;
+  name: string;
+  description?: string;
+  price: number;
+  currency: string;
+  capacity?: number;
+  sold_count: number;
+  status: string;
+  ticket_type: string;
+  category: string;
+  min_per_order: number;
+  max_per_order: number;
+  is_visible: boolean;
+  is_on_sale: boolean;
+  internal_notes?: string;
+  sales_start_at?: string;
+  sales_end_at?: string;
+  created_at: string;
+  updated_at: string;
+  is_deleted: boolean;
+}
+
+export interface TicketStats {
+  totalSales: number;
+  ticketsSold: number;
+  totalCapacity: number;
+  addonRevenue: number;
+  avgOrderValue: number;
+}
+
+export interface CreateTicketInput {
+  name: string;
+  description?: string;
+  price: number;
+  currency?: string;
+  capacity?: number;
+  category?: string;
+  min_per_order?: number;
+  max_per_order?: number;
+  is_visible?: boolean;
+  is_on_sale?: boolean;
+  internal_notes?: string;
+  sales_start_at?: string;
+  sales_end_at?: string;
+}
+
+export interface UpdateTicketInput {
+  name?: string;
+  description?: string;
+  price?: number;
+  currency?: string;
+  capacity?: number;
+  category?: string;
+  min_per_order?: number;
+  max_per_order?: number;
+  is_visible?: boolean;
+  is_on_sale?: boolean;
+  internal_notes?: string;
+  sales_start_at?: string;
+  sales_end_at?: string;
+  status?: string;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
