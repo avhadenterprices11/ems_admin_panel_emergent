@@ -1210,7 +1210,7 @@ export const eventsAPI = {
   },
 
   runReport: async (eventId: number | string, reportId: number | string, options?: { date_from?: string; date_to?: string; limit?: number; offset?: number }) => {
-    const response = await apiClient.post(`/events/${eventId}/reports/${reportId}/run`, null, { params: options });
+    const response = await apiClient.post(`/events/${eventId}/reports/${reportId}/run`, {}, { params: options });
     return response.data as ReportRunResult;
   },
 
@@ -1238,7 +1238,7 @@ export const eventsAPI = {
   },
 
   runStandardReport: async (eventId: number | string, standardReportId: string, options?: { date_from?: string; date_to?: string }) => {
-    const response = await apiClient.post(`/events/${eventId}/reports/standard/${standardReportId}/run`, null, { params: options });
+    const response = await apiClient.post(`/events/${eventId}/reports/standard/${standardReportId}/run`, {}, { params: options });
     return response.data as { success: boolean; data: Record<string, any>[] };
   },
 };
