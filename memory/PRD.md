@@ -209,6 +209,16 @@ A full-stack Event Management Admin System built with:
 - `GET /api/events/:eventId/settings` - Get all event settings
 - `PUT /api/events/:eventId/settings` - Update event settings
 
+### Event Detail - Registrations API (NEW - Jan 3, 2026)
+- `GET /api/events/:eventId/registrations` - List registrations with filters (status, payment_status, search), pagination
+- `GET /api/events/:eventId/registrations/stats` - Get registration stats (total, pending, incomplete, cancelled, approved)
+- `POST /api/events/:eventId/registrations` - Create new registration (admin entry)
+- `GET /api/events/:eventId/registrations/:registrationId` - Get single registration by ID
+- `PUT /api/events/:eventId/registrations/:registrationId` - Update registration
+- `DELETE /api/events/:eventId/registrations/:registrationId` - Delete registration (soft delete)
+- `POST /api/events/:eventId/registrations/:registrationId/status` - Update registration status (started, pending, completed, approved, cancelled, refunded, expired)
+- `POST /api/events/:eventId/registrations/:registrationId/payment-status` - Update payment status (pending, paid, free, failed, refunded)
+
 ### File Upload
 - `POST /api/upload/single` - Upload single file
 - `POST /api/upload/multiple` - Upload multiple files
