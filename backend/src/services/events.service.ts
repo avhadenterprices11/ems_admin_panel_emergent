@@ -191,6 +191,17 @@ export class EventsService {
       .insert(eventRecord)
       .returning('*');
 
+    // Handle tag_ids - insert into event_tags junction table
+    const tagIds = (eventData as any).tag_ids;
+    if (tagIds && Array.isArray(tagIds) && tagIds.length > 0) {
+      const eventTagRecords = tagIds.map((tagId: number) => ({
+        event_id: createdEvent.id,
+        tag_id: tagId,
+        created_at: now,
+      }));
+      await db('event_tags').insert(eventTagRecords).onConflict(['event_id', 'tag_id']).ignore();
+    }
+
     return this.parseEventJson(createdEvent);
   }
 
