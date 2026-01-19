@@ -135,6 +135,7 @@ export class EventsService {
       name: eventData.name,
       description: eventData.description || null,
       category: eventData.category || null,
+      category_id: (eventData as any).category_id || null,
       type: eventData.type,
       event_type: eventData.event_type || null,
       start_date: eventData.start_date,
