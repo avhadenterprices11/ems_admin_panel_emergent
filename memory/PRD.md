@@ -337,14 +337,45 @@ A full-stack Event Management Admin System built with:
   - events.category_id (foreign key to categories)
 - **Seeded Data**: 8 categories (Conference, Workshop, Meetup, Awards, Webinar, Networking, Training, Seminar), 7 tags with colors
 
+### 12. Reusable Category and Tags Components ✅ COMPLETE (Jan 19, 2026)
+- **CategorySelect Component** (`/app/frontend/src/app/components/shared/CategorySelect.tsx`):
+  - Single-select dropdown for categories
+  - Fetches categories from `/api/master/categories` API
+  - Uses `category_id` (number) as value - proper FK relationship
+  - Inline "Create New Category" dialog
+  - Loading state, error handling
+  - `data-testid="category-select-trigger"` for testing
+- **TagsSelect Component** (`/app/frontend/src/app/components/shared/TagsSelect.tsx`):
+  - Multi-select popover for tags
+  - Fetches tags from `/api/master/tags` API with search support
+  - Uses `tag_ids` (number[]) as value - proper many-to-many relationship
+  - Color badges for selected tags
+  - Inline "Create new tag" dialog with color picker
+  - Search/filter functionality
+  - `data-testid="tags-select-trigger"` for testing
+- **EventSetupPage Integration**:
+  - CategorySelect integrated for category selection
+  - TagsSelect integrated in "Internal Info" section
+  - Form sends `category_id` and `tag_ids` to backend
+- **Backend Support**:
+  - `create-event.dto.ts` - Added `category_id` and `tag_ids` validation
+  - `events.service.ts` - Saves `category_id` to events table and `tag_ids` to `event_tags` junction table
+- **Database Model**:
+  - `events.category_id` - FK to `categories.id`
+  - `event_tags` - Junction table with `event_id` and `tag_id`
+
 ## Upcoming Tasks
 
-### P1 - Settings Tab (Other Subsections)
+### P1 - Data Migration (Legacy category field)
+- Create migration script to populate `events.category_id` from old `events.category` text field
+- Drop legacy `events.category` text column after migration
+
+### P2 - Settings Tab (Other Subsections)
 - Branding & Design, Payment & Tax, Team & Permissions, Badge Design
 - Integrations, Data & Privacy, Email Configuration, Advanced Configuration
 - Archive Event, Delete Event
 
-### P2 - Master Data Management UI
+### P3 - Master Data Management UI
 - Admin UI for CRUD operations on categories
 - Admin UI for CRUD operations on tags
 
