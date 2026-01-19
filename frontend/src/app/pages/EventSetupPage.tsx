@@ -390,30 +390,15 @@ const EventSetupPageComponent = () => {
                 <div className="space-y-2">
                   <Label className="text-slate-700 font-medium">Category</Label>
                   <Controller
-                    name="category"
+                    name="category_id"
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={(value) => {
-                        if (value === 'ADD_NEW') {
-                          setIsAddCategoryOpen(true);
-                        } else {
-                          field.onChange(value);
-                        }
-                      }} value={field.value}>
-                        <SelectTrigger className="border-slate-200">
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map(cat => (
-                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
-                          ))}
-                          <SelectItem value="ADD_NEW" className="text-blue-600 focus:text-blue-600 font-medium cursor-pointer">
-                            <div className="flex items-center">
-                              <Plus size={14} className="mr-2" /> Create New Category
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <CategorySelect
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select Category"
+                        showAddNew={true}
+                      />
                     )}
                   />
                 </div>
