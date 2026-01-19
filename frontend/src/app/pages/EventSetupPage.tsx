@@ -200,7 +200,7 @@ const EventSetupPageComponent = () => {
         event_code: `EVT-${Date.now().toString().slice(-6)}`, // Generate unique code
         name: data.title || '',
         description: data.description || '',
-        category: data.category || '',
+        category_id: data.category_id || null,
         type: data.type || 'Conference',
         event_type: data.event_type || 'public',
         start_date: data.start_at ? new Date(data.start_at).toISOString() : new Date().toISOString(),
@@ -237,7 +237,7 @@ const EventSetupPageComponent = () => {
         check_in_mode: data.check_in_mode || 'qr',
         data_collection_form_id: data.data_collection_form ? parseInt(data.data_collection_form) : null,
         co_hosts: data.co_hosts || [],
-        tags: data.tags || [],
+        tag_ids: data.tag_ids || [],
         partners: data.partners || [],
         sponsors: data.sponsors || [],
         agenda: data.agenda || [],
