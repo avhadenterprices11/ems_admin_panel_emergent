@@ -1046,14 +1046,14 @@ const EventSetupPageComponent = () => {
                     <TooltipTrigger asChild>
                       <div className="w-full">
                         <Controller
-                          name="tags"
+                          name="tag_ids"
                           control={control}
                           render={({ field }) => (
-                            <TagInput 
-                              tags={field.value} 
-                              setTags={field.onChange}
-                              placeholder="Add tags..."
-                              suggestions={['Internal', 'Marketing', 'VIP', 'Urgent', 'Q4']}
+                            <TagsSelect 
+                              value={field.value || []} 
+                              onChange={field.onChange}
+                              placeholder="Select tags..."
+                              showAddNew={true}
                             />
                           )}
                         />
@@ -1076,28 +1076,6 @@ const EventSetupPageComponent = () => {
               </div>
             </div>
           </div>
-
-          {/* Card 4: Our Partners */}
-          <div className="bg-white rounded-[20px] shadow-sm border border-slate-100 p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="text-slate-400" size={20} />
-                <h3 className="text-lg font-bold text-[#1d293d]">Our Partners</h3>
-              </div>
-              <Button 
-                type="button" 
-                variant="secondary" 
-                size="sm" 
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700"
-                onClick={() => appendPartner({ name: '', logo: '', link: '' })}
-              >
-                <Plus size={16} className="mr-2" /> Add Partner
-              </Button>
-            </div>
-
-            <div className="space-y-4">
-              {partnerFields.map((field, index) => (
-                <div key={field.id} className="p-4 border border-slate-200 rounded-xl bg-slate-50/50 space-y-4 relative group">
                   <Button
                     type="button"
                     variant="ghost"
