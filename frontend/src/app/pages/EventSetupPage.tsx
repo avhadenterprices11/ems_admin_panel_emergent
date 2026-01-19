@@ -270,16 +270,6 @@ const EventSetupPageComponent = () => {
     navigate('/events');
   };
 
-  const handleAddCategory = () => {
-    if (newCategoryName.trim()) {
-      const newId = newCategoryName.toLowerCase().replace(/\s+/g, '-');
-      setCategories([...categories, { value: newId, label: newCategoryName }]);
-      setValue('category', newId);
-      setNewCategoryName('');
-      setIsAddCategoryOpen(false);
-    }
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* TOP ACTION BAR */}
