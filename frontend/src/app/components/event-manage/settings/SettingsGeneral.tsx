@@ -54,9 +54,7 @@ export const SettingsGeneral = ({ eventId }: SettingsGeneralProps) => {
   // Form data
   const [formData, setFormData] = useState<EventGeneralDetails | null>(null);
   
-  // Master data
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  // Master data - only users for co-hosts (categories/tags handled by shared components)
   const [users, setUsers] = useState<UserBasic[]>([]);
 
   // Form state
@@ -90,14 +88,6 @@ export const SettingsGeneral = ({ eventId }: SettingsGeneralProps) => {
   const [promoVideoUrl, setPromoVideoUrl] = useState('');
   const [accessibilityNotes, setAccessibilityNotes] = useState('');
   const [emergencyContact, setEmergencyContact] = useState('');
-
-  // UI state
-  const [tagOpen, setTagOpen] = useState(false);
-  const [coHostOpen, setCoHostOpen] = useState(false);
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [isAddTagOpen, setIsAddTagOpen] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [newTagName, setNewTagName] = useState('');
   const [newTagColor, setNewTagColor] = useState('#3B82F6');
 
   // Load initial data
