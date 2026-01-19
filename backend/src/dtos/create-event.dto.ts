@@ -236,6 +236,11 @@ export class CreateEventDTO {
   @IsArray()
   tags?: string[];
 
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  tag_ids?: number[];
+
   // JSON Structures
   @IsOptional()
   @IsArray()
