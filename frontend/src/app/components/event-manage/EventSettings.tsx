@@ -32,10 +32,11 @@ import { SettingsDelete } from './settings/SettingsDelete';
 import { SettingsEmail } from './settings/SettingsEmail';
 
 interface EventSettingsProps {
+  eventId?: number | string;
   onNavigateToAdvanced?: () => void;
 }
 
-export const EventSettings = ({ onNavigateToAdvanced }: EventSettingsProps) => {
+export const EventSettings = ({ eventId, onNavigateToAdvanced }: EventSettingsProps) => {
   const [activeTab, setActiveTab] = useState('general');
 
   return (
