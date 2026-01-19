@@ -36,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/saved-views', savedViewsRoutes);
 app.use('/api/upload', fileUploadRoutes);
+app.use('/api/master', masterDataRoutes);
 
 async function startServer() {
   try {
