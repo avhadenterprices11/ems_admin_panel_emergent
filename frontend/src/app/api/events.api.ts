@@ -1356,6 +1356,90 @@ export const eventsAPI = {
     const response = await apiClient.post(`/events/${eventId}/reports/standard/${standardReportId}/run`, {}, { params: options });
     return response.data as { success: boolean; data: Record<string, any>[] };
   },
+
+  // Event General Details APIs (Settings Tab)
+  getEventGeneralDetails: async (eventId: number | string) => {
+    const response = await apiClient.get(`/events/${eventId}/general`);
+    return response.data as EventGeneralDetails;
+  },
+
+  updateEventGeneralDetails: async (eventId: number | string, data: UpdateEventGeneralDetailsInput) => {
+    const response = await apiClient.put(`/events/${eventId}/general`, data);
+    return response.data as EventGeneralDetails;
+  },
+
+  getEventMedia: async (eventId: number | string, type?: string) => {
+    const response = await apiClient.get(`/events/${eventId}/media`, { params: { type } });
+    return response.data as EventMedia[];
+  },
+
+  addEventMedia: async (eventId: number | string, data: {
+    file_key: string;
+    url: string;
+    file_type: string;
+    media_type: string;
+    size?: number;
+    original_name?: string;
+  }) => {
+    const response = await apiClient.post(`/events/${eventId}/media`, data);
+    return response.data as EventMedia;
+  },
+
+  deleteEventMedia: async (eventId: number | string, mediaId: number) => {
+    const response = await apiClient.delete(`/events/${eventId}/media/${mediaId}`);
+    return response.data;
+  },
+};
+
+// Master Data API
+export const masterDataAPI = {
+  // Categories
+  getCategories: async (includeInactive = false) => {
+    const response = await apiClient.get('/master/categories', { params: { include_inactive: includeInactive } });
+    return response.data as Category[];
+  },
+
+  createCategory: async (data: { name: string; description?: string }) => {
+    const response = await apiClient.post('/master/categories', data);
+    return response.data as Category;
+  },
+
+  updateCategory: async (id: number, data: { name?: string; description?: string; is_active?: boolean }) => {
+    const response = await apiClient.put(`/master/categories/${id}`, data);
+    return response.data as Category;
+  },
+
+  deleteCategory: async (id: number) => {
+    const response = await apiClient.delete(`/master/categories/${id}`);
+    return response.data;
+  },
+
+  // Tags
+  getTags: async (search?: string, includeInactive = false) => {
+    const response = await apiClient.get('/master/tags', { params: { search, include_inactive: includeInactive } });
+    return response.data as Tag[];
+  },
+
+  createTag: async (data: { name: string; color?: string }) => {
+    const response = await apiClient.post('/master/tags', data);
+    return response.data as Tag;
+  },
+
+  updateTag: async (id: number, data: { name?: string; color?: string; is_active?: boolean }) => {
+    const response = await apiClient.put(`/master/tags/${id}`, data);
+    return response.data as Tag;
+  },
+
+  deleteTag: async (id: number) => {
+    const response = await apiClient.delete(`/master/tags/${id}`);
+    return response.data;
+  },
+
+  // Users
+  getUsers: async () => {
+    const response = await apiClient.get('/master/users');
+    return response.data as UserBasic[];
+  },
 };
 
 export const savedViewsAPI = {
