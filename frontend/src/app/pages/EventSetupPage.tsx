@@ -42,7 +42,7 @@ const EventSetupPageComponent = () => {
     defaultValues: {
       title: '',
       description: '',
-      category: 'conference',
+      category_id: undefined as number | undefined,
       type: 'public',
       start_at: '',
       end_at: '',
@@ -77,7 +77,7 @@ const EventSetupPageComponent = () => {
       data_collection_form: 'standard',
       owner_id: 'user_1',
       co_hosts: [],
-      tags: [],
+      tag_ids: [] as number[],
       internal_notes: '',
       partners: [],
       sponsors: [],
