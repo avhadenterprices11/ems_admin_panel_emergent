@@ -277,15 +277,76 @@ A full-stack Event Management Admin System built with:
   - POST /events/:eventId/reports/standard/:id/run - Run standard report
 - **Database Tables**: reports, report_fields, report_filters, report_runs
 
+### 11. Event Detail Module - Settings Tab → General Details ✅ COMPLETE (Jan 19, 2026)
+- **Left Navigation**: General Details, Branding & Design, Payment & Tax, Team & Permissions, Badge Design, Integrations, Data & Privacy, Email Configuration, Advanced Configuration, Archive Event, Delete Event
+- **General Details Page** (fully wired end-to-end):
+  - **Event Banner**: Upload area with recommended size
+  - **Basic Information**:
+    - Event Name (text input)
+    - Category (dropdown from categories master table + add new category dialog)
+    - Description (textarea)
+    - Event Type (dropdown: conference, workshop, meetup, webinar, seminar, networking)
+    - Visibility (dropdown: public, private, unlisted)
+    - Check-in Mode (dropdown: qr_code, manual, both)
+  - **Organizer & Tags**:
+    - Event Owner (text input)
+    - Co-hosts (multi-select popover from users table)
+    - Tags (multi-select with color badges + create new tag dialog)
+  - **Date & Time**:
+    - Start Date & Time (datetime-local input)
+    - End Date & Time (datetime-local input)
+    - Timezone (dropdown: major timezones)
+    - All-day event (switch)
+  - **Registration Settings**:
+    - Registration Opens (datetime-local)
+    - Registration Closes (datetime-local)
+    - Capacity (number input)
+    - Enable Waitlist (switch)
+  - **Location**:
+    - Event Mode (buttons: In Person, Virtual, Hybrid)
+    - Venue Name, Address Line 1/2, City, State, ZIP, Country (for in-person/hybrid)
+    - Meeting URL (for virtual/hybrid)
+  - **Event Media**:
+    - Promo Video URL (text input with URL validation)
+    - Event Photos (upload area placeholder)
+  - **Accessibility & Safety**:
+    - Accessibility Information (textarea)
+    - Emergency Contact (phone input)
+  - **Save Changes**: Button that calls PUT API and shows success toast
+- **APIs Implemented**:
+  - GET /master/categories - List all categories
+  - POST /master/categories - Create new category
+  - PUT /master/categories/:id - Update category
+  - DELETE /master/categories/:id - Soft delete category
+  - GET /master/tags - List all tags (with search query param)
+  - POST /master/tags - Create new tag
+  - PUT /master/tags/:id - Update tag
+  - DELETE /master/tags/:id - Soft delete tag
+  - GET /master/users - List users for co-host dropdown
+  - GET /events/:eventId/general - Get full event details with category, tags, co_hosts, media
+  - PUT /events/:eventId/general - Update event with tag_ids, cohost_ids arrays
+  - GET /events/:eventId/media - Get event media
+  - POST /events/:eventId/media - Add event media
+  - DELETE /events/:eventId/media/:mediaId - Delete event media
+- **Database Tables Created**:
+  - categories (id, name, slug, description, is_active, audit + soft delete)
+  - tags (id, name, slug, color, is_active, audit + soft delete)
+  - event_tags (event_id, tag_id - junction table)
+  - event_cohosts (event_id, user_id, role - junction table)
+  - event_media (event_id, file_key, url, file_type, media_type, size, original_name, sort_order)
+  - events.category_id (foreign key to categories)
+- **Seeded Data**: 8 categories (Conference, Workshop, Meetup, Awards, Webinar, Networking, Training, Seminar), 7 tags with colors
+
 ## Upcoming Tasks
 
-### P1 - Settings Tab
-- Event Detail → Settings tab implementation
-- General settings, access control, notifications, integrations
+### P1 - Settings Tab (Other Subsections)
+- Branding & Design, Payment & Tax, Team & Permissions, Badge Design
+- Integrations, Data & Privacy, Email Configuration, Advanced Configuration
+- Archive Event, Delete Event
 
-### P2 - Master Data Management
-- CRUD UI for event_categories
-- CRUD UI for event_tags
+### P2 - Master Data Management UI
+- Admin UI for CRUD operations on categories
+- Admin UI for CRUD operations on tags
 
 ## Technical Architecture
 
