@@ -715,6 +715,121 @@ export interface UpdateReportInput {
   schedule_recipients?: string;
 }
 
+// Master Data Interfaces
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  is_active: boolean;
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+  slug: string;
+  color?: string;
+  is_active: boolean;
+}
+
+export interface UserBasic {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface EventMedia {
+  id: number;
+  event_id: number;
+  file_key: string;
+  url: string;
+  file_type: string;
+  media_type: string;
+  size?: number;
+  original_name?: string;
+  sort_order: number;
+}
+
+// Event General Details Interfaces
+export interface EventGeneralDetails {
+  id: number;
+  event_code: string;
+  name: string;
+  description?: string;
+  category_id?: number;
+  category?: { id: number; name: string; slug: string };
+  type: string;
+  event_type?: string;
+  visibility: string;
+  check_in_mode?: string;
+  owner: string;
+  co_hosts?: { id: number; user_id: number; role: string; name: string; email: string }[];
+  tags?: Tag[];
+  start_date: string;
+  end_date: string;
+  all_day: boolean;
+  timezone?: string;
+  reg_start_at?: string;
+  reg_end_at?: string;
+  capacity?: number;
+  waitlist_enabled: boolean;
+  mode?: string;
+  venue_id?: string;
+  venue_name?: string;
+  location?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  country?: string;
+  meeting_url?: string;
+  banner_image_url?: string;
+  promo_video_url?: string;
+  gallery_images?: any[];
+  event_media?: EventMedia[];
+  accessibility_notes?: string;
+  emergency_contact?: string;
+  agenda?: any[];
+}
+
+export interface UpdateEventGeneralDetailsInput {
+  name?: string;
+  description?: string;
+  category_id?: number;
+  type?: string;
+  event_type?: string;
+  visibility?: string;
+  check_in_mode?: string;
+  owner?: string;
+  tag_ids?: number[];
+  cohost_ids?: number[];
+  start_date?: string;
+  end_date?: string;
+  all_day?: boolean;
+  timezone?: string;
+  reg_start_at?: string;
+  reg_end_at?: string;
+  capacity?: number;
+  waitlist_enabled?: boolean;
+  mode?: string;
+  venue_id?: string;
+  venue_name?: string;
+  location?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  country?: string;
+  meeting_url?: string;
+  banner_image_url?: string;
+  promo_video_url?: string;
+  accessibility_notes?: string;
+  emergency_contact?: string;
+  agenda?: any[];
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
