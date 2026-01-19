@@ -76,6 +76,10 @@ export class CreateEventDTO {
   @IsString()
   category?: string;
 
+  @IsOptional()
+  @IsInt()
+  category_id?: number;
+
   @IsString()
   type!: string;
 
