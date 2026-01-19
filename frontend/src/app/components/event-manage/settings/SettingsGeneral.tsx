@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Save, 
   MapPin,
   Calendar,
-  Check,
-  ChevronsUpDown,
   X,
-  Plus,
-  Search,
   FileText,
   Image as ImageIcon,
   ShieldAlert,
@@ -16,7 +12,6 @@ import {
   Users,
   Globe,
   Video,
-  Trash2,
   Loader2,
   AlertCircle
 } from 'lucide-react';
@@ -34,35 +29,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../ui/select";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../../ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../ui/popover";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../ui/dialog";
 import { cn } from "../../ui/utils";
 import { toast } from "sonner";
+import { CategorySelect } from '../../shared/CategorySelect';
+import { TagsSelect } from '../../shared/TagsSelect';
 import { 
   eventsAPI, 
   masterDataAPI, 
   EventGeneralDetails, 
-  Category, 
-  Tag, 
   UserBasic,
   UpdateEventGeneralDetailsInput 
 } from '../../../api/events.api';
