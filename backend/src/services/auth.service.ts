@@ -15,7 +15,7 @@ export class AuthService {
     }
 
     const isPasswordValid = await PasswordUtils.verify(
-      loginDto.password_hash,
+      loginDto.password,
       user.password_hash
     );
 
