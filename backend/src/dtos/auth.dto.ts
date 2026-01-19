@@ -6,7 +6,7 @@ export class LoginDTO {
 
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters' })
-  password_hash!: string;
+  password!: string;
 }
 
 export class TokenResponseDTO {
