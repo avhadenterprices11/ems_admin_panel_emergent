@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Save, 
   MapPin,
@@ -16,7 +16,9 @@ import {
   Users,
   Globe,
   Video,
-  Trash2
+  Trash2,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -39,7 +41,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "../../ui/command";
 import {
   Popover,
@@ -54,583 +55,805 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../ui/dialog";
-import { DateTimePicker } from "../../ui/datetime-picker";
 import { cn } from "../../ui/utils";
 import { toast } from "sonner";
+import { 
+  eventsAPI, 
+  masterDataAPI, 
+  EventGeneralDetails, 
+  Category, 
+  Tag, 
+  UserBasic,
+  UpdateEventGeneralDetailsInput 
+} from '../../../api/events.api';
 
-// Mock Data
-const existingTags = ["Technology", "Innovation", "Networking", "Business", "Startup", "AI", "Design"];
-const teamMembers = [
-    { value: "mike", label: "Mike Johnson" },
-    { value: "sarah", label: "Sarah Williams" },
-    { value: "alex", label: "Alex Chen" },
-    { value: "emily", label: "Emily Davis" }
-];
+interface SettingsGeneralProps {
+  eventId: number | string;
+}
 
-const MOCK_VENUES = [
-  { id: 'ven_1', name: 'ExCeL London', address: 'Royal Victoria Dock, London E16 1XL, UK' },
-  { id: 'ven_2', name: 'Moscone Center', address: '747 Howard St, San Francisco, CA 94103, USA' },
-];
+export const SettingsGeneral = ({ eventId }: SettingsGeneralProps) => {
+  // Loading states
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export const SettingsGeneral = () => {
-  // ALL STATE DECLARATIONS
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
-  const [regOpen, setRegOpen] = useState<Date>();
-  const [regClose, setRegClose] = useState<Date>();
-  const [eventMode, setEventMode] = useState('hybrid');
-  const [categories, setCategories] = useState([
-    { value: 'conference', label: 'Conference' },
-    { value: 'awards', label: 'Awards' },
-    { value: 'meetup', label: 'Meetup' },
-    { value: 'workshop', label: 'Workshop' },
-  ]);
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [coHosts, setCoHosts] = useState<string[]>([]);
-  const [coHostOpen, setCoHostOpen] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>(["Technology", "Innovation"]);
+  // Form data
+  const [formData, setFormData] = useState<EventGeneralDetails | null>(null);
+  
+  // Master data
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [users, setUsers] = useState<UserBasic[]>([]);
+
+  // Form state
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [categoryId, setCategoryId] = useState<number | undefined>();
+  const [eventType, setEventType] = useState('conference');
+  const [visibility, setVisibility] = useState('public');
+  const [checkInMode, setCheckInMode] = useState('qr_code');
+  const [owner, setOwner] = useState('');
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [coHostIds, setCoHostIds] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [allDay, setAllDay] = useState(false);
+  const [timezone, setTimezone] = useState('');
+  const [regStartAt, setRegStartAt] = useState('');
+  const [regEndAt, setRegEndAt] = useState('');
+  const [capacity, setCapacity] = useState('');
+  const [waitlistEnabled, setWaitlistEnabled] = useState(false);
+  const [mode, setMode] = useState('in_person');
+  const [venueName, setVenueName] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [stateProvince, setStateProvince] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [country, setCountry] = useState('');
+  const [meetingUrl, setMeetingUrl] = useState('');
+  const [bannerImageUrl, setBannerImageUrl] = useState('');
+  const [promoVideoUrl, setPromoVideoUrl] = useState('');
+  const [accessibilityNotes, setAccessibilityNotes] = useState('');
+  const [emergencyContact, setEmergencyContact] = useState('');
+
+  // UI state
   const [tagOpen, setTagOpen] = useState(false);
-  const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
-  const [newTagName, setNewTagName] = useState("");
-  const [availableTags, setAvailableTags] = useState(existingTags);
-  const [address, setAddress] = useState("");
-  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
-  const [isAddressOpen, setIsAddressOpen] = useState(false);
-  const [capacity, setCapacity] = useState('500');
-  const [waitlistEnabled, setWaitlistEnabled] = useState(true);
-  const [agendaItems, setAgendaItems] = useState<Array<{
-    title: string;
-    startTime: string;
-    endTime: string;
-    description: string;
-  }>>([]);
+  const [coHostOpen, setCoHostOpen] = useState(false);
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isAddTagOpen, setIsAddTagOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagColor, setNewTagColor] = useState('#3B82F6');
 
-  // ALL HANDLERS
-  const handleAddCategory = () => {
-    if (newCategoryName.trim()) {
-      const newId = newCategoryName.toLowerCase().replace(/\s+/g, '-');
-      setCategories([...categories, { value: newId, label: newCategoryName }]);
+  // Load initial data
+  useEffect(() => {
+    loadData();
+  }, [eventId]);
+
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [details, cats, tags, userList] = await Promise.all([
+        eventsAPI.getEventGeneralDetails(eventId),
+        masterDataAPI.getCategories(),
+        masterDataAPI.getTags(),
+        masterDataAPI.getUsers(),
+      ]);
+
+      setFormData(details);
+      setCategories(cats);
+      setAvailableTags(tags);
+      setUsers(userList);
+
+      // Populate form fields
+      setName(details.name || '');
+      setDescription(details.description || '');
+      setCategoryId(details.category_id || undefined);
+      setEventType(details.type || 'conference');
+      setVisibility(details.visibility || 'public');
+      setCheckInMode(details.check_in_mode || 'qr_code');
+      setOwner(details.owner || '');
+      setSelectedTagIds(details.tags?.map(t => t.id) || []);
+      setCoHostIds(details.co_hosts?.map(c => c.user_id) || []);
+      setStartDate(details.start_date ? new Date(details.start_date).toISOString().slice(0, 16) : '');
+      setEndDate(details.end_date ? new Date(details.end_date).toISOString().slice(0, 16) : '');
+      setAllDay(details.all_day || false);
+      setTimezone(details.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone);
+      setRegStartAt(details.reg_start_at ? new Date(details.reg_start_at).toISOString().slice(0, 16) : '');
+      setRegEndAt(details.reg_end_at ? new Date(details.reg_end_at).toISOString().slice(0, 16) : '');
+      setCapacity(details.capacity?.toString() || '');
+      setWaitlistEnabled(details.waitlist_enabled || false);
+      setMode(details.mode || 'in_person');
+      setVenueName(details.venue_name || '');
+      setAddressLine1(details.address_line1 || '');
+      setAddressLine2(details.address_line2 || '');
+      setCity(details.city || '');
+      setStateProvince(details.state || '');
+      setZipCode(details.zip_code || '');
+      setCountry(details.country || '');
+      setMeetingUrl(details.meeting_url || '');
+      setBannerImageUrl(details.banner_image_url || '');
+      setPromoVideoUrl(details.promo_video_url || '');
+      setAccessibilityNotes(details.accessibility_notes || '');
+      setEmergencyContact(details.emergency_contact || '');
+
+    } catch (err: any) {
+      console.error('Error loading data:', err);
+      setError(err.response?.data?.message || 'Failed to load event details');
+      toast.error('Failed to load event details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const updateData: UpdateEventGeneralDetailsInput = {
+        name,
+        description,
+        category_id: categoryId,
+        type: eventType,
+        visibility,
+        check_in_mode: checkInMode,
+        owner,
+        tag_ids: selectedTagIds,
+        cohost_ids: coHostIds,
+        start_date: startDate ? new Date(startDate).toISOString() : undefined,
+        end_date: endDate ? new Date(endDate).toISOString() : undefined,
+        all_day: allDay,
+        timezone,
+        reg_start_at: regStartAt ? new Date(regStartAt).toISOString() : undefined,
+        reg_end_at: regEndAt ? new Date(regEndAt).toISOString() : undefined,
+        capacity: capacity ? parseInt(capacity) : undefined,
+        waitlist_enabled: waitlistEnabled,
+        mode,
+        venue_name: venueName,
+        address_line1: addressLine1,
+        address_line2: addressLine2,
+        city,
+        state: stateProvince,
+        zip_code: zipCode,
+        country,
+        meeting_url: meetingUrl,
+        banner_image_url: bannerImageUrl,
+        promo_video_url: promoVideoUrl,
+        accessibility_notes: accessibilityNotes,
+        emergency_contact: emergencyContact,
+      };
+
+      const updated = await eventsAPI.updateEventGeneralDetails(eventId, updateData);
+      setFormData(updated);
+      toast.success('Event details saved successfully');
+    } catch (err: any) {
+      console.error('Error saving:', err);
+      toast.error(err.response?.data?.message || 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    try {
+      const newCat = await masterDataAPI.createCategory({ name: newCategoryName.trim() });
+      setCategories([...categories, newCat]);
+      setCategoryId(newCat.id);
       setNewCategoryName('');
       setIsAddCategoryOpen(false);
-      toast.success('Category added successfully');
+      toast.success('Category created successfully');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to create category');
     }
   };
 
-  const toggleCoHost = (value: string) => {
-    if (coHosts.includes(value)) {
-        setCoHosts(coHosts.filter(id => id !== value));
+  const handleAddTag = async () => {
+    if (!newTagName.trim()) return;
+    try {
+      const newTag = await masterDataAPI.createTag({ name: newTagName.trim(), color: newTagColor });
+      setAvailableTags([...availableTags, newTag]);
+      setSelectedTagIds([...selectedTagIds, newTag.id]);
+      setNewTagName('');
+      setIsAddTagOpen(false);
+      toast.success('Tag created successfully');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to create tag');
+    }
+  };
+
+  const toggleTag = (tagId: number) => {
+    if (selectedTagIds.includes(tagId)) {
+      setSelectedTagIds(selectedTagIds.filter(id => id !== tagId));
     } else {
-        setCoHosts([...coHosts, value]);
+      setSelectedTagIds([...selectedTagIds, tagId]);
     }
   };
 
-  const toggleTag = (tag: string) => {
-      if (selectedTags.includes(tag)) {
-          setSelectedTags(selectedTags.filter(t => t !== tag));
-      } else {
-          setSelectedTags([...selectedTags, tag]);
-      }
+  const toggleCoHost = (userId: number) => {
+    if (coHostIds.includes(userId)) {
+      setCoHostIds(coHostIds.filter(id => id !== userId));
+    } else {
+      setCoHostIds([...coHostIds, userId]);
+    }
   };
 
-  const handleCreateTag = () => {
-      if (newTagName && !availableTags.includes(newTagName)) {
-          setAvailableTags([...availableTags, newTagName]);
-          setSelectedTags([...selectedTags, newTagName]);
-          setNewTagName("");
-          setIsTagDialogOpen(false);
-          toast.success('Tag created successfully');
-      }
-  };
+  const getSelectedTags = () => availableTags.filter(t => selectedTagIds.includes(t.id));
+  const getSelectedCoHosts = () => users.filter(u => coHostIds.includes(u.id));
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      setAddress(val);
-      if (val.length > 3) {
-          setAddressSuggestions([
-              `${val} Street, London, UK`,
-              `${val} Avenue, New York, USA`,
-              `${val} Road, Sydney, Australia`
-          ]);
-          setIsAddressOpen(true);
-      } else {
-          setAddressSuggestions([]);
-          setIsAddressOpen(false);
-      }
-  };
+  if (loading) {
+    return (
+      <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <span className="ml-2 text-slate-500">Loading event details...</span>
+      </div>
+    );
+  }
 
-  const selectAddress = (addr: string) => {
-      setAddress(addr);
-      setIsAddressOpen(false);
-  };
-  
-  const handleAddAgendaItem = () => {
-    setAgendaItems([...agendaItems, {
-      title: '',
-      startTime: '',
-      endTime: '',
-      description: ''
-    }]);
-  };
-  
-  const handleRemoveAgendaItem = (index: number) => {
-    setAgendaItems(agendaItems.filter((_, i) => i !== index));
-  };
-  
-  const updateAgendaItem = (index: number, field: string, value: string) => {
-    const updated = [...agendaItems];
-    updated[index] = { ...updated[index], [field]: value };
-    setAgendaItems(updated);
-  };
+  if (error) {
+    return (
+      <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+        <AlertCircle className="h-12 w-12 text-red-400 mb-4" />
+        <p className="text-red-600 mb-4">{error}</p>
+        <Button onClick={loadData}>Try Again</Button>
+      </div>
+    );
+  }
 
   return (
-      <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-6">
-          {/* HEADER */}
-          <div className="flex justify-between items-center">
-              <h3 className="font-bold text-lg text-[#1d293d]">General Details</h3>
-              <Button className="bg-[#0f172b]"><Save size={16} className="mr-2" /> Save Changes</Button>
+    <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-6" data-testid="settings-general">
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
+        <h3 className="font-bold text-lg text-[#1d293d]">General Details</h3>
+        <Button 
+          className="bg-[#0f172b]" 
+          onClick={handleSave} 
+          disabled={saving}
+          data-testid="save-changes-btn"
+        >
+          {saving ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Save size={16} className="mr-2" />}
+          {saving ? 'Saving...' : 'Save Changes'}
+        </Button>
+      </div>
+      <Separator />
+      
+      {/* SECTION 1: EVENT BANNER */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <ImageIcon size={18} className="text-slate-400" /> Event Banner
+        </h4>
+        <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
+          <Upload size={32} className="text-slate-300 mb-2 group-hover:text-slate-400" />
+          <p className="text-sm text-slate-500">Drag and drop your banner image here, or click to browse</p>
+          <p className="text-xs text-slate-400 mt-1">Recommended size: 1920x600px</p>
+        </div>
+        {bannerImageUrl && (
+          <div className="flex items-center gap-2">
+            <Input 
+              value={bannerImageUrl} 
+              onChange={(e) => setBannerImageUrl(e.target.value)}
+              placeholder="Banner image URL"
+              className="flex-1"
+            />
+            <Button variant="ghost" size="icon" onClick={() => setBannerImageUrl('')}>
+              <X size={16} />
+            </Button>
           </div>
-          <Separator />
-          
-          {/* SECTION 1: EVENT BANNER */}
-          <div className="grid gap-4">
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                  <ImageIcon size={18} className="text-slate-400" /> Event Banner
-              </h4>
-              <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
-                <div className="bg-slate-100 p-3 rounded-full mb-3 group-hover:bg-slate-200 transition-colors">
-                  <ImageIcon className="text-slate-400" size={24} />
-                </div>
-                <p className="text-sm font-medium text-slate-700">Drag & drop or click to upload</p>
-                <p className="text-xs text-slate-400 mt-1">Recommended size: 2160x1080px (2:1 ratio)</p>
-              </div>
+        )}
+      </div>
+      <Separator />
+
+      {/* SECTION 2: BASIC INFO */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <FileText size={18} className="text-slate-400" /> Basic Information
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="event-name">Event Name *</Label>
+            <Input 
+              id="event-name" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter event name"
+              data-testid="event-name-input"
+            />
           </div>
-          
-          <Separator />
-          
-          {/* SECTION 2: BASIC INFO WITH EVENT NAME, CATEGORY, DESCRIPTION */}
-          <div className="grid gap-6">
-              {/* Event Name + Category Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="grid gap-2">
-                      <Label>Event Name <span className="text-red-500">*</span></Label>
-                      <Input defaultValue="Global Tech Summit 2024" />
-                  </div>
-                  <div className="grid gap-2">
-                      <Label>Category <span className="text-red-500">*</span></Label>
-                      <Select defaultValue="conference">
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {categories.map(cat => (
-                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
-                          ))}
-                          <SelectItem value="ADD_NEW" className="text-blue-600 font-medium">+ Add New Category</SelectItem>
-                        </SelectContent>
-                      </Select>
-                  </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <div className="flex gap-2">
+              <Select value={categoryId?.toString()} onValueChange={(v) => setCategoryId(parseInt(v))}>
+                <SelectTrigger className="flex-1" data-testid="category-select">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="icon" onClick={() => setIsAddCategoryOpen(true)}>
+                <Plus size={16} />
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea 
+            id="description" 
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe your event..."
+            rows={4}
+            data-testid="description-input"
+          />
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label>Event Type</Label>
+            <Select value={eventType} onValueChange={setEventType}>
+              <SelectTrigger data-testid="event-type-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="conference">Conference</SelectItem>
+                <SelectItem value="workshop">Workshop</SelectItem>
+                <SelectItem value="meetup">Meetup</SelectItem>
+                <SelectItem value="webinar">Webinar</SelectItem>
+                <SelectItem value="seminar">Seminar</SelectItem>
+                <SelectItem value="networking">Networking</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Visibility</Label>
+            <Select value={visibility} onValueChange={setVisibility}>
+              <SelectTrigger data-testid="visibility-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="unlisted">Unlisted</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Check-in Mode</Label>
+            <Select value={checkInMode} onValueChange={setCheckInMode}>
+              <SelectTrigger data-testid="checkin-mode-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="qr_code">QR Code</SelectItem>
+                <SelectItem value="manual">Manual</SelectItem>
+                <SelectItem value="both">Both</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+      <Separator />
+
+      {/* SECTION 3: ORGANIZER & TAGS */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <Users size={18} className="text-slate-400" /> Organizer & Tags
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Event Owner</Label>
+            <Input 
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              placeholder="Owner name"
+              data-testid="owner-input"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Co-hosts</Label>
+            <Popover open={coHostOpen} onOpenChange={setCoHostOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-between" data-testid="cohosts-trigger">
+                  {coHostIds.length > 0 ? `${coHostIds.length} selected` : "Select co-hosts"}
+                  <ChevronsUpDown size={14} className="ml-2 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[300px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search users..." />
+                  <CommandList>
+                    <CommandEmpty>No users found.</CommandEmpty>
+                    <CommandGroup>
+                      {users.map((user) => (
+                        <CommandItem key={user.id} onSelect={() => toggleCoHost(user.id)}>
+                          <Check className={cn("mr-2 h-4 w-4", coHostIds.includes(user.id) ? "opacity-100" : "opacity-0")} />
+                          <span>{user.name || user.email}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {coHostIds.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {getSelectedCoHosts().map((user) => (
+                  <Badge key={user.id} variant="secondary" className="gap-1">
+                    {user.name || user.email}
+                    <X size={12} className="cursor-pointer" onClick={() => toggleCoHost(user.id)} />
+                  </Badge>
+                ))}
               </div>
-              
-              {/* Description */}
-              <div className="grid gap-2">
-                  <Label>Description</Label>
-                  <Textarea defaultValue="A comprehensive technology summit bringing together industry leaders and innovators." className="min-h-[100px]" />
-              </div>
-
-              {/* Event Type, Visibility, Check-in Mode */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="grid gap-2">
-                      <Label>Event Type</Label>
-                      <Select defaultValue="public">
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="public">Public</SelectItem>
-                                <SelectItem value="private">Private</SelectItem>
-                            </SelectContent>
-                      </Select>
-                  </div>
-                  <div className="grid gap-2">
-                      <Label>Visibility</Label>
-                      <Select defaultValue="public">
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="public">Public (Listed)</SelectItem>
-                                <SelectItem value="private">Private (Unlisted)</SelectItem>
-                                <SelectItem value="invite">Invite Only</SelectItem>
-                            </SelectContent>
-                      </Select>
-                  </div>
-                  <div className="grid gap-2">
-                      <Label>Check-in Mode</Label>
-                      <Select defaultValue="both">
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="qr">QR Code Scan</SelectItem>
-                                <SelectItem value="manual">Manual Lookup</SelectItem>
-                                <SelectItem value="both">Both</SelectItem>
-                            </SelectContent>
-                      </Select>
-                  </div>
-              </div>
-
-              {/* Event Owner */}
-              <div className="grid gap-2">
-                  <Label>Event Owner</Label>
-                  <Select defaultValue="sarah">
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="sarah">Sarah Williams (You)</SelectItem>
-                            <SelectItem value="mike">Mike Johnson</SelectItem>
-                            <SelectItem value="admin">Admin Team</SelectItem>
-                        </SelectContent>
-                  </Select>
-              </div>
-
-              {/* CRITICAL PATTERN: CO-HOSTS MULTI-SELECT */}
-              <div className="grid gap-2">
-                  <Label>Co-hosts</Label>
-                  <Popover open={coHostOpen} onOpenChange={setCoHostOpen}>
-                      <PopoverTrigger asChild>
-                          <Button variant="outline" role="combobox" aria-expanded={coHostOpen} className="w-full justify-between h-auto min-h-[40px]">
-                              {coHosts.length > 0 ? (
-                                  <div className="flex flex-wrap gap-1">
-                                      {coHosts.map(hostId => {
-                                          const member = teamMembers.find(m => m.value === hostId);
-                                          return (
-                                              <Badge key={hostId} variant="secondary" className="mr-1">
-                                                  {member?.label}
-                                                  <X className="ml-1 h-3 w-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleCoHost(hostId); }} />
-                                              </Badge>
-                                          );
-                                      })}
-                                  </div>
-                              ) : (
-                                  <span className="text-muted-foreground">Select co-hosts...</span>
-                              )}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[400px] p-0">
-                          <Command>
-                              <CommandInput placeholder="Search team..." />
-                              <CommandList>
-                                  <CommandEmpty>No team member found.</CommandEmpty>
-                                  <CommandGroup>
-                                      {teamMembers.map((member) => (
-                                          <CommandItem key={member.value} value={member.label} onSelect={() => toggleCoHost(member.value)}>
-                                              <Check className={cn("mr-2 h-4 w-4", coHosts.includes(member.value) ? "opacity-100" : "opacity-0")} />
-                                              {member.label}
-                                          </CommandItem>
-                                      ))}
-                                  </CommandGroup>
-                              </CommandList>
-                          </Command>
-                      </PopoverContent>
-                  </Popover>
-              </div>
-
-              {/* CRITICAL PATTERN: TAGS MULTI-SELECT WITH CREATE NEW */}
-              <div className="grid gap-2">
-                    <Label>Event Tags</Label>
-                    <Popover open={tagOpen} onOpenChange={setTagOpen}>
-                      <PopoverTrigger asChild>
-                          <Button variant="outline" role="combobox" aria-expanded={tagOpen} className="w-full justify-between h-auto min-h-[40px]">
-                              {selectedTags.length > 0 ? (
-                                  <div className="flex flex-wrap gap-1">
-                                      {selectedTags.map(tag => (
-                                          <Badge key={tag} variant="secondary" className="mr-1">
-                                              {tag}
-                                              <X className="ml-1 h-3 w-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} />
-                                          </Badge>
-                                      ))}
-                                  </div>
-                              ) : (
-                                  <span className="text-muted-foreground">Select tags...</span>
-                              )}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[400px] p-0">
-                          <Command>
-                              <CommandInput placeholder="Search tags..." />
-                              <CommandList>
-                                  <CommandEmpty>No tags found.</CommandEmpty>
-                                  <CommandGroup heading="Existing Tags">
-                                      {availableTags.map((tag) => (
-                                          <CommandItem key={tag} value={tag} onSelect={() => toggleTag(tag)}>
-                                              <Check className={cn("mr-2 h-4 w-4", selectedTags.includes(tag) ? "opacity-100" : "opacity-0")} />
-                                              {tag}
-                                          </CommandItem>
-                                      ))}
-                                  </CommandGroup>
-                                  <CommandSeparator />
-                                  <CommandGroup>
-                                      <CommandItem onSelect={() => { setIsTagDialogOpen(true); setTagOpen(false); }}>
-                                          <Plus className="mr-2 h-4 w-4" /> Create New Tag
-                                      </CommandItem>
-                                  </CommandGroup>
-                              </CommandList>
-                          </Command>
-                      </PopoverContent>
-                  </Popover>
-
-                  {/* Create Tag Dialog */}
-                  <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Add New Tag</DialogTitle>
-                                <DialogDescription>Create a new tag for your event.</DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid gap-2">
-                                    <Label>Tag Name</Label>
-                                    <Input value={newTagName} onChange={(e) => setNewTagName(e.target.value)} placeholder="e.g. Workshop" />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsTagDialogOpen(false)}>Cancel</Button>
-                                <Button onClick={handleCreateTag}>Create Tag</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                  </Dialog>
-              </div>
-
-              <Separator />
-
-              {/* SECTION 3: DATE & TIME */}
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                  <Calendar size={18} className="text-slate-400" /> Date & Time
-              </h4>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="grid gap-2">
-                      <Label>Start Date & Time <span className="text-red-500">*</span></Label>
-                      <DateTimePicker value={startDate} onChange={setStartDate} />
-                  </div>
-                  <div className="grid gap-2">
-                      <Label>End Date & Time <span className="text-red-500">*</span></Label>
-                      <DateTimePicker value={endDate} onChange={setEndDate} />
-                  </div>
-              </div>
-              
-              <div className="grid gap-2">
-                  <Label>Timezone</Label>
-                  <Select defaultValue="gmt">
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                          <SelectItem value="gmt">London (GMT/BST)</SelectItem>
-                          <SelectItem value="est">New York (EST/EDT)</SelectItem>
-                          <SelectItem value="pst">Los Angeles (PST/PDT)</SelectItem>
-                          <SelectItem value="jst">Tokyo (JST)</SelectItem>
-                      </SelectContent>
-                  </Select>
-              </div>
-
-              <Separator />
-
-              {/* SECTION 4: REGISTRATION WINDOW */}
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                  <Users size={18} className="text-slate-400" /> Registration Window
-              </h4>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="grid gap-2">
-                      <Label>Registration Opens</Label>
-                      <DateTimePicker value={regOpen} onChange={setRegOpen} />
-                  </div>
-                  <div className="grid gap-2">
-                      <Label>Registration Closes</Label>
-                      <DateTimePicker value={regClose} onChange={setRegClose} />
-                  </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                <div className="grid gap-2">
-                  <Label htmlFor="capacity">Max Capacity</Label>
-                  <Input 
-                    id="capacity" 
-                    type="number" 
-                    value={capacity}
-                    onChange={(e) => setCapacity(e.target.value)}
-                    placeholder="Unlimited" 
-                  />
-                </div>
-                <div className="flex items-center justify-between p-3 border border-slate-100 rounded-lg bg-slate-50/50">
-                  <div className="space-y-0.5">
-                    <Label className="text-slate-900 font-medium">Enable Waitlist</Label>
-                    <p className="text-xs text-slate-500">Allow signups after full</p>
-                  </div>
-                  <Switch checked={waitlistEnabled} onCheckedChange={setWaitlistEnabled} />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* SECTION 5: LOCATION & MODE */}
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                  <MapPin size={18} className="text-slate-400" /> Location & Mode
-              </h4>
-              
-              <div className="grid gap-2">
-                  <Label>Event Mode</Label>
-                  <Select value={eventMode} onValueChange={setEventMode}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="in-person">In-Person</SelectItem>
-                            <SelectItem value="online">Virtual / Online</SelectItem>
-                            <SelectItem value="hybrid">Hybrid</SelectItem>
-                        </SelectContent>
-                  </Select>
-              </div>
-
-              {/* CONDITIONAL: IN-PERSON/HYBRID FIELDS */}
-              {(eventMode === 'in-person' || eventMode === 'hybrid') && (
-                <div className="grid gap-4 pt-4 border-t border-slate-100">
-                    <div className="grid gap-2">
-                        <Label>Venue Preset</Label>
-                        <Select>
-                          <SelectTrigger><SelectValue placeholder="Select a saved venue or enter custom" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="custom">Custom Location</SelectItem>
-                            {MOCK_VENUES.map(v => (
-                              <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                    </div>
-                    
-                    <div className="grid gap-2">
-                        <Label>Venue Name</Label>
-                        <Input placeholder="e.g. ExCeL London" />
-                    </div>
-                    
-                    {/* CRITICAL PATTERN: ADDRESS AUTOCOMPLETE */}
-                    <div className="grid gap-2 relative">
-                        <Label>Address</Label>
-                        <Popover open={isAddressOpen} onOpenChange={setIsAddressOpen}>
-                            <PopoverTrigger asChild>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input 
-                                        placeholder="Start typing address..." 
-                                        className="pl-9"
-                                        value={address}
-                                        onChange={handleAddressChange}
-                                        autoComplete="off"
-                                    />
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
-                                <Command>
-                                    <CommandList>
-                                        <CommandGroup heading="Suggestions">
-                                            {addressSuggestions.map((addr, i) => (
-                                                <CommandItem key={i} value={addr} onSelect={() => selectAddress(addr)}>
-                                                    <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                                                    {addr}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
-                        <p className="text-xs text-slate-500">We'll automatically detect city, state, and zip code.</p>
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label>Google Maps Link (Optional)</Label>
-                        <Input placeholder="https://maps.google.com/..." />
-                    </div>
-                </div>
-              )}
-              
-              {/* CONDITIONAL: VIRTUAL/HYBRID FIELDS */}
-              {(eventMode === 'online' || eventMode === 'hybrid') && (
-                <div className="grid gap-2 pt-4 border-t border-slate-100">
-                  <Label>Meeting URL</Label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-3 text-slate-400" size={16} />
-                    <Input placeholder="https://zoom.us/j/..." className="pl-9" />
-                  </div>
-                  <p className="text-xs text-slate-500">Link for attendees to join the virtual session</p>
-                </div>
-              )}
-
-              <Separator />
-
-              {/* SECTION 6: EVENT AGENDA (Dynamic List) */}
-              <div className="flex items-center justify-between">
-                <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                    <FileText size={18} className="text-slate-400" /> Event Agenda
-                </h4>
-                <Button variant="outline" size="sm" onClick={handleAddAgendaItem}>
-                  <Plus size={14} className="mr-1" /> Add Item
+            )}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Tags</Label>
+          <Popover open={tagOpen} onOpenChange={setTagOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-between" data-testid="tags-trigger">
+                {selectedTagIds.length > 0 ? `${selectedTagIds.length} tags selected` : "Select tags"}
+                <ChevronsUpDown size={14} className="ml-2 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0">
+              <Command>
+                <CommandInput placeholder="Search tags..." />
+                <CommandList>
+                  <CommandEmpty>No tags found.</CommandEmpty>
+                  <CommandGroup>
+                    {availableTags.map((tag) => (
+                      <CommandItem key={tag.id} onSelect={() => toggleTag(tag.id)}>
+                        <Check className={cn("mr-2 h-4 w-4", selectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0")} />
+                        <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: tag.color || '#3B82F6' }} />
+                        {tag.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+              <div className="p-2 border-t">
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => { setTagOpen(false); setIsAddTagOpen(true); }}>
+                  <Plus size={14} className="mr-2" /> Create new tag
                 </Button>
               </div>
-              
-              <div className="space-y-3">
-                {agendaItems.map((item, index) => (
-                  <div key={index} className="p-4 border border-slate-200 rounded-xl bg-slate-50/50 space-y-4 relative group">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
-                      onClick={() => handleRemoveAgendaItem(index)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-
-                    <div className="grid gap-2">
-                      <Label className="text-sm">Agenda Title</Label>
-                      <Input 
-                        placeholder="e.g. Opening Keynote" 
-                        value={item.title}
-                        onChange={(e) => updateAgendaItem(index, 'title', e.target.value)}
-                        className="bg-white"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="grid gap-2">
-                        <Label className="text-sm">Start Time</Label>
-                        <Input 
-                          type="time" 
-                          value={item.startTime}
-                          onChange={(e) => updateAgendaItem(index, 'startTime', e.target.value)}
-                          className="bg-white"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label className="text-sm">End Time</Label>
-                        <Input 
-                          type="time" 
-                          value={item.endTime}
-                          onChange={(e) => updateAgendaItem(index, 'endTime', e.target.value)}
-                          className="bg-white"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label className="text-sm">Description</Label>
-                      <Textarea 
-                        placeholder="Brief details about this session" 
-                        value={item.description}
-                        onChange={(e) => updateAgendaItem(index, 'description', e.target.value)}
-                        className="min-h-[60px] bg-white resize-none"
-                      />
-                    </div>
-                  </div>
-                ))}
-                
-                {agendaItems.length === 0 && (
-                  <div className="text-center py-8 border-2 border-dashed border-slate-100 rounded-xl">
-                    <p className="text-slate-400 text-sm">No agenda items added yet</p>
-                  </div>
-                )}
-              </div>
-          </div>
+            </PopoverContent>
+          </Popover>
+          {selectedTagIds.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {getSelectedTags().map((tag) => (
+                <Badge key={tag.id} style={{ backgroundColor: tag.color || '#3B82F6' }} className="text-white gap-1">
+                  {tag.name}
+                  <X size={12} className="cursor-pointer" onClick={() => toggleTag(tag.id)} />
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+      <Separator />
+
+      {/* SECTION 4: DATE & TIME */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <Calendar size={18} className="text-slate-400" /> Date & Time
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Start Date & Time</Label>
+            <Input 
+              type="datetime-local"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              data-testid="start-date-input"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>End Date & Time</Label>
+            <Input 
+              type="datetime-local"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              data-testid="end-date-input"
+            />
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Timezone</Label>
+            <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger data-testid="timezone-select">
+                <SelectValue placeholder="Select timezone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="America/New_York">Eastern Time (ET)</SelectItem>
+                <SelectItem value="America/Chicago">Central Time (CT)</SelectItem>
+                <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
+                <SelectItem value="America/Los_Angeles">Pacific Time (PT)</SelectItem>
+                <SelectItem value="Europe/London">London (GMT)</SelectItem>
+                <SelectItem value="Europe/Paris">Central European (CET)</SelectItem>
+                <SelectItem value="Asia/Tokyo">Japan (JST)</SelectItem>
+                <SelectItem value="Asia/Singapore">Singapore (SGT)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center space-x-2 pt-8">
+            <Switch checked={allDay} onCheckedChange={setAllDay} id="all-day" />
+            <Label htmlFor="all-day">All-day event</Label>
+          </div>
+        </div>
+      </div>
+      <Separator />
+
+      {/* SECTION 5: REGISTRATION */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <Clock size={18} className="text-slate-400" /> Registration Settings
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Registration Opens</Label>
+            <Input 
+              type="datetime-local"
+              value={regStartAt}
+              onChange={(e) => setRegStartAt(e.target.value)}
+              data-testid="reg-start-input"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Registration Closes</Label>
+            <Input 
+              type="datetime-local"
+              value={regEndAt}
+              onChange={(e) => setRegEndAt(e.target.value)}
+              data-testid="reg-end-input"
+            />
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Capacity</Label>
+            <Input 
+              type="number"
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              placeholder="Maximum attendees"
+              data-testid="capacity-input"
+            />
+          </div>
+          <div className="flex items-center space-x-2 pt-8">
+            <Switch checked={waitlistEnabled} onCheckedChange={setWaitlistEnabled} id="waitlist" />
+            <Label htmlFor="waitlist">Enable waitlist when capacity is reached</Label>
+          </div>
+        </div>
+      </div>
+      <Separator />
+
+      {/* SECTION 6: LOCATION */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <MapPin size={18} className="text-slate-400" /> Location
+        </h4>
+        <div className="space-y-2">
+          <Label>Event Mode</Label>
+          <div className="flex gap-2">
+            {['in_person', 'virtual', 'hybrid'].map((m) => (
+              <Button
+                key={m}
+                variant={mode === m ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setMode(m)}
+                className={mode === m ? 'bg-[#0f172b]' : ''}
+                data-testid={`mode-${m}-btn`}
+              >
+                {m === 'in_person' && <MapPin size={14} className="mr-1" />}
+                {m === 'virtual' && <Video size={14} className="mr-1" />}
+                {m === 'hybrid' && <Globe size={14} className="mr-1" />}
+                {m.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </Button>
+            ))}
+          </div>
+        </div>
+        
+        {(mode === 'in_person' || mode === 'hybrid') && (
+          <>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Venue Name</Label>
+                <Input 
+                  value={venueName}
+                  onChange={(e) => setVenueName(e.target.value)}
+                  placeholder="Enter venue name"
+                  data-testid="venue-name-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Input 
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder="Country"
+                  data-testid="country-input"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Address Line 1</Label>
+              <Input 
+                value={addressLine1}
+                onChange={(e) => setAddressLine1(e.target.value)}
+                placeholder="Street address"
+                data-testid="address1-input"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Address Line 2</Label>
+              <Input 
+                value={addressLine2}
+                onChange={(e) => setAddressLine2(e.target.value)}
+                placeholder="Suite, floor, etc."
+              />
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>City</Label>
+                <Input 
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="City"
+                  data-testid="city-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>State/Province</Label>
+                <Input 
+                  value={stateProvince}
+                  onChange={(e) => setStateProvince(e.target.value)}
+                  placeholder="State"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>ZIP/Postal Code</Label>
+                <Input 
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value)}
+                  placeholder="ZIP Code"
+                />
+              </div>
+            </div>
+          </>
+        )}
+        
+        {(mode === 'virtual' || mode === 'hybrid') && (
+          <div className="space-y-2">
+            <Label>Meeting URL</Label>
+            <Input 
+              value={meetingUrl}
+              onChange={(e) => setMeetingUrl(e.target.value)}
+              placeholder="https://zoom.us/j/..."
+              data-testid="meeting-url-input"
+            />
+          </div>
+        )}
+      </div>
+      <Separator />
+
+      {/* SECTION 7: EVENT MEDIA */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <Video size={18} className="text-slate-400" /> Event Media
+        </h4>
+        <div className="space-y-2">
+          <Label>Promo Video URL</Label>
+          <Input 
+            value={promoVideoUrl}
+            onChange={(e) => setPromoVideoUrl(e.target.value)}
+            placeholder="https://youtube.com/watch?v=..."
+            data-testid="promo-video-input"
+          />
+          <p className="text-xs text-slate-400">YouTube or Vimeo URL</p>
+        </div>
+        <div className="space-y-2">
+          <Label>Event Photos</Label>
+          <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer">
+            <Upload size={24} className="text-slate-300 mb-2" />
+            <p className="text-sm text-slate-500">Drag and drop photos here</p>
+            <p className="text-xs text-slate-400 mt-1">PNG, JPG up to 5MB each</p>
+          </div>
+        </div>
+      </div>
+      <Separator />
+
+      {/* SECTION 8: ACCESSIBILITY & SAFETY */}
+      <div className="grid gap-4">
+        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+          <ShieldAlert size={18} className="text-slate-400" /> Accessibility & Safety
+        </h4>
+        <div className="space-y-2">
+          <Label>Accessibility Information</Label>
+          <Textarea 
+            value={accessibilityNotes}
+            onChange={(e) => setAccessibilityNotes(e.target.value)}
+            placeholder="Describe accessibility features (wheelchair access, hearing loops, etc.)"
+            rows={3}
+            data-testid="accessibility-input"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Emergency Contact</Label>
+          <Input 
+            value={emergencyContact}
+            onChange={(e) => setEmergencyContact(e.target.value)}
+            placeholder="+1 (555) 000-0000"
+            data-testid="emergency-contact-input"
+          />
+          <p className="text-xs text-slate-400">Contact number for emergencies during the event</p>
+        </div>
+      </div>
+
+      {/* ADD CATEGORY DIALOG */}
+      <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Category</DialogTitle>
+            <DialogDescription>Add a new category for your events.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Category Name</Label>
+              <Input 
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Enter category name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddCategoryOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddCategory}>Create Category</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ADD TAG DIALOG */}
+      <Dialog open={isAddTagOpen} onOpenChange={setIsAddTagOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Tag</DialogTitle>
+            <DialogDescription>Add a new tag for your events.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Tag Name</Label>
+              <Input 
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="Enter tag name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Tag Color</Label>
+              <div className="flex gap-2">
+                {['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899', '#EF4444'].map((color) => (
+                  <button
+                    key={color}
+                    className={cn("w-8 h-8 rounded-full border-2", newTagColor === color ? "border-slate-900" : "border-transparent")}
+                    style={{ backgroundColor: color }}
+                    onClick={() => setNewTagColor(color)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddTagOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddTag}>Create Tag</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
