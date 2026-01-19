@@ -37,14 +37,6 @@ import { format } from 'date-fns';
 const EventSetupPageComponent = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [categories, setCategories] = useState([
-    { value: 'conference', label: 'Conference' },
-    { value: 'meetup', label: 'Meetup' },
-    { value: 'workshop', label: 'Workshop' },
-    { value: 'awards', label: 'Awards' },
-  ]);
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
