@@ -51,6 +51,13 @@ router.get('/:eventId/overview/tickets', (req, res) => eventOverviewController.g
 router.get('/:eventId/overview/alerts', (req, res) => eventOverviewController.getAlerts(req, res));
 router.get('/:eventId/overview/activity', (req, res) => eventOverviewController.getActivityTimeline(req, res));
 
+// Event Detail - General Details APIs (Settings Tab)
+router.get('/:eventId/general', (req, res) => eventGeneralController.getGeneralDetails(req, res));
+router.put('/:eventId/general', (req, res) => eventGeneralController.updateGeneralDetails(req, res));
+router.get('/:eventId/media', (req, res) => eventGeneralController.getMedia(req, res));
+router.post('/:eventId/media', (req, res) => eventGeneralController.addMedia(req, res));
+router.delete('/:eventId/media/:mediaId', (req, res) => eventGeneralController.deleteMedia(req, res));
+
 // Event Detail - Tickets Tab APIs (CRUD)
 router.get('/:eventId/tickets', (req, res) => ticketsController.getTickets(req, res));
 router.get('/:eventId/tickets/stats', (req, res) => ticketsController.getTicketStats(req, res));
