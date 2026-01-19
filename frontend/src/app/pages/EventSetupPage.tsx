@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { eventsAPI } from '../api/events.api';
+import { eventsAPI, masterDataAPI } from '../api/events.api';
 import { toast } from 'sonner';
 import { FileUpload } from '../components/FileUpload';
 import { EmailOverrideSection } from '../components/EmailOverrideSection';
+import { CategorySelect } from '../components/shared/CategorySelect';
+import { TagsSelect, TagsSelectLegacy } from '../components/shared/TagsSelect';
 import {
   MOCK_USERS,
   MOCK_VENUES,
