@@ -115,7 +115,7 @@ export const EventSettings = ({ eventId, onNavigateToAdvanced }: EventSettingsPr
 
        {/* Content Area */}
        <div className="md:col-span-3 space-y-6">
-          {activeTab === 'general' && <SettingsGeneral />}
+          {activeTab === 'general' && eventId && <SettingsGeneral eventId={eventId} />}
           {activeTab === 'branding' && <SettingsBranding />}
           {activeTab === 'payment' && <SettingsPayment />}
           {activeTab === 'team' && <SettingsTeam />}
