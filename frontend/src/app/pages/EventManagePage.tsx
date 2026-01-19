@@ -233,7 +233,7 @@ export function EventManagePage() {
             <EventReports eventId={event.id} />
           </TabsContent>
           <TabsContent value="settings" className="mt-0 animate-in fade-in zoom-in-95 duration-200">
-            <EventSettings />
+            <EventSettings eventId={event.id} />
           </TabsContent>
         </div>
       </Tabs>
