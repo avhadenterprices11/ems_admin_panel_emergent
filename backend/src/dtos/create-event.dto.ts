@@ -126,7 +126,7 @@ export class CreateEventDTO {
   // Venue/Mode
   @IsOptional()
   @IsString()
-  @IsIn(['in-person', 'virtual', 'hybrid'])
+  @IsIn(['in-person', 'virtual', 'online', 'hybrid'])
   mode?: string;
 
   @IsOptional()
