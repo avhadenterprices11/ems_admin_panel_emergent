@@ -210,7 +210,10 @@ class TestEventCreationWithMeetingUrl:
                 "end_date": "2025-02-01T12:00:00Z",
                 "mode": "online",
                 "meeting_url": "https://meet.google.com/abc-defg-hij",
-                "virtual_platform": "other"
+                "virtual_platform": "other",
+                "location": "Virtual",
+                "owner": "Admin",
+                "status": "Draft"
             }
         )
         
