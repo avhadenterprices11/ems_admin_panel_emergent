@@ -49,7 +49,7 @@ const LoginPage = () => {
 
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     <FormikForm
-                        initialValues={{ email: "", password_hash: "" }}
+                        initialValues={{ email: "", password: "" }}
                         validationSchema={Schemas.login}
                         onSubmit={handleSubmit}
                     >
@@ -92,8 +92,8 @@ const LoginPage = () => {
 
                                         <input
                                             type={showPassword ? "text" : "password"}
-                                            name="password_hash"
-                                            value={formik.values.password_hash}
+                                            name="password"
+                                            value={formik.values.password}
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             placeholder="Enter your password"
@@ -109,9 +109,9 @@ const LoginPage = () => {
                                         </button>
                                     </div>
 
-                                    {formik.touched.password_hash && formik.errors.password_hash && (
+                                    {formik.touched.password && formik.errors.password && (
                                         <p className="text-red-500 text-xs mt-1">
-                                            {formik.errors.password_hash}
+                                            {formik.errors.password}
                                         </p>
                                     )}
                                 </div>
