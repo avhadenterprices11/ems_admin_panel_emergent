@@ -396,6 +396,10 @@ A full-stack Event Management Admin System built with:
 - **Timezone Handling**:
   - Timezone passed consistently from frontend (event.timezone)
   - Used in Zoom API (timezone field) and Google Calendar API (start/end timeZone)
+- **✅ CREDENTIALS CONFIGURED (Jan 20, 2026)**:
+  - Zoom: Server-to-Server OAuth credentials active
+  - Google Meet: OAuth 2.0 with Calendar API credentials active
+  - Both platforms tested and generating real meeting links
 
 ## Upcoming Tasks
 
