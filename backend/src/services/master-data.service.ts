@@ -201,10 +201,16 @@ export class MasterDataService {
   // ============ EVENT CO-HOSTS ============
   
   async getEventCohosts(eventId: number): Promise<{ id: number; user_id: number; role: string; name: string; email: string }[]> {
-    return db('event_cohosts')
+    const cohosts = await db('event_cohosts')
       .join('users', 'event_cohosts.user_id', 'users.id')
       .where('event_cohosts.event_id', eventId)
       .select('event_cohosts.id', 'event_cohosts.user_id', 'event_cohosts.role', 'users.name', 'users.email');
+    
+    // Ensure name is never null - use email prefix as fallback
+    return cohosts.map(c => ({
+      ...c,
+      name: c.name || c.email.split('@')[0]
+    }));
   }
 
   async setEventCohosts(eventId: number, userIds: number[]): Promise<void> {
