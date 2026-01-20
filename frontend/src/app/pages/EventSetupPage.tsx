@@ -117,6 +117,9 @@ const EventSetupPageComponent = () => {
   const watchEnd = watch('end_at');
   const watchTitle = watch('title');
   const watchDescription = watch('description');
+  const watchVirtualPlatform = watch('virtual_platform');
+  const watchMeetingUrl = watch('meeting_url');
+  const watchTimezone = watch('timezone');
 
   // SEO Auto-generation - only on first input, don't override manual changes
   const [seoAutoFilled, setSeoAutoFilled] = useState({
@@ -124,6 +127,52 @@ const EventSetupPageComponent = () => {
     meta_description: false,
     url_slug: false,
   });
+
+  // Check if event mode requires virtual meeting
+  const isVirtualMode = watchMode === 'online' || watchMode === 'hybrid';
+  const canGenerateMeeting = isVirtualMode && watchVirtualPlatform && 
+    ((watchVirtualPlatform === 'zoom' && meetingIntegrationStatus.zoom) ||
+     (watchVirtualPlatform === 'google-meet' && meetingIntegrationStatus.googleMeet));
+
+  // Function to generate meeting link
+  const handleGenerateMeeting = async () => {
+    if (!watchTitle) {
+      toast.error('Please enter an event title first');
+      return;
+    }
+    if (!watchStart || !watchEnd) {
+      toast.error('Please set event start and end dates first');
+      return;
+    }
+    if (!watchVirtualPlatform) {
+      toast.error('Please select a meeting platform');
+      return;
+    }
+
+    setIsGeneratingMeeting(true);
+    try {
+      const result = await meetingAPI.generateMeeting({
+        platform: watchVirtualPlatform as 'zoom' | 'google-meet',
+        topic: watchTitle,
+        description: watchDescription,
+        start_time: new Date(watchStart).toISOString(),
+        end_time: new Date(watchEnd).toISOString(),
+        timezone: watchTimezone || 'America/New_York',
+      });
+
+      if (result.success && result.meeting_url) {
+        setValue('meeting_url', result.meeting_url);
+        toast.success(`${watchVirtualPlatform === 'zoom' ? 'Zoom' : 'Google Meet'} meeting link generated successfully!`);
+      } else {
+        toast.error('Failed to generate meeting link');
+      }
+    } catch (error: any) {
+      console.error('Meeting generation error:', error);
+      toast.error(error.response?.data?.message || 'Failed to generate meeting link');
+    } finally {
+      setIsGeneratingMeeting(false);
+    }
+  };
 
   // Venue preset auto-fill
   useEffect(() => {
