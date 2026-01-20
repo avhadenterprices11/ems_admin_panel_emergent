@@ -13,7 +13,8 @@ import {
   Globe,
   Video,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
