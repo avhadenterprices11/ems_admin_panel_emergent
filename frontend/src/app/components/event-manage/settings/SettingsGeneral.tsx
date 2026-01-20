@@ -38,7 +38,9 @@ import {
   masterDataAPI, 
   EventGeneralDetails, 
   UserBasic,
-  UpdateEventGeneralDetailsInput 
+  UpdateEventGeneralDetailsInput,
+  Category,
+  Tag
 } from '../../../api/events.api';
 
 interface SettingsGeneralProps {
@@ -54,7 +56,9 @@ export const SettingsGeneral = ({ eventId }: SettingsGeneralProps) => {
   // Form data
   const [formData, setFormData] = useState<EventGeneralDetails | null>(null);
   
-  // Master data - only users for co-hosts (categories/tags handled by shared components)
+  // Master data
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [users, setUsers] = useState<UserBasic[]>([]);
 
   // Form state
