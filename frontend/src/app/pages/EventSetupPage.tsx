@@ -37,6 +37,15 @@ import { format } from 'date-fns';
 const EventSetupPageComponent = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const [isGeneratingMeeting, setIsGeneratingMeeting] = useState(false);
+  const [meetingIntegrationStatus, setMeetingIntegrationStatus] = useState<MeetingIntegrationStatus>({ zoom: false, googleMeet: false });
+
+  // Load meeting integration status on mount
+  useEffect(() => {
+    meetingAPI.getIntegrationStatus()
+      .then(setMeetingIntegrationStatus)
+      .catch(err => console.error('Failed to load meeting integration status:', err));
+  }, []);
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
