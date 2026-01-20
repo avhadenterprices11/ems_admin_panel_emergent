@@ -255,7 +255,10 @@ class TestEventCreationWithMeetingUrl:
                 "meeting_url": "https://zoom.us/j/123456789",
                 "virtual_platform": "other",
                 "venue_name": "Test Venue",
-                "city": "New York"
+                "city": "New York",
+                "location": "Test Venue, New York",
+                "owner": "Admin",
+                "status": "Draft"
             }
         )
         
