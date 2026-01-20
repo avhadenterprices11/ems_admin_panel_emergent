@@ -99,36 +99,45 @@ export class EventsService {
 
   async createEvent(eventData: CreateEventDTO): Promise<Event> {
     const now = new Date();
+    
+    // Initialize meeting fields
     let meeting_url = eventData.meeting_url || null;
+    let meeting_platform: string | null = null;
+    let meeting_id: string | null = null;
+    let meeting_password: string | null = null;
+    let meeting_provider_payload: any = null;
 
-    // Handle virtual event platform integration
-    if (eventData.mode === 'virtual' && (eventData as any).virtual_platform) {
+    // Handle virtual/hybrid event platform integration
+    const virtual_platform = (eventData as any).virtual_platform;
+    const shouldGenerateMeeting = 
+      (eventData.mode === 'virtual' || eventData.mode === 'online' || eventData.mode === 'hybrid') && 
+      virtual_platform && 
+      ['zoom', 'google-meet'].includes(virtual_platform);
+
+    if (shouldGenerateMeeting) {
       try {
-        const platform = (eventData as any).virtual_platform;
-        if (platform === 'zoom') {
-          const startTime = new Date(eventData.start_date);
-          const endTime = new Date(eventData.end_date);
-          const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+        const result = await this.meetingService.createMeeting({
+          platform: virtual_platform,
+          topic: eventData.name,
+          description: eventData.description,
+          start_time: eventData.start_date,
+          end_time: eventData.end_date,
+          timezone: eventData.timezone || 'UTC',
+        });
 
-          meeting_url = await this.zoomService.createMeeting({
-            topic: eventData.name,
-            start_time: eventData.start_date,
-            duration: durationMinutes,
-            timezone: eventData.timezone || 'UTC',
-            agenda: eventData.description,
-          });
-        } else if (platform === 'google-meet') {
-          meeting_url = await this.googleMeetService.createMeetingLink({
-            summary: eventData.name,
-            description: eventData.description,
-            start: eventData.start_date,
-            end: eventData.end_date,
-            timezone: eventData.timezone || 'UTC',
-          });
-        }
-      } catch (error) {
-        console.error('Virtual platform integration error:', error);
+        meeting_url = result.meeting_url;
+        meeting_platform = result.platform;
+        meeting_id = result.meeting_id;
+        meeting_password = result.meeting_password;
+        meeting_provider_payload = result.provider_payload;
+      } catch (error: any) {
+        console.error('Virtual platform integration error:', error.message);
+        // Don't throw - allow event creation to continue without meeting link
+        // The error will be logged and can be retried later
       }
+    } else if (virtual_platform) {
+      // If platform is specified but not auto-generating, just store the platform
+      meeting_platform = virtual_platform;
     }
 
     const eventRecord = {
@@ -159,6 +168,10 @@ export class EventsService {
       zip_code: eventData.zip_code || null,
       country: eventData.country || null,
       meeting_url: meeting_url,
+      meeting_platform: meeting_platform,
+      meeting_id: meeting_id,
+      meeting_password: meeting_password,
+      meeting_provider_payload: meeting_provider_payload ? JSON.stringify(meeting_provider_payload) : null,
       accessibility_notes: eventData.accessibility_notes || null,
       emergency_contact: eventData.emergency_contact || null,
       owner: eventData.owner,
