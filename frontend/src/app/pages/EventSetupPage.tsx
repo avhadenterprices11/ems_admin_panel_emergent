@@ -745,17 +745,110 @@ const EventSetupPageComponent = () => {
             )}
 
             {(watchMode === 'online' || watchMode === 'hybrid') && (
-              <div className="space-y-2 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
-                <Label className="text-slate-700 font-medium">Meeting URL</Label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-3 text-slate-400" size={16} />
-                  <Input 
-                    placeholder="https://zoom.us/j/..." 
-                    className="pl-9 border-slate-200" 
-                    {...register('meeting_url')} 
+              <div className="space-y-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
+                {/* Meeting Platform Selection */}
+                <div className="space-y-2">
+                  <Label className="text-slate-700 font-medium">Meeting Platform</Label>
+                  <Controller
+                    name="virtual_platform"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
+                        <SelectTrigger className="border-slate-200" data-testid="meeting-platform-select">
+                          <SelectValue placeholder="Select meeting platform" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="zoom" disabled={!meetingIntegrationStatus.zoom}>
+                            <div className="flex items-center gap-2">
+                              <Video size={16} className="text-blue-500" />
+                              <span>Zoom</span>
+                              {!meetingIntegrationStatus.zoom && (
+                                <Badge variant="secondary" className="ml-2 text-xs">Not configured</Badge>
+                              )}
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="google-meet" disabled={!meetingIntegrationStatus.googleMeet}>
+                            <div className="flex items-center gap-2">
+                              <Video size={16} className="text-green-500" />
+                              <span>Google Meet</span>
+                              {!meetingIntegrationStatus.googleMeet && (
+                                <Badge variant="secondary" className="ml-2 text-xs">Not configured</Badge>
+                              )}
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="other">
+                            <div className="flex items-center gap-2">
+                              <Globe size={16} className="text-slate-500" />
+                              <span>Other (Enter URL manually)</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
+                  <p className="text-xs text-slate-500">
+                    {!meetingIntegrationStatus.zoom && !meetingIntegrationStatus.googleMeet 
+                      ? 'No meeting integrations configured. Contact admin to set up Zoom or Google Meet.'
+                      : 'Select a platform to auto-generate meeting link, or choose "Other" to enter manually.'}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500">Link for attendees to join the session</p>
+
+                {/* Meeting URL with Generate Button */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-slate-700 font-medium">Meeting URL</Label>
+                    {canGenerateMeeting && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleGenerateMeeting}
+                        disabled={isGeneratingMeeting || !watchTitle || !watchStart || !watchEnd}
+                        className="h-7 text-xs"
+                        data-testid="generate-meeting-btn"
+                      >
+                        {isGeneratingMeeting ? (
+                          <>
+                            <Loader2 size={12} className="mr-1 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Video size={12} className="mr-1" />
+                            Generate Link
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 text-slate-400" size={16} />
+                    <Input 
+                      placeholder={watchVirtualPlatform === 'zoom' ? 'https://zoom.us/j/...' : 
+                                  watchVirtualPlatform === 'google-meet' ? 'https://meet.google.com/...' :
+                                  'Enter meeting URL'}
+                      className="pl-9 pr-10 border-slate-200" 
+                      {...register('meeting_url')} 
+                      data-testid="meeting-url-input"
+                    />
+                    {watchMeetingUrl && (
+                      <a 
+                        href={watchMeetingUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="absolute right-3 top-3 text-blue-500 hover:text-blue-600"
+                        title="Open meeting link"
+                      >
+                        <ExternalLink size={16} />
+                      </a>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    {watchVirtualPlatform && watchVirtualPlatform !== 'other' && !watchMeetingUrl
+                      ? 'Click "Generate Link" to create a meeting, or enter a URL manually.'
+                      : 'Link for attendees to join the virtual session'}
+                  </p>
+                </div>
               </div>
             )}
           </div>
