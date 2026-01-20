@@ -1442,6 +1442,46 @@ export const masterDataAPI = {
   },
 };
 
+// Meeting Generation API
+export interface MeetingGenerateRequest {
+  platform: 'zoom' | 'google-meet';
+  topic: string;
+  description?: string;
+  start_time: string;
+  end_time: string;
+  timezone: string;
+}
+
+export interface MeetingGenerateResponse {
+  success: boolean;
+  meeting_url: string;
+  meeting_id: string | null;
+  meeting_password: string | null;
+  platform: string;
+  provider_payload?: any;
+}
+
+export interface MeetingIntegrationStatus {
+  zoom: boolean;
+  googleMeet: boolean;
+}
+
+export const meetingAPI = {
+  getIntegrationStatus: async (): Promise<MeetingIntegrationStatus> => {
+    const response = await apiClient.get('/meetings/status');
+    return response.data as MeetingIntegrationStatus;
+  },
+
+  generateMeeting: async (data: MeetingGenerateRequest): Promise<MeetingGenerateResponse> => {
+    const response = await apiClient.post('/meetings/generate', data);
+    return response.data as MeetingGenerateResponse;
+  },
+
+  deleteMeeting: async (platform: string, meetingId: string): Promise<void> => {
+    await apiClient.delete(`/meetings/${platform}/${meetingId}`);
+  },
+};
+
 export const savedViewsAPI = {
   getViews: async (module: string) => {
     const response = await apiClient.get('/saved-views', { params: { module } });
