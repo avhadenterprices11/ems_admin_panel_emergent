@@ -302,6 +302,8 @@ const EventSetupPageComponent = () => {
         email_config: data.email_overrides || null,
         internal_notes: data.internal_notes || '',
         lifecycle_status: data.lifecycle_status || 'draft',
+        virtual_platform: data.virtual_platform || null,
+        promo_video_url: data.promo_video_url || null,
       };
       
       const createdEvent = await eventsAPI.createEvent(eventData);
