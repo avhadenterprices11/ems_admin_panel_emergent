@@ -1,7 +1,6 @@
 import db from '../database/db';
 import { CreateEventDTO } from '../dtos/create-event.dto';
-import { ZoomService } from './zoom.service';
-import { GoogleMeetService } from './google-meet.service';
+import { MeetingService } from './meeting.service';
 import { Knex } from 'knex';
 
 interface Event {
@@ -32,6 +31,10 @@ interface Event {
   zip_code?: string;
   country?: string;
   meeting_url?: string;
+  meeting_platform?: string;
+  meeting_id?: string;
+  meeting_password?: string;
+  meeting_provider_payload?: any;
   accessibility_notes?: string;
   emergency_contact?: string;
   owner: string;
@@ -88,12 +91,10 @@ interface EventMetrics {
 }
 
 export class EventsService {
-  private zoomService: ZoomService;
-  private googleMeetService: GoogleMeetService;
+  private meetingService: MeetingService;
 
   constructor() {
-    this.zoomService = new ZoomService();
-    this.googleMeetService = new GoogleMeetService();
+    this.meetingService = new MeetingService();
   }
 
   async createEvent(eventData: CreateEventDTO): Promise<Event> {
