@@ -364,6 +364,39 @@ A full-stack Event Management Admin System built with:
   - `events.category_id` - FK to `categories.id`
   - `event_tags` - Junction table with `event_id` and `tag_id`
 
+### 13. Virtual Meeting Integration ✅ COMPLETE (Jan 20, 2026)
+- **Frontend (EventSetupPage.tsx)**:
+  - Meeting Platform dropdown appears when Event Mode = "Virtual / Online" or "Hybrid"
+  - Platform options: Zoom, Google Meet, Other (Enter URL manually)
+  - "Not configured" badges shown when credentials aren't set
+  - "Generate Link" button appears when credentials are configured
+  - Manual URL entry fallback for "Other" option
+  - `data-testid="meeting-platform-select"` and `data-testid="meeting-url-input"` for testing
+- **Backend APIs**:
+  - GET `/api/meetings/status` - Returns {zoom: boolean, googleMeet: boolean} indicating credential configuration
+  - POST `/api/meetings/generate` - Generates meeting link for specified platform
+    - Required fields: platform, topic, start_time, end_time, timezone
+    - Returns: meeting_url, meeting_id, meeting_password, platform, provider_payload
+  - DELETE `/api/meetings/:platform/:meetingId` - Deletes a meeting
+- **Services**:
+  - `meeting.service.ts` - Central orchestrator for meeting generation
+  - `zoom.service.ts` - Server-to-Server OAuth flow, meeting creation/deletion
+    - Requires: ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET env vars
+  - `google-meet.service.ts` - Google Calendar API with Meet link
+    - Requires: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN env vars
+- **Database Migration (20260119000001_add_meeting_platform_fields.ts)**:
+  - `meeting_platform` (string) - 'zoom', 'google-meet', 'other', null
+  - `meeting_id` (string) - Platform's meeting identifier
+  - `meeting_password` (string) - Meeting password (Zoom only)
+  - `meeting_provider_payload` (jsonb) - Full API response for reference
+- **Events Service Integration**:
+  - Auto-generates meeting when mode=virtual/online/hybrid AND virtual_platform is set
+  - Stores meeting_url, meeting_platform, meeting_id, meeting_password, meeting_provider_payload
+  - Graceful fallback if meeting generation fails (logs error, allows manual entry)
+- **Timezone Handling**:
+  - Timezone passed consistently from frontend (event.timezone)
+  - Used in Zoom API (timezone field) and Google Calendar API (start/end timeZone)
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
