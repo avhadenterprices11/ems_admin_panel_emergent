@@ -192,10 +192,16 @@ export class MasterDataService {
   // ============ USERS (for co-hosts) ============
   
   async getUsers(): Promise<{ id: number; name: string; email: string }[]> {
-    return db('users')
+    const users = await db('users')
       .whereNull('deleted_at')
       .select('id', 'name', 'email')
-      .orderBy('name', 'asc');
+      .orderBy('email', 'asc');
+    
+    // Ensure name is never null - use email prefix as fallback
+    return users.map(u => ({
+      ...u,
+      name: u.name || u.email.split('@')[0]
+    }));
   }
 
   // ============ EVENT CO-HOSTS ============
