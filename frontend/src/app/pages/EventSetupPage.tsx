@@ -1150,25 +1150,41 @@ const EventSetupPageComponent = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-slate-700 font-medium">Primary Owner</Label>
-                  <Button type="button" variant="link" size="sm" className="h-auto p-0 text-xs">Transfer</Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-auto p-0 text-xs text-blue-600 hover:text-blue-700"
+                      onClick={() => setIsAddOwnerOpen(true)}
+                    >
+                      <UserPlus size={12} className="mr-1" />
+                      Add New
+                    </Button>
+                    <Button type="button" variant="link" size="sm" className="h-auto p-0 text-xs">Transfer</Button>
+                  </div>
                 </div>
                 <Controller
                   name="owner_id"
                   control={control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger className="border-slate-200">
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                      <SelectTrigger className="border-slate-200" data-testid="owner-select">
                         <SelectValue placeholder="Select Owner" />
                       </SelectTrigger>
                       <SelectContent>
-                        {MOCK_USERS.map(u => (
-                          <SelectItem key={u.id} value={u.id}>
-                            <div className="flex items-center justify-between w-full">
-                              <span>{u.name}</span>
-                              <span className="text-xs text-slate-400 ml-2">{u.role}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        {users.length === 0 ? (
+                          <SelectItem value="" disabled>Loading users...</SelectItem>
+                        ) : (
+                          users.map(u => (
+                            <SelectItem key={u.id} value={String(u.id)}>
+                              <div className="flex items-center justify-between w-full">
+                                <span>{u.name}</span>
+                                <span className="text-xs text-slate-400 ml-2">{u.email}</span>
+                              </div>
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   )}
@@ -1186,7 +1202,7 @@ const EventSetupPageComponent = () => {
                       tags={field.value} 
                       setTags={field.onChange}
                       placeholder="Add User..."
-                      suggestions={MOCK_USERS.map(u => u.name)}
+                      suggestions={users.map(u => u.name)}
                     />
                   )}
                 />
