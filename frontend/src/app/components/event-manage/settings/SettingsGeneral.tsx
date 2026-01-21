@@ -120,6 +120,12 @@ export const SettingsGeneral = ({ eventId }: SettingsGeneralProps) => {
   const [coHostOpen, setCoHostOpen] = useState(false);
   const [tagOpen, setTagOpen] = useState(false);
 
+  // Dialog and creation states
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isAddTagOpen, setIsAddTagOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newTagName, setNewTagName] = useState('');
+
   // Load initial data
   useEffect(() => {
     loadData();
