@@ -1461,6 +1461,22 @@ export const eventsAPI = {
     const response = await apiClient.post(`/events/${eventId}/branding/reset`);
     return response.data as EventBranding;
   },
+
+  // Payment & Tax Settings APIs (Settings Tab)
+  getPaymentTaxSettings: async (eventId: number | string): Promise<PaymentTaxSettings> => {
+    const response = await apiClient.get(`/events/${eventId}/payment-tax`);
+    return response.data as PaymentTaxSettings;
+  },
+
+  updatePaymentTaxSettings: async (eventId: number | string, data: UpdatePaymentTaxInput): Promise<PaymentTaxSettings> => {
+    const response = await apiClient.put(`/events/${eventId}/payment-tax`, data);
+    return response.data as PaymentTaxSettings;
+  },
+
+  resetPaymentTaxSettings: async (eventId: number | string): Promise<PaymentTaxSettings> => {
+    const response = await apiClient.post(`/events/${eventId}/payment-tax/reset`);
+    return response.data as PaymentTaxSettings;
+  },
 };
 
 // Master Data API
