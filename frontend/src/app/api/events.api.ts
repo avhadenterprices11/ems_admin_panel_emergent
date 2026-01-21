@@ -854,6 +854,38 @@ export interface UpdateEventBrandingInput {
   font_family?: string;
 }
 
+// Payment & Tax Settings Interfaces
+export interface PaymentTaxSettings {
+  id: number;
+  event_id: number | null;
+  currency: string;
+  stripe_enabled: boolean;
+  razorpay_enabled: boolean;
+  offline_enabled: boolean;
+  tax_enabled: boolean;
+  tax_name: string;
+  tax_percentage: number;
+  legal_entity_name: string | null;
+  billing_address: string | null;
+  tax_id: string | null;
+  updated_at: string;
+  updated_by: string | null;
+  created_at: string;
+}
+
+export interface UpdatePaymentTaxInput {
+  currency?: string;
+  stripe_enabled?: boolean;
+  razorpay_enabled?: boolean;
+  offline_enabled?: boolean;
+  tax_enabled?: boolean;
+  tax_name?: string;
+  tax_percentage?: number;
+  legal_entity_name?: string | null;
+  billing_address?: string | null;
+  tax_id?: string | null;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
