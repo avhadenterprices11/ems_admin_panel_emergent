@@ -13,6 +13,7 @@ import { AudienceSegmentsController } from '../controllers/audience-segments.con
 import { CommunicationSettingsController } from '../controllers/communication-settings.controller';
 import { ReportsController } from '../controllers/reports.controller';
 import { EventGeneralController } from '../controllers/event-general.controller';
+import { EventBrandingController } from '../controllers/event-branding.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -32,6 +33,7 @@ const audienceSegmentsController = new AudienceSegmentsController();
 const communicationSettingsController = new CommunicationSettingsController();
 const reportsController = new ReportsController();
 const eventGeneralController = new EventGeneralController();
+const eventBrandingController = new EventBrandingController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
