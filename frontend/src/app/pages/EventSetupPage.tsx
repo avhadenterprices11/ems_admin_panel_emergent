@@ -94,7 +94,7 @@ const EventSetupPageComponent = () => {
       visibility: 'public',
       check_in_mode: 'qr',
       data_collection_form: 'standard',
-      owner_id: 'user_1',
+      owner_id: '',
       co_hosts: [],
       tag_ids: [] as number[],
       internal_notes: '',
