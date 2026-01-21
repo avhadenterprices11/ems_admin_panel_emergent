@@ -116,6 +116,10 @@ export const SettingsGeneral = ({ eventId }: SettingsGeneralProps) => {
   const [emergencyContact, setEmergencyContact] = useState('');
   const [newTagColor, setNewTagColor] = useState('#3B82F6');
 
+  // Popover open states
+  const [coHostOpen, setCoHostOpen] = useState(false);
+  const [tagOpen, setTagOpen] = useState(false);
+
   // Load initial data
   useEffect(() => {
     loadData();
