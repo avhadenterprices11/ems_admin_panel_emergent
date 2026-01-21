@@ -1447,6 +1447,70 @@ const EventSetupPageComponent = () => {
           </div>
         </div>
       </div>
+
+      {/* Add New Owner Dialog */}
+      <Dialog open={isAddOwnerOpen} onOpenChange={setIsAddOwnerOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Owner</DialogTitle>
+            <DialogDescription>
+              Create a new user to be set as the event owner.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="newOwnerName">Name</Label>
+              <Input
+                id="newOwnerName"
+                placeholder="Enter name"
+                value={newOwnerName}
+                onChange={(e) => setNewOwnerName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newOwnerEmail">Email</Label>
+              <Input
+                id="newOwnerEmail"
+                type="email"
+                placeholder="Enter email address"
+                value={newOwnerEmail}
+                onChange={(e) => setNewOwnerEmail(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddOwnerOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={async () => {
+                if (!newOwnerEmail) {
+                  toast.error('Email is required');
+                  return;
+                }
+                try {
+                  // For now, just add to local users list (backend user creation would need a separate API)
+                  const newUser = {
+                    id: Date.now(), // Temporary ID
+                    name: newOwnerName || newOwnerEmail.split('@')[0],
+                    email: newOwnerEmail
+                  };
+                  setUsers(prev => [...prev, newUser]);
+                  setValue('owner_id', String(newUser.id));
+                  setIsAddOwnerOpen(false);
+                  setNewOwnerName('');
+                  setNewOwnerEmail('');
+                  toast.success('Owner added successfully');
+                } catch (error) {
+                  toast.error('Failed to add owner');
+                }
+              }}
+            >
+              Add Owner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 };
