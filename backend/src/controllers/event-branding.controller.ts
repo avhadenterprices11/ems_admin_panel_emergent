@@ -9,11 +9,11 @@ export class EventBrandingController {
   }
 
   /**
-   * GET /api/events/:id/branding
+   * GET /api/events/:eventId/branding
    */
   async getBranding(req: Request, res: Response): Promise<void> {
     try {
-      const eventId = parseInt(req.params.id);
+      const eventId = parseInt(req.params.eventId);
       
       if (isNaN(eventId)) {
         res.status(400).json({ message: 'Invalid event ID' });
@@ -33,11 +33,11 @@ export class EventBrandingController {
   }
 
   /**
-   * PUT /api/events/:id/branding
+   * PUT /api/events/:eventId/branding
    */
   async updateBranding(req: Request, res: Response): Promise<void> {
     try {
-      const eventId = parseInt(req.params.id);
+      const eventId = parseInt(req.params.eventId);
       
       if (isNaN(eventId)) {
         res.status(400).json({ message: 'Invalid event ID' });
