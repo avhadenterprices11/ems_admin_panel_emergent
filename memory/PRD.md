@@ -418,6 +418,27 @@ A full-stack Event Management Admin System built with:
   - Stores: meeting_url, meeting_platform, meeting_id, meeting_password, meeting_provider_payload
 - **Test Results**: 14/14 backend API tests pass (100%)
 
+### 15. Branding & Design Settings ✅ COMPLETE (Jan 21, 2026)
+- **Database**: `event_branding` table with unique `event_id` FK
+  - `light_logo_url`, `dark_logo_url`, `cover_image_url`
+  - `primary_color` (hex), `secondary_color` (hex)
+  - `font_family` (inter, roboto, poppins, open-sans, lato, montserrat)
+  - `updated_at`, `updated_by`
+- **Backend APIs**:
+  - `GET /api/events/:eventId/branding` - Returns branding (auto-creates default if not exists)
+  - `PUT /api/events/:eventId/branding` - Updates branding with hex color and font validation
+  - `POST /api/events/:eventId/branding/reset` - Resets to defaults
+- **Frontend UI** (`SettingsBranding.tsx`):
+  - Light Logo & Dark Logo upload with preview (reuses FileUpload component)
+  - Cover Image upload with preview
+  - Primary & Secondary color pickers with hex input
+  - Font Family dropdown (6 fonts)
+  - Live Preview section showing current branding
+  - Save Changes button (disables while saving, toast on success/error)
+  - Reset Defaults button (reverts and persists)
+- **Default Values**: primary=#0f172b, secondary=#3b82f6, font=inter
+- **Test Results**: 19/19 backend API tests pass (100%), Frontend verified
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
@@ -425,7 +446,7 @@ A full-stack Event Management Admin System built with:
 - Drop legacy `events.category` text column after migration
 
 ### P2 - Settings Tab (Other Subsections)
-- Branding & Design, Payment & Tax, Team & Permissions, Badge Design
+- Payment & Tax, Team & Permissions, Badge Design
 - Integrations, Data & Privacy, Email Configuration, Advanced Configuration
 - Archive Event, Delete Event
 
