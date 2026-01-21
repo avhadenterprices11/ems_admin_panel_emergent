@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="14" time="4.874" timestamp="2026-01-21T08:49:08.708155+00:00" hostname="agent-env-97b53990-4668-42f0-b957-5a7315d23e84"><testcase classname="tests.test_event_setup_form.TestMasterDataAPIs" name="test_get_categories" time="0.087" /><testcase classname="tests.test_event_setup_form.TestMasterDataAPIs" name="test_get_tags" time="0.099" /><testcase classname="tests.test_event_setup_form.TestMasterDataAPIs" name="test_get_users" time="0.069" /><testcase classname="tests.test_event_setup_form.TestMeetingIntegration" name="test_meeting_integration_status" time="0.059" /><testcase classname="tests.test_event_setup_form.TestMeetingIntegration" name="test_generate_zoom_meeting" time="0.747" /><testcase classname="tests.test_event_setup_form.TestMeetingIntegration" name="test_generate_google_meet" time="1.104" /><testcase classname="tests.test_event_setup_form.TestAuthentication" name="test_login_success" time="0.135" /><testcase classname="tests.test_event_setup_form.TestAuthentication" name="test_login_invalid_credentials" time="0.067" /><testcase classname="tests.test_event_setup_form.TestEventCreation" name="test_create_event_with_category_and_tags" time="0.311"><failure message="assert 400 in [200, 201]&#10; +  where 400 = &lt;Response [400]&gt;.status_code">tests/test_event_setup_form.py:214: in test_create_event_with_category_and_tags
+    assert response.status_code in [200, 201]
+E   assert 400 in [200, 201]
+E    +  where 400 = &lt;Response [400]&gt;.status_code</failure></testcase><testcase classname="tests.test_event_setup_form.TestEventCreation" name="test_create_virtual_event_with_meeting_url" time="0.184"><failure message="assert 400 in [200, 201]&#10; +  where 400 = &lt;Response [400]&gt;.status_code">tests/test_event_setup_form.py:241: in test_create_virtual_event_with_meeting_url
+    assert response.status_code in [200, 201]
+E   assert 400 in [200, 201]
+E    +  where 400 = &lt;Response [400]&gt;.status_code</failure></testcase><testcase classname="tests.test_event_setup_form.TestEventCreation" name="test_create_hybrid_event_with_all_fields" time="1.190"><failure message="AssertionError: assert 'https://meet.../ojd-fqyj-ntv' == 'https://meet.../abc-defg-hij'&#10;  &#10;  - https://meet.google.com/abc-defg-hij&#10;  ?                         ^^^ -- ^ ^^^&#10;  + https://meet.google.com/ojd-fqyj-ntv&#10;  ?                         ^^^  ^^^ ^^^">tests/test_event_setup_form.py:289: in test_create_hybrid_event_with_all_fields
+    assert data.get('meeting_url') == event_data['meeting_url']
+E   AssertionError: assert 'https://meet.../ojd-fqyj-ntv' == 'https://meet.../abc-defg-hij'
+E     
+E     - https://meet.google.com/abc-defg-hij
+E     ?                         ^^^ -- ^ ^^^
+E     + https://meet.google.com/ojd-fqyj-ntv
+E     ?                         ^^^  ^^^ ^^^</failure></testcase><testcase classname="tests.test_event_setup_form.TestEventCreation" name="test_verify_event_tags_junction_table" time="0.281"><failure message="assert 400 in [200, 201]&#10; +  where 400 = &lt;Response [400]&gt;.status_code">tests/test_event_setup_form.py:315: in test_verify_event_tags_junction_table
+    assert response.status_code in [200, 201]
+E   assert 400 in [200, 201]
+E    +  where 400 = &lt;Response [400]&gt;.status_code</failure></testcase><testcase classname="tests.test_event_setup_form.TestTimezoneSupport" name="test_create_event_with_asia_kolkata_timezone" time="0.187"><failure message="assert 400 in [200, 201]&#10; +  where 400 = &lt;Response [400]&gt;.status_code">tests/test_event_setup_form.py:359: in test_create_event_with_asia_kolkata_timezone
+    assert response.status_code in [200, 201]
+E   assert 400 in [200, 201]
+E    +  where 400 = &lt;Response [400]&gt;.status_code</failure></testcase><testcase classname="tests.test_event_setup_form.TestTimezoneSupport" name="test_create_event_with_various_timezones" time="0.191"><failure message="AssertionError: Failed for timezone America/New_York&#10;assert 400 in [200, 201]&#10; +  where 400 = &lt;Response [400]&gt;.status_code">tests/test_event_setup_form.py:389: in test_create_event_with_various_timezones
+    assert response.status_code in [200, 201], f"Failed for timezone {tz}"
+E   AssertionError: Failed for timezone America/New_York
+E   assert 400 in [200, 201]
+E    +  where 400 = &lt;Response [400]&gt;.status_code</failure></testcase></testsuite></testsuites>
