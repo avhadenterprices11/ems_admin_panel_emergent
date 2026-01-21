@@ -206,6 +206,7 @@ class TestEventCreation:
             "end_date": "2026-03-01T17:00:00Z",
             "timezone": "America/New_York",
             "mode": "in-person",
+            "location": "Test Venue",
             "owner": "admin@example.com",
             "status": "Draft"
         }
@@ -231,8 +232,9 @@ class TestEventCreation:
             "end_date": "2026-03-15T16:00:00Z",
             "timezone": "Asia/Kolkata",
             "mode": "online",
-            "virtual_platform": "zoom",
+            "virtual_platform": "other",
             "meeting_url": "https://zoom.us/j/1234567890",
+            "location": "Online",
             "owner": "admin@example.com",
             "status": "Draft"
         }
@@ -265,7 +267,7 @@ class TestEventCreation:
             "end_date": "2026-04-02T18:00:00Z",
             "timezone": "Asia/Kolkata",
             "mode": "hybrid",
-            "virtual_platform": "google-meet",
+            "virtual_platform": "other",
             "meeting_url": "https://meet.google.com/abc-defg-hij",
             "venue_name": "Tech Hub Conference Center",
             "location": "123 Tech Street",
@@ -286,6 +288,7 @@ class TestEventCreation:
         assert 'id' in data
         assert data['name'] == event_data['name']
         assert data.get('mode') == 'hybrid'
+        # When virtual_platform is 'other', meeting_url is preserved as-is
         assert data.get('meeting_url') == event_data['meeting_url']
         assert data.get('timezone') == 'Asia/Kolkata'
         print(f"✓ Hybrid event created with all fields, id={data['id']}")
@@ -307,6 +310,7 @@ class TestEventCreation:
             "end_date": "2026-05-01T12:00:00Z",
             "timezone": "UTC",
             "mode": "in-person",
+            "location": "Workshop Room",
             "owner": "admin@example.com",
             "status": "Draft"
         }
@@ -351,6 +355,7 @@ class TestTimezoneSupport:
             "end_date": "2026-06-01T12:00:00Z",
             "timezone": "Asia/Kolkata",
             "mode": "in-person",
+            "location": "Mumbai Office",
             "owner": "admin@example.com",
             "status": "Draft"
         }
@@ -381,6 +386,7 @@ class TestTimezoneSupport:
                 "end_date": "2026-07-01T12:00:00Z",
                 "timezone": tz,
                 "mode": "in-person",
+                "location": "Test Location",
                 "owner": "admin@example.com",
                 "status": "Draft"
             }
