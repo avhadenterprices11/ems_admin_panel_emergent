@@ -1389,6 +1389,22 @@ export const eventsAPI = {
     const response = await apiClient.delete(`/events/${eventId}/media/${mediaId}`);
     return response.data;
   },
+
+  // Event Branding APIs (Settings Tab)
+  getEventBranding: async (eventId: number | string): Promise<EventBranding> => {
+    const response = await apiClient.get(`/events/${eventId}/branding`);
+    return response.data as EventBranding;
+  },
+
+  updateEventBranding: async (eventId: number | string, data: UpdateEventBrandingInput): Promise<EventBranding> => {
+    const response = await apiClient.put(`/events/${eventId}/branding`, data);
+    return response.data as EventBranding;
+  },
+
+  resetEventBranding: async (eventId: number | string): Promise<EventBranding> => {
+    const response = await apiClient.post(`/events/${eventId}/branding/reset`);
+    return response.data as EventBranding;
+  },
 };
 
 // Master Data API
