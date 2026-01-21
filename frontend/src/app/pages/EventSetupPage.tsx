@@ -293,7 +293,14 @@ const EventSetupPageComponent = () => {
         meeting_url: data.meeting_url || null,
         accessibility_notes: data.accessibility_notes || '',
         emergency_contact: data.emergency_contact || '',
-        owner: data.owner_id || 'Admin',
+        // Map owner_id to owner email - find the user and use their email
+        owner: (() => {
+          if (data.owner_id) {
+            const selectedUser = users.find(u => String(u.id) === data.owner_id);
+            return selectedUser?.email || data.owner_id;
+          }
+          return 'admin@example.com';
+        })(),
         banner_image_url: data.banner_image_url || null,
         gallery_images: data.gallery_images || [],
         meta_title: data.meta_title || '',
