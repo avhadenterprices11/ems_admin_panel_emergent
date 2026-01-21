@@ -177,4 +177,9 @@ router.get('/:eventId/branding', (req, res) => eventBrandingController.getBrandi
 router.put('/:eventId/branding', (req, res) => eventBrandingController.updateBranding(req, res));
 router.post('/:eventId/branding/reset', (req, res) => eventBrandingController.resetBranding(req, res));
 
+// Event Detail - Settings Tab - Payment & Tax APIs
+router.get('/:eventId/payment-tax', (req, res) => paymentTaxController.getEventSettings(req, res));
+router.put('/:eventId/payment-tax', (req, res) => paymentTaxController.updateEventSettings(req, res));
+router.post('/:eventId/payment-tax/reset', (req, res) => paymentTaxController.resetEventSettings(req, res));
+
 export default router;
