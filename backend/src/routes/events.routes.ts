@@ -170,4 +170,9 @@ router.get('/:eventId/reports/:reportId/export', (req, res) => reportsController
 router.get('/:eventId/reports/:reportId/runs', (req, res) => reportsController.getReportRuns(req, res));
 router.post('/:eventId/reports/standard/:standardReportId/run', (req, res) => reportsController.runStandardReport(req, res));
 
+// Event Detail - Settings Tab - Branding APIs
+router.get('/:eventId/branding', (req, res) => eventBrandingController.getBranding(req, res));
+router.put('/:eventId/branding', (req, res) => eventBrandingController.updateBranding(req, res));
+router.post('/:eventId/branding/reset', (req, res) => eventBrandingController.resetBranding(req, res));
+
 export default router;
