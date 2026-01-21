@@ -96,11 +96,11 @@ export class EventBrandingController {
   }
 
   /**
-   * POST /api/events/:id/branding/reset
+   * POST /api/events/:eventId/branding/reset
    */
   async resetBranding(req: Request, res: Response): Promise<void> {
     try {
-      const eventId = parseInt(req.params.id);
+      const eventId = parseInt(req.params.eventId);
       
       if (isNaN(eventId)) {
         res.status(400).json({ message: 'Invalid event ID' });
