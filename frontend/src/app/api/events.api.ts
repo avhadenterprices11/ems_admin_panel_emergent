@@ -830,6 +830,30 @@ export interface UpdateEventGeneralDetailsInput {
   agenda?: any[];
 }
 
+// Event Branding Interfaces
+export interface EventBranding {
+  id: number;
+  event_id: number;
+  light_logo_url: string | null;
+  dark_logo_url: string | null;
+  cover_image_url: string | null;
+  primary_color: string;
+  secondary_color: string;
+  font_family: string;
+  updated_at: string;
+  updated_by: string | null;
+  created_at: string;
+}
+
+export interface UpdateEventBrandingInput {
+  light_logo_url?: string | null;
+  dark_logo_url?: string | null;
+  cover_image_url?: string | null;
+  primary_color?: string;
+  secondary_color?: string;
+  font_family?: string;
+}
+
 export const eventsAPI = {
   getEvents: async (params: EventsListParams) => {
     const response = await apiClient.get('/events', { params });
