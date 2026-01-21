@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { eventsAPI, masterDataAPI, meetingAPI, MeetingIntegrationStatus } from '../api/events.api';
+import { eventsAPI, masterDataAPI, meetingAPI, MeetingIntegrationStatus, UserBasic } from '../api/events.api';
 import { toast } from 'sonner';
 import { FileUpload } from '../components/FileUpload';
 import { EmailOverrideSection } from '../components/EmailOverrideSection';
 import { CategorySelect } from '../components/shared/CategorySelect';
 import { TagsSelect, TagsSelectLegacy } from '../components/shared/TagsSelect';
 import {
-  MOCK_USERS,
   MOCK_VENUES,
   TIMEZONES,
   validateUrl,
@@ -18,7 +17,7 @@ import {
   ChevronLeft, MapPin, Calendar, Clock, Users, Lock, Eye,
   AlertCircle, Globe, Info, Shield, LifeBuoy,
   Plus, Video, Image, FileText, Search, Upload, X,
-  Mail, ChevronDown, ChevronUp, Loader2, ExternalLink
+  Mail, ChevronDown, ChevronUp, Loader2, ExternalLink, UserPlus
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
