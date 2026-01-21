@@ -401,6 +401,23 @@ A full-stack Event Management Admin System built with:
   - Google Meet: OAuth 2.0 with Calendar API credentials active
   - Both platforms tested and generating real meeting links
 
+### 14. Event Setup Form Audit & Fixes ✅ COMPLETE (Jan 21, 2026)
+- **Primary Owner Dropdown**:
+  - Now fetches users from `/api/master/users` instead of hardcoded MOCK_USERS
+  - "Add New" button added to create new owners inline
+  - Maps selected user's email to `owner` field in database
+- **Category & Tags**:
+  - CategorySelect component fetches from `/api/master/categories` (8 categories)
+  - TagsSelect component fetches from `/api/master/tags` (7 tags with colors)
+  - Backend saves `category_id` (FK) and `tag_ids` via `event_tags` junction table
+- **Timezone Support**:
+  - Expanded to 35+ IANA timezones including Asia/Kolkata (India Standard Time)
+  - Timezone passed consistently to Zoom/Google Meet APIs
+- **Meeting Integration**:
+  - Backend auto-generates meeting link when mode=online/hybrid and virtual_platform is zoom/google-meet
+  - Stores: meeting_url, meeting_platform, meeting_id, meeting_password, meeting_provider_payload
+- **Test Results**: 14/14 backend API tests pass (100%)
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
