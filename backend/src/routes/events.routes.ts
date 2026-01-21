@@ -14,6 +14,7 @@ import { CommunicationSettingsController } from '../controllers/communication-se
 import { ReportsController } from '../controllers/reports.controller';
 import { EventGeneralController } from '../controllers/event-general.controller';
 import { EventBrandingController } from '../controllers/event-branding.controller';
+import { PaymentTaxController } from '../controllers/payment-tax.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -34,6 +35,7 @@ const communicationSettingsController = new CommunicationSettingsController();
 const reportsController = new ReportsController();
 const eventGeneralController = new EventGeneralController();
 const eventBrandingController = new EventBrandingController();
+const paymentTaxController = new PaymentTaxController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
