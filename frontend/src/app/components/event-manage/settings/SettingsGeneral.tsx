@@ -14,7 +14,9 @@ import {
   Video,
   Loader2,
   AlertCircle,
-  Plus
+  Plus,
+  Check,
+  ChevronsUpDown
 } from 'lucide-react';
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -30,6 +32,25 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../ui/select";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "../../ui/popover";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "../../ui/command";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "../../ui/dialog";
 import { cn } from "../../ui/utils";
 import { toast } from "sonner";
 import { CategorySelect } from '../../shared/CategorySelect';
