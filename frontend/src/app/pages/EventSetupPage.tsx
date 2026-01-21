@@ -1181,7 +1181,7 @@ const EventSetupPageComponent = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {users.length === 0 ? (
-                          <SelectItem value="" disabled>Loading users...</SelectItem>
+                          <div className="px-2 py-1.5 text-sm text-slate-500">Loading users...</div>
                         ) : (
                           users.map(u => (
                             <SelectItem key={u.id} value={String(u.id)}>
