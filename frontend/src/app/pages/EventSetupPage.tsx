@@ -39,11 +39,22 @@ const EventSetupPageComponent = () => {
   const [isGeneratingMeeting, setIsGeneratingMeeting] = useState(false);
   const [meetingIntegrationStatus, setMeetingIntegrationStatus] = useState<MeetingIntegrationStatus>({ zoom: false, googleMeet: false });
 
-  // Load meeting integration status on mount
+  // Master data states
+  const [users, setUsers] = useState<UserBasic[]>([]);
+  const [isAddOwnerOpen, setIsAddOwnerOpen] = useState(false);
+  const [newOwnerEmail, setNewOwnerEmail] = useState('');
+  const [newOwnerName, setNewOwnerName] = useState('');
+
+  // Load meeting integration status and users on mount
   useEffect(() => {
     meetingAPI.getIntegrationStatus()
       .then(setMeetingIntegrationStatus)
       .catch(err => console.error('Failed to load meeting integration status:', err));
+    
+    // Load users for owner dropdown
+    masterDataAPI.getUsers()
+      .then(setUsers)
+      .catch(err => console.error('Failed to load users:', err));
   }, []);
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
