@@ -375,7 +375,6 @@ const EventSetupPageComponent = () => {
       
       // Map frontend fields to backend schema
       const eventData = {
-        event_code: `EVT-${Date.now().toString().slice(-6)}`, // Generate unique code
         name: data.title || '',
         description: data.description || '',
         category_id: data.category_id || null,
@@ -433,15 +432,28 @@ const EventSetupPageComponent = () => {
         promo_video_url: data.promo_video_url || null,
       };
       
-      const createdEvent = await eventsAPI.createEvent(eventData);
-      
-      toast.success('Event created successfully!');
-      setTimeout(() => {
-        navigate('/events');
-      }, 1000);
+      if (isEditMode && eventId) {
+        // Update existing event
+        await eventsAPI.updateEventGeneralDetails(eventId, eventData);
+        toast.success('Event updated successfully!');
+        setTimeout(() => {
+          navigate(`/events/${eventId}`);
+        }, 1000);
+      } else {
+        // Create new event
+        const createData = {
+          ...eventData,
+          event_code: `EVT-${Date.now().toString().slice(-6)}`, // Generate unique code only for new events
+        };
+        const createdEvent = await eventsAPI.createEvent(createData);
+        toast.success('Event created successfully!');
+        setTimeout(() => {
+          navigate('/events');
+        }, 1000);
+      }
     } catch (error: any) {
-      console.error('Error creating event:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to create event';
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} event:`, error);
+      const errorMessage = error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} event`;
       toast.error(errorMessage);
     } finally {
       setIsSaving(false);
