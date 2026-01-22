@@ -15,6 +15,9 @@ import { ReportsController } from '../controllers/reports.controller';
 import { EventGeneralController } from '../controllers/event-general.controller';
 import { EventBrandingController } from '../controllers/event-branding.controller';
 import { PaymentTaxController } from '../controllers/payment-tax.controller';
+import { BadgeDesignController } from '../controllers/badge-design.controller';
+import { BookingController } from '../controllers/booking.controller';
+import { IssuedTicketController } from '../controllers/issued-ticket.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -36,6 +39,9 @@ const reportsController = new ReportsController();
 const eventGeneralController = new EventGeneralController();
 const eventBrandingController = new EventBrandingController();
 const paymentTaxController = new PaymentTaxController();
+const badgeDesignController = new BadgeDesignController();
+const bookingController = new BookingController();
+const issuedTicketController = new IssuedTicketController();
 
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
