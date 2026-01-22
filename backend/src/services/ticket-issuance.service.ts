@@ -1,7 +1,9 @@
 import db from '../database/db';
 import { v4 as uuidv4 } from 'uuid';
+import QRCode from 'qrcode';
 import { BadgeDesignService, BadgeDesign } from './badge-design.service';
 import { BookingService, Booking } from './booking.service';
+import { S3Service } from './s3.service';
 
 export interface IssuedTicket {
   id: number;
