@@ -30,7 +30,7 @@
     "frontend": "100%"
   },
   "test_credentials": {
-    "api_base_url": "https://eventpro-19.preview.emergentagent.com",
+    "api_base_url": "https://eventsphere-20.preview.emergentagent.com",
     "test_event_id": 1
   },
   "seed_data_creation": "Test tickets created and cleaned up during testing. Event ID 1 has 6 tickets: Early Bird, VIP Access, Early Bird (Copy), Student Discount, Early Bird (Copy), UI Test Ticket Updated",

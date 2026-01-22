@@ -8,7 +8,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://eventpro-19.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://eventsphere-20.preview.emergentagent.com')
 EVENT_ID = 4  # Test event with registrations and attendees
 
 

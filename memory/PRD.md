@@ -700,7 +700,7 @@ A full-stack Event Management Admin System built with:
 11. ✅ All 31 backend tests passed (100% success rate) for Registrations
 
 ### Test Credentials
-- **URL**: https://eventpro-19.preview.emergentagent.com
+- **URL**: https://eventsphere-20.preview.emergentagent.com
 - **Email**: admin@example.com
 - **Password**: admin123
 - **Test Event ID**: 1 (Tech Conference 2026)
@@ -712,7 +712,7 @@ A full-stack Event Management Admin System built with:
 
 ### Frontend (.env)
 ```
-VITE_API_URL=https://eventpro-19.preview.emergentagent.com
+VITE_API_URL=https://eventsphere-20.preview.emergentagent.com
 ```
 
 ### Backend (.env)
@@ -731,7 +731,7 @@ AWS_ACCESS_KEY_ID=           # For production S3
 AWS_SECRET_ACCESS_KEY=       # For production S3
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=event-management-uploads
-PREVIEW_URL=https://eventpro-19.preview.emergentagent.com
+PREVIEW_URL=https://eventsphere-20.preview.emergentagent.com
 ```
 
 ## Testing
@@ -743,7 +743,7 @@ PREVIEW_URL=https://eventpro-19.preview.emergentagent.com
 ### Test Credentials
 - Email: admin@example.com
 - Password: admin123
-- API URL: https://eventpro-19.preview.emergentagent.com
+- API URL: https://eventsphere-20.preview.emergentagent.com
 
 ## Known Limitations
 1. AWS S3 uploads are **MOCKED** - using local file storage at `/app/uploads`

@@ -27,7 +27,7 @@
     "frontend": "100%"
   },
   "test_credentials": {
-    "api_base_url": "https://eventpro-19.preview.emergentagent.com"
+    "api_base_url": "https://eventsphere-20.preview.emergentagent.com"
   },
   "seed_data_creation": "Created 4 test events with file uploads via API and UI testing",
   "retest_needed": false,
