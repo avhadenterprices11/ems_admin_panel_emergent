@@ -240,4 +240,11 @@ router.put('/:eventId/privacy-settings', (req, res) => privacySettingsController
 router.post('/:eventId/privacy-settings/reset', (req, res) => privacySettingsController.resetToGlobal(req, res));
 router.get('/:eventId/privacy-settings/export', (req, res) => privacySettingsController.exportEventData(req, res));
 
+// Event Detail - Settings Tab - Email Configuration APIs
+router.get('/:eventId/email-templates', (req, res) => emailTemplatesController.getEventTemplates(req, res));
+router.put('/:eventId/email-templates', (req, res) => emailTemplatesController.saveEventTemplates(req, res));
+router.post('/:eventId/email-templates/reset', (req, res) => emailTemplatesController.resetToGlobal(req, res));
+router.post('/:eventId/email-templates/test', (req, res) => emailTemplatesController.sendTestEmail(req, res));
+router.get('/:eventId/email-templates/status', (req, res) => emailTemplatesController.getEmailProviderStatus(req, res));
+
 export default router;
