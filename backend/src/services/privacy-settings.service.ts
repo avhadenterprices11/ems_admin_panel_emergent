@@ -96,15 +96,20 @@ export class PrivacySettingsService {
    * Create or update privacy settings for an event
    */
   async upsertEventSettings(eventId: number, input: UpsertPrivacySettingsInput): Promise<PrivacySettings> {
-    // Check if event-specific settings exist
+    // Check if event-specific settings exist (including soft-deleted ones due to unique constraint)
     const existing = await db('privacy_settings')
       .where('event_id', eventId)
-      .where('is_deleted', false)
       .first();
 
+    // Get global defaults to use as base for new/restored records
+    const globalDefaults = await this.getGlobalSettings();
+
     if (existing) {
-      // Update existing
-      const updateData: any = { updated_at: db.fn.now() };
+      // Update existing record (restore if soft-deleted)
+      const updateData: any = { 
+        updated_at: db.fn.now(),
+        is_deleted: false  // Restore if it was soft-deleted
+      };
       
       if (input.gdpr_consent_enabled !== undefined) {
         updateData.gdpr_consent_enabled = input.gdpr_consent_enabled;
@@ -136,10 +141,7 @@ export class PrivacySettingsService {
       return { ...updated, is_global_default: false };
     }
 
-    // Create new event-specific settings
-    // Get global defaults to use as base
-    const globalDefaults = await this.getGlobalSettings();
-
+    // Create new event-specific settings (only if no record exists at all)
     const [created] = await db('privacy_settings')
       .insert({
         event_id: eventId,
