@@ -165,7 +165,7 @@ export const SettingsBadge: React.FC<SettingsBadgeProps> = ({ eventId }) => {
       setSaving(true);
       const data: CreateBadgeDesignInput = {
         name: newDesignName.trim(),
-        ticket_type_id: newDesignTicketType ? parseInt(newDesignTicketType) : null,
+        ticket_type_id: newDesignTicketType && newDesignTicketType !== 'all' ? parseInt(newDesignTicketType) : null,
         is_event_default: false
       };
       const newDesign = await badgeDesignAPI.createDesign(eventId, data);
