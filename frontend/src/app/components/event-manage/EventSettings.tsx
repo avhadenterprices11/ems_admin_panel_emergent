@@ -121,7 +121,7 @@ export const EventSettings = ({ eventId, onNavigateToAdvanced }: EventSettingsPr
           {activeTab === 'team' && <SettingsTeam />}
           {activeTab === 'badge' && eventId && <SettingsBadge eventId={typeof eventId === 'string' ? parseInt(eventId) : eventId} />}
           {activeTab === 'integrations' && eventId && <SettingsIntegrations eventId={typeof eventId === 'string' ? parseInt(eventId) : eventId} />}
-          {activeTab === 'privacy' && <SettingsDataPrivacy />}
+          {activeTab === 'privacy' && eventId && <SettingsDataPrivacy eventId={typeof eventId === 'string' ? parseInt(eventId) : eventId} />}
           {activeTab === 'advanced' && <SettingsAdvanced onNavigate={onNavigateToAdvanced} />}
           {activeTab === 'archive' && <SettingsArchive />}
           {activeTab === 'delete' && <SettingsDelete />}
