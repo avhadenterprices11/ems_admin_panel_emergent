@@ -395,34 +395,57 @@ Returns check-in metrics for an event.
 
 ---
 
-## 4. QR CODE GENERATION
+## 4. QR CODE IMAGES
 
-### QR Payload Format
-The `qr_payload` field contains an encoded string that should be converted to a QR code image:
+### Auto-Generated QR Images ✅
+**QR code images are now automatically generated** when tickets are issued. Each ticket includes a `qr_image_url` field with a direct URL to the PNG image.
+
+**Example Response Field:**
+```json
+{
+  "qr_image_url": "https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png"
+}
+```
+
+### Using the QR Image
+Simply use the `qr_image_url` directly in an `<img>` tag:
+
+**HTML:**
+```html
+<img src="https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png" 
+     alt="Ticket QR Code" 
+     width="200" />
+```
+
+**React:**
+```jsx
+<img src={ticket.qr_image_url} alt="Ticket QR Code" width={200} />
+```
+
+### QR Payload Format (for validation)
+The `qr_payload` field contains the encoded data inside the QR code:
 
 ```
 {eventId}-{ticketId}-{uniqueCode}-{checksum}
 ```
 
-**Example:** `1-1-V8KWUS-ABC1`
+**Example:** `1-2-F7B12A-80BY`
 
-### Generating QR Code Image
-Use any QR code library to convert the `qr_payload` to an image:
+### Image Specifications
+- **Format:** PNG
+- **Size:** 300x300 pixels
+- **Error Correction:** Medium (M)
+- **Margin:** 2 modules
 
-**JavaScript (qrcode.js):**
+### Manual QR Generation (Optional)
+If you need to generate QR codes client-side (e.g., for real-time preview), you can use the `qr_payload`:
+
+**JavaScript:**
 ```javascript
 import QRCode from 'qrcode';
 
-const qrPayload = "1-1-V8KWUS-ABC1";
+const qrPayload = ticket.qr_payload; // e.g., "1-2-F7B12A-80BY"
 const qrImageDataUrl = await QRCode.toDataURL(qrPayload);
-// Use qrImageDataUrl in an <img> tag
-```
-
-**React:**
-```jsx
-import { QRCodeSVG } from 'qrcode.react';
-
-<QRCodeSVG value={ticket.qr_payload} size={200} />
 ```
 
 ---
