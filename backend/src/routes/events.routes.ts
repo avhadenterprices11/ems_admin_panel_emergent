@@ -221,8 +221,4 @@ router.post('/:eventId/issued-tickets/:ticketId/undo-checkin', (req, res) => iss
 // Check-in API (supports both QR and unique code)
 router.post('/:eventId/checkin', (req, res) => issuedTicketController.checkinByCode(req, res));
 
-// Public APIs (for customer-facing website)
-router.get('/public/bookings/:bookingCode', (req, res) => bookingController.getBookingByCode(req, res));
-router.get('/public/tickets/:code', (req, res) => issuedTicketController.getIssuedTicketByCode(req, res));
-
 export default router;
