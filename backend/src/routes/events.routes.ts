@@ -188,4 +188,37 @@ router.get('/:eventId/payment-tax', (req, res) => paymentTaxController.getEventS
 router.put('/:eventId/payment-tax', (req, res) => paymentTaxController.updateEventSettings(req, res));
 router.post('/:eventId/payment-tax/reset', (req, res) => paymentTaxController.resetEventSettings(req, res));
 
+// Event Detail - Settings Tab - Badge Design APIs
+router.get('/:eventId/badge-designs', (req, res) => badgeDesignController.getBadgeDesigns(req, res));
+router.get('/:eventId/badge-designs/for-ticket', (req, res) => badgeDesignController.getDesignForTicket(req, res));
+router.post('/:eventId/badge-designs', (req, res) => badgeDesignController.createBadgeDesign(req, res));
+router.get('/:eventId/badge-designs/:designId', (req, res) => badgeDesignController.getBadgeDesignById(req, res));
+router.put('/:eventId/badge-designs/:designId', (req, res) => badgeDesignController.updateBadgeDesign(req, res));
+router.delete('/:eventId/badge-designs/:designId', (req, res) => badgeDesignController.deleteBadgeDesign(req, res));
+router.post('/:eventId/badge-designs/:designId/duplicate', (req, res) => badgeDesignController.duplicateBadgeDesign(req, res));
+
+// Event Detail - Bookings APIs (public-ready)
+router.get('/:eventId/bookings', (req, res) => bookingController.getBookings(req, res));
+router.post('/:eventId/bookings', (req, res) => bookingController.createBooking(req, res));
+router.get('/:eventId/bookings/:bookingId', (req, res) => bookingController.getBookingById(req, res));
+router.post('/:eventId/bookings/:bookingId/confirm', (req, res) => bookingController.confirmBooking(req, res));
+router.post('/:eventId/bookings/:bookingId/payment-status', (req, res) => bookingController.updatePaymentStatus(req, res));
+router.post('/:eventId/bookings/:bookingId/cancel', (req, res) => bookingController.cancelBooking(req, res));
+router.delete('/:eventId/bookings/:bookingId', (req, res) => bookingController.deleteBooking(req, res));
+
+// Event Detail - Issued Tickets APIs
+router.get('/:eventId/issued-tickets', (req, res) => issuedTicketController.getIssuedTickets(req, res));
+router.get('/:eventId/issued-tickets/stats', (req, res) => issuedTicketController.getCheckinStats(req, res));
+router.post('/:eventId/issued-tickets', (req, res) => issuedTicketController.issueTicket(req, res));
+router.get('/:eventId/issued-tickets/:ticketId', (req, res) => issuedTicketController.getIssuedTicketById(req, res));
+router.post('/:eventId/issued-tickets/:ticketId/cancel', (req, res) => issuedTicketController.cancelTicket(req, res));
+router.post('/:eventId/issued-tickets/:ticketId/undo-checkin', (req, res) => issuedTicketController.undoCheckin(req, res));
+
+// Check-in API (supports both QR and unique code)
+router.post('/:eventId/checkin', (req, res) => issuedTicketController.checkinByCode(req, res));
+
+// Public APIs (for customer-facing website)
+router.get('/public/bookings/:bookingCode', (req, res) => bookingController.getBookingByCode(req, res));
+router.get('/public/tickets/:code', (req, res) => issuedTicketController.getIssuedTicketByCode(req, res));
+
 export default router;
