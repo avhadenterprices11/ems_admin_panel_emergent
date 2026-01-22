@@ -119,7 +119,7 @@ export const EventSettings = ({ eventId, onNavigateToAdvanced }: EventSettingsPr
           {activeTab === 'branding' && eventId && <SettingsBranding eventId={eventId} />}
           {activeTab === 'payment' && eventId && <SettingsPayment eventId={eventId} />}
           {activeTab === 'team' && <SettingsTeam />}
-          {activeTab === 'badge' && <SettingsBadge />}
+          {activeTab === 'badge' && eventId && <SettingsBadge eventId={typeof eventId === 'string' ? parseInt(eventId) : eventId} />}
           {activeTab === 'integrations' && <SettingsIntegrations />}
           {activeTab === 'privacy' && <SettingsDataPrivacy />}
           {activeTab === 'advanced' && <SettingsAdvanced onNavigate={onNavigateToAdvanced} />}
