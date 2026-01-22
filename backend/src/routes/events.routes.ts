@@ -43,6 +43,10 @@ const badgeDesignController = new BadgeDesignController();
 const bookingController = new BookingController();
 const issuedTicketController = new IssuedTicketController();
 
+// Public APIs (for customer-facing website) - MUST be before /:eventId routes
+router.get('/public/bookings/:bookingCode', (req, res) => bookingController.getBookingByCode(req, res));
+router.get('/public/tickets/:code', (req, res) => issuedTicketController.getIssuedTicketByCode(req, res));
+
 router.post('/', validateDTO(CreateEventDTO), (req, res) => eventsController.create(req, res));
 
 router.get('/', (req, res) => eventsController.list(req, res));
