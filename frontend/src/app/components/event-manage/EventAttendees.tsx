@@ -198,30 +198,55 @@ export const EventAttendees: React.FC<EventAttendeesProps> = ({ eventId }) => {
   // QR check-in
   const handleQRCheckin = async () => {
     if (!qrCode.trim()) {
-      toast.error('Please enter a QR code');
+      toast.error('Please enter a QR code or unique code');
       return;
     }
 
     try {
       setIsSubmitting(true);
-      const result = await eventsAPI.qrCheckin(eventId, {
-        qr_code: qrCode.trim(),
-        location: scannerLocation || undefined,
-        device_name: 'Web Scanner',
-      });
+      // First try the new issuedTicketAPI (supports both QR payload and 6-digit unique code)
+      try {
+        const result = await issuedTicketAPI.checkin(eventId, {
+          code: qrCode.trim(),
+          location: scannerLocation || undefined,
+          device_name: 'Web Scanner',
+        });
 
-      if (result.success) {
-        toast.success(`${result.attendee?.attendee_name} checked in successfully!`);
-        setQRCode('');
-        fetchAttendees();
-        fetchMetrics();
-        fetchLocations();
-        fetchDevices();
-      } else {
-        toast.error(result.message);
+        if (result.success) {
+          toast.success(`${result.ticket?.holder_name || 'Attendee'} checked in successfully!`);
+          setQRCode('');
+          setIsQROpen(false);
+          fetchAttendees();
+          fetchMetrics();
+          fetchLocations();
+          fetchDevices();
+          return;
+        } else {
+          toast.error(result.message);
+          return;
+        }
+      } catch (ticketError: any) {
+        // If issued ticket API fails, fall back to legacy attendee QR check-in
+        const result = await eventsAPI.qrCheckin(eventId, {
+          qr_code: qrCode.trim(),
+          location: scannerLocation || undefined,
+          device_name: 'Web Scanner',
+        });
+
+        if (result.success) {
+          toast.success(`${result.attendee?.attendee_name} checked in successfully!`);
+          setQRCode('');
+          setIsQROpen(false);
+          fetchAttendees();
+          fetchMetrics();
+          fetchLocations();
+          fetchDevices();
+        } else {
+          toast.error(result.message);
+        }
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to process QR check-in');
+      toast.error(error.response?.data?.message || 'Invalid code. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
