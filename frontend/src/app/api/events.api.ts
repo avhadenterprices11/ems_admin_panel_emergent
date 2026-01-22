@@ -1970,3 +1970,54 @@ export const integrationsAPI = {
     await apiClient.delete(`/events/${eventId}/integrations/${configId}`);
   },
 };
+
+// ===== Privacy Settings API =====
+export interface PrivacySettings {
+  id?: number;
+  event_id: number | null;
+  gdpr_consent_enabled: boolean;
+  privacy_policy_url: string | null;
+  custom_consent_text: string | null;
+  data_retention_days: '90' | '180' | '365' | 'forever';
+  dpa_signed: boolean;
+  dpa_signed_at: string | null;
+  cookie_consent_enabled: boolean;
+  is_global_default?: boolean;
+}
+
+export interface UpdatePrivacySettingsInput {
+  gdpr_consent_enabled?: boolean;
+  privacy_policy_url?: string | null;
+  custom_consent_text?: string | null;
+  data_retention_days?: '90' | '180' | '365' | 'forever';
+  dpa_signed?: boolean;
+  cookie_consent_enabled?: boolean;
+}
+
+export const privacySettingsAPI = {
+  // Get privacy settings for an event (resolved with global defaults)
+  getEventSettings: async (eventId: number | string): Promise<PrivacySettings> => {
+    const response = await apiClient.get(`/events/${eventId}/privacy-settings`);
+    return response.data as PrivacySettings;
+  },
+
+  // Update privacy settings for an event
+  updateEventSettings: async (eventId: number | string, data: UpdatePrivacySettingsInput): Promise<{ message: string; settings: PrivacySettings }> => {
+    const response = await apiClient.put(`/events/${eventId}/privacy-settings`, data);
+    return response.data;
+  },
+
+  // Reset event settings to global defaults
+  resetToGlobal: async (eventId: number | string): Promise<{ message: string; settings: PrivacySettings }> => {
+    const response = await apiClient.post(`/events/${eventId}/privacy-settings/reset`);
+    return response.data;
+  },
+
+  // Export full event data as CSV
+  exportEventData: async (eventId: number | string): Promise<Blob> => {
+    const response = await apiClient.get(`/events/${eventId}/privacy-settings/export`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+};
