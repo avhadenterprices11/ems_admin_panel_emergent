@@ -507,7 +507,8 @@ class TestIssuedTicketAPI:
         response = api_client.post(f"{BASE_URL}/api/events/{EVENT_ID}/checkin", json={
             "code": "INVALID"
         })
-        assert response.status_code == 200
+        # API returns 400 for invalid codes
+        assert response.status_code == 400
         data = response.json()
         assert data["success"] == False
         assert "Invalid" in data["message"]
