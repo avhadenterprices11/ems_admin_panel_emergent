@@ -556,6 +556,36 @@ A full-stack Event Management Admin System built with:
 - **Bug Fixed**: Unique constraint violation when updating settings after reset (soft-deleted records handling)
 - **Test Results**: 23/23 backend API tests pass (100%), Frontend verified
 
+### 19. Email Configuration Settings ✅ COMPLETE (Jan 22, 2026)
+- **Database**: `email_templates` table with columns:
+  - `event_id` (nullable FK) - null for global defaults
+  - `scenario` (varchar 50) - registration_complete, payment_successful, event_reminder, event_cancelled, post_event_followup
+  - `is_enabled` (boolean) - whether email is enabled for this scenario
+  - `has_override` (boolean) - whether using custom template
+  - `subject`, `body` (text) - template content with variable placeholders
+  - `send_timing` ('immediate' | 'scheduled'), `schedule_offset`, `schedule_unit`
+- **Backend Services**:
+  - `EmailTemplatesService`: getEventTemplates(), saveEventTemplates(), resetToGlobal(), getResolvedTemplate()
+  - `EmailSendingService`: sendEmail(), sendScenarioEmail(), sendTestEmail() - uses Integrations DB for provider config (NOT .env)
+- **Resolution Logic**: Event-specific templates → Global defaults fallback (same pattern as Integrations/Privacy)
+- **Email Provider Config Source**: Reads from `integration_configs` table via IntegrationsService (SendGrid or SMTP)
+- **Backend APIs**:
+  - `GET /api/events/:eventId/email-templates` - Fetch all scenarios with global fallback + provider status
+  - `PUT /api/events/:eventId/email-templates` - Save event-specific templates
+  - `POST /api/events/:eventId/email-templates/reset` - Reset to global defaults
+  - `POST /api/events/:eventId/email-templates/test` - Send test email (requires provider in Integrations)
+  - `GET /api/events/:eventId/email-templates/status` - Get email provider availability
+- **Frontend** (`SettingsEmail.tsx`):
+  - **Email Provider Status**: Shows amber warning if not configured, green status if connected
+  - **5 Email Scenarios**: Registration Completed, Payment Successful, Event Reminder, Event Cancelled, Post-Event Follow-up
+  - **Per-Scenario Controls**: Enabled toggle, Override toggle
+  - **Override OFF**: Read-only preview of global template (subject + body)
+  - **Override ON**: Editable fields - Send Timing (immediate/scheduled), Subject with variable chips, Body with variable chips
+  - **Actions**: Preview (shows resolved template with sample data), Send Test (disabled if no provider)
+  - **Header Actions**: Reset to Global button, Save Changes button
+- **Email Variables**: {{attendee_name}}, {{event_name}}, {{event_date}}, {{event_time}}, {{venue_name}}, {{confirmation_number}}, {{organizer_name}}, {{payment_amount}}, {{transaction_id}}
+- **Test Results**: 23/23 backend API tests pass (100%), Frontend verified
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
@@ -564,7 +594,7 @@ A full-stack Event Management Admin System built with:
 
 ### P2 - Settings Tab (Remaining Subsections)
 - Team & Permissions
-- Email Configuration, Advanced Configuration
+- Advanced Configuration
 - Archive Event, Delete Event
 
 ### P3 - Master Data Management UI
@@ -572,7 +602,7 @@ A full-stack Event Management Admin System built with:
 - Admin UI for CRUD operations on tags
 
 ### P4 - Global Settings UI
-- Build UI for managing global settings (Payment, Tax, Integrations, Privacy)
+- Build UI for managing global settings (Payment, Tax, Integrations, Privacy, Email Templates)
 - These serve as fallback defaults for events without custom settings
 
 
