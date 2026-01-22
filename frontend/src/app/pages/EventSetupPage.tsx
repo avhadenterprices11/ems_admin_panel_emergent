@@ -182,8 +182,9 @@ const EventSetupPageComponent = () => {
         setValue('capacity', data.capacity?.toString() || '');
         setValue('waitlist', data.waitlist_enabled || false);
         
-        // Mode and venue
-        setValue('mode', data.mode || data.type || 'in-person');
+        // Mode and venue - normalize underscore to hyphen (API returns 'in_person', form expects 'in-person')
+        const modeValue = (data.mode || data.type || 'in-person').replace(/_/g, '-');
+        setValue('mode', modeValue);
         
         // Location fields
         if (data.venue_id) {
