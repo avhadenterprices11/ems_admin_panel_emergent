@@ -96,7 +96,7 @@ export const SettingsBadge: React.FC<SettingsBadgeProps> = ({ eventId }) => {
 
   // New design form
   const [newDesignName, setNewDesignName] = useState('');
-  const [newDesignTicketType, setNewDesignTicketType] = useState<string>('');
+  const [newDesignTicketType, setNewDesignTicketType] = useState<string>('all');
 
   // Fetch data
   const fetchDesigns = async () => {
