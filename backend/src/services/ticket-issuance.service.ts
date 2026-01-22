@@ -210,6 +210,7 @@ export class TicketIssuanceService {
         holder_company: input.holder_company || null,
         holder_job_title: input.holder_job_title || null,
         qr_payload: '', // Will update after
+        qr_image_url: null, // Will update after
         badge_design_id: badgeDesign?.id || null,
         status: 'valid',
         is_checked_in: false,
@@ -220,10 +221,21 @@ export class TicketIssuanceService {
     // Generate QR payload with actual ticket ID
     const qrPayload = this.generateQRPayload(ticket.id, input.event_id, uniqueCode);
 
-    // Update with QR payload
+    // Generate and upload QR code image
+    let qrImageUrl: string | null = null;
+    try {
+      qrImageUrl = await this.generateAndUploadQRImage(qrPayload, ticketNumber);
+    } catch (error) {
+      console.error('Failed to generate QR image, continuing without:', error);
+    }
+
+    // Update with QR payload and image URL
     const [updated] = await db('issued_tickets')
       .where('id', ticket.id)
-      .update({ qr_payload: qrPayload })
+      .update({ 
+        qr_payload: qrPayload,
+        qr_image_url: qrImageUrl
+      })
       .returning('*');
 
     return updated;
