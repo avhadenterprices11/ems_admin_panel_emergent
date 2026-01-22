@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { eventsAPI, masterDataAPI, meetingAPI, MeetingIntegrationStatus, UserBasic } from '../api/events.api';
 import { toast } from 'sonner';
@@ -31,11 +31,16 @@ import { TagInput } from '../components/ui/tag-input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { DateTimePicker } from '../components/ui/datetime-picker';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 const EventSetupPageComponent = () => {
   const navigate = useNavigate();
+  const { id: eventIdParam } = useParams<{ id: string }>();
+  const isEditMode = !!eventIdParam;
+  const eventId = eventIdParam ? parseInt(eventIdParam) : null;
+
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditMode);
   const [isGeneratingMeeting, setIsGeneratingMeeting] = useState(false);
   const [meetingIntegrationStatus, setMeetingIntegrationStatus] = useState<MeetingIntegrationStatus>({ zoom: false, googleMeet: false });
 
