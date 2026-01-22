@@ -232,4 +232,10 @@ router.put('/:eventId/integrations/:integrationType', (req, res) => integrations
 router.post('/:eventId/integrations/:configId/test', (req, res) => integrationsController.testConnection(req, res));
 router.delete('/:eventId/integrations/:configId', (req, res) => integrationsController.deleteIntegration(req, res));
 
+// Event Detail - Settings Tab - Privacy Settings APIs
+router.get('/:eventId/privacy-settings', (req, res) => privacySettingsController.getEventSettings(req, res));
+router.put('/:eventId/privacy-settings', (req, res) => privacySettingsController.updateEventSettings(req, res));
+router.post('/:eventId/privacy-settings/reset', (req, res) => privacySettingsController.resetToGlobal(req, res));
+router.get('/:eventId/privacy-settings/export', (req, res) => privacySettingsController.exportEventData(req, res));
+
 export default router;
