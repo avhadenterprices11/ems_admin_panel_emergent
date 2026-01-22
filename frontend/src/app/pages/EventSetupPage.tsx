@@ -469,6 +469,18 @@ const EventSetupPageComponent = () => {
     navigate('/events');
   };
 
+  // Show loading state when fetching event data in Edit mode
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center gap-2 text-slate-500">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>Loading event data...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* TOP ACTION BAR */}
