@@ -79,7 +79,7 @@ export const SettingsBadge: React.FC<SettingsBadgeProps> = ({ eventId }) => {
 
   // Form state for selected design
   const [name, setName] = useState('');
-  const [ticketTypeId, setTicketTypeId] = useState<string>('');
+  const [ticketTypeId, setTicketTypeId] = useState<string>('all');
   const [badgeSize, setBadgeSize] = useState('a6');
   const [customWidth, setCustomWidth] = useState<number>(105);
   const [customHeight, setCustomHeight] = useState<number>(148);
