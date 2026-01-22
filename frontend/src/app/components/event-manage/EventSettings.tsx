@@ -125,7 +125,7 @@ export const EventSettings = ({ eventId, onNavigateToAdvanced }: EventSettingsPr
           {activeTab === 'advanced' && <SettingsAdvanced onNavigate={onNavigateToAdvanced} />}
           {activeTab === 'archive' && <SettingsArchive />}
           {activeTab === 'delete' && <SettingsDelete />}
-          {activeTab === 'email' && <SettingsEmail />}
+          {activeTab === 'email' && eventId && <SettingsEmail eventId={typeof eventId === 'string' ? parseInt(eventId) : eventId} />}
        </div>
     </div>
   );
