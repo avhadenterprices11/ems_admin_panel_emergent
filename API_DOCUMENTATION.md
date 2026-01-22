@@ -112,7 +112,7 @@ Creates a new booking/order with ticket items.
 ---
 
 ### 1.2 Confirm Booking & Issue Tickets
-Confirms booking and automatically issues tickets with QR codes and unique codes.
+Confirms booking and automatically issues tickets with QR codes, unique codes, and **QR code images**.
 
 **Endpoint:** `POST /events/:eventId/bookings/:bookingId/confirm`
 
@@ -128,6 +128,17 @@ Confirms booking and automatically issues tickets with QR codes and unique codes
   },
   "tickets": [
     {
+      "id": "1",
+      "ticket_number": "TK-MKP98Z1V-4QYS",
+      "unique_code": "F7B12A",
+      "qr_payload": "1-1-F7B12A-80BY",
+      "qr_image_url": "https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png",
+      "holder_name": "John Doe",
+      "holder_email": "john@example.com",
+      "status": "valid",
+      "is_checked_in": false,
+      "ticket_type_name": "VIP Pass"
+    }
       "id": "1",
       "ticket_number": "TK-M8XYZ1-A2B3",
       "unique_code": "V8KWUS",
