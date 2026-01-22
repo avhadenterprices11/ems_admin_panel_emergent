@@ -97,6 +97,45 @@ export class S3Service {
     return Promise.all(uploadPromises);
   }
 
+  // Upload buffer directly (for generated images like QR codes)
+  async uploadBuffer(buffer: Buffer, fileName: string, contentType: string = 'image/png'): Promise<string> {
+    if (USE_LOCAL_STORAGE) {
+      return this.uploadBufferToLocal(buffer, fileName);
+    }
+
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: fileName,
+      Body: buffer,
+      ContentType: contentType,
+      ACL: 'public-read' as const,
+    };
+
+    try {
+      const result = await s3.upload(params).promise();
+      return result.Location;
+    } catch (error) {
+      console.error('S3 upload error:', error);
+      // Fallback to local storage if S3 fails
+      return this.uploadBufferToLocal(buffer, fileName);
+    }
+  }
+
+  private async uploadBufferToLocal(buffer: Buffer, fileName: string): Promise<string> {
+    const fullPath = path.join(LOCAL_UPLOAD_DIR, fileName);
+    const dir = path.dirname(fullPath);
+    
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    fs.writeFileSync(fullPath, buffer);
+    
+    // Return a URL that can be served
+    const baseUrl = process.env.PREVIEW_URL || process.env.APP_URL || 'https://eventsphere-20.preview.emergentagent.com';
+    return `${baseUrl}/api/uploads/${fileName}`;
+  }
+
   async deleteFile(fileUrl: string): Promise<void> {
     if (USE_LOCAL_STORAGE || fileUrl.includes('/uploads/')) {
       // Delete from local storage
