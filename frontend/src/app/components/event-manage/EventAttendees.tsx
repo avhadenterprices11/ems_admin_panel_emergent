@@ -15,6 +15,7 @@ import {
   Users,
   Wifi,
   Battery,
+  Hash,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -27,6 +28,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { 
   eventsAPI, 
+  issuedTicketAPI,
   Attendee, 
   CheckinMetrics, 
   CheckinDevice,
