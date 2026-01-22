@@ -19,6 +19,7 @@ import { BadgeDesignController } from '../controllers/badge-design.controller';
 import { BookingController } from '../controllers/booking.controller';
 import { IssuedTicketController } from '../controllers/issued-ticket.controller';
 import { IntegrationsController } from '../controllers/integrations.controller';
+import { PrivacySettingsController } from '../controllers/privacy-settings.controller';
 import { validateDTO } from '../utils/validation.utils';
 import { EventListQueryDTO, BulkActionDTO, EventMetricsQueryDTO } from '../dtos/events.dto';
 import { CreateEventDTO } from '../dtos/create-event.dto';
@@ -44,6 +45,7 @@ const badgeDesignController = new BadgeDesignController();
 const bookingController = new BookingController();
 const issuedTicketController = new IssuedTicketController();
 const integrationsController = new IntegrationsController();
+const privacySettingsController = new PrivacySettingsController();
 
 // Public APIs (for customer-facing website) - MUST be before /:eventId routes
 router.get('/public/bookings/:bookingCode', (req, res) => bookingController.getBookingByCode(req, res));
