@@ -223,4 +223,11 @@ router.post('/:eventId/issued-tickets/:ticketId/undo-checkin', (req, res) => iss
 // Check-in API (supports both QR and unique code)
 router.post('/:eventId/checkin', (req, res) => issuedTicketController.checkinByCode(req, res));
 
+// Event Detail - Settings Tab - Integrations APIs
+router.get('/:eventId/integrations', (req, res) => integrationsController.getEventIntegrations(req, res));
+router.put('/:eventId/integrations', (req, res) => integrationsController.saveAllEventIntegrations(req, res));
+router.put('/:eventId/integrations/:integrationType', (req, res) => integrationsController.upsertEventIntegration(req, res));
+router.post('/:eventId/integrations/:configId/test', (req, res) => integrationsController.testConnection(req, res));
+router.delete('/:eventId/integrations/:configId', (req, res) => integrationsController.deleteIntegration(req, res));
+
 export default router;
