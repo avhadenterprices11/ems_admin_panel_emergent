@@ -484,8 +484,8 @@ const EventSetupPageComponent = () => {
             <ChevronLeft size={20} />
           </Button>
           <div className="flex flex-col">
-            <h1 className="text-xl font-bold text-[#1d293d]">Event Setup</h1>
-            <p className="text-sm text-slate-500">Create and configure your new event</p>
+            <h1 className="text-xl font-bold text-[#1d293d]">{isEditMode ? 'Edit Event' : 'Event Setup'}</h1>
+            <p className="text-sm text-slate-500">{isEditMode ? 'Update event configuration' : 'Create and configure your new event'}</p>
           </div>
         </div>
         
@@ -496,7 +496,7 @@ const EventSetupPageComponent = () => {
             className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             onClick={onBack}
           >
-            Discard
+            {isEditMode ? 'Cancel' : 'Discard'}
           </Button>
           <Button 
             type="submit"
@@ -504,7 +504,7 @@ const EventSetupPageComponent = () => {
             className="border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
             disabled={isSaving}
           >
-            {isSaving ? 'Saving...' : 'Save Draft'}
+            {isSaving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Save Draft')}
           </Button>
           <Button 
             type="button"
@@ -512,7 +512,7 @@ const EventSetupPageComponent = () => {
             onClick={handlePublish}
             disabled={isSaving}
           >
-            Publish Event
+            {isEditMode ? 'Update & Publish' : 'Publish Event'}
           </Button>
         </div>
       </div>
