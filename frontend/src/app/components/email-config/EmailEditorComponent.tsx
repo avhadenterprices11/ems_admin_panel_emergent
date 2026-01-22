@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, Send } from 'lucide-react';
+import { Eye, Send, Loader2 } from 'lucide-react';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -27,12 +27,21 @@ interface EmailEditorComponentProps {
   emailType: EmailType;
   value: EmailEditorValue;
   onChange: (value: Partial<EmailEditorValue>) => void;
+  onSendTest?: (email: string) => Promise<boolean>;
+  emailProviderAvailable?: boolean;
 }
 
-export function EmailEditorComponent({ emailType, value, onChange }: EmailEditorComponentProps) {
+export function EmailEditorComponent({ 
+  emailType, 
+  value, 
+  onChange, 
+  onSendTest,
+  emailProviderAvailable = true 
+}: EmailEditorComponentProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [testEmailOpen, setTestEmailOpen] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [sendingTest, setSendingTest] = useState(false);
 
   const sampleData: Record<string, string> = {
     '{{attendee_name}}': 'John Smith',
@@ -65,11 +74,26 @@ export function EmailEditorComponent({ emailType, value, onChange }: EmailEditor
     setPreviewOpen(true);
   };
 
-  const handleSendTest = () => {
+  const handleSendTest = async () => {
     if (!testEmailAddress) return;
-    toast.success(`Test email sent to ${testEmailAddress}`);
-    setTestEmailOpen(false);
-    setTestEmailAddress('');
+    
+    if (onSendTest) {
+      setSendingTest(true);
+      try {
+        const success = await onSendTest(testEmailAddress);
+        if (success) {
+          setTestEmailOpen(false);
+          setTestEmailAddress('');
+        }
+      } finally {
+        setSendingTest(false);
+      }
+    } else {
+      // Fallback to local toast if no callback provided
+      toast.success(`Test email sent to ${testEmailAddress}`);
+      setTestEmailOpen(false);
+      setTestEmailAddress('');
+    }
   };
 
   return (
@@ -82,7 +106,7 @@ export function EmailEditorComponent({ emailType, value, onChange }: EmailEditor
             value={value.sendTiming}
             onValueChange={(val: 'immediate' | 'scheduled') => onChange({ sendTiming: val })}
           >
-            <SelectTrigger className="bg-white">
+            <SelectTrigger className="bg-white" data-testid="send-timing-select">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -99,12 +123,13 @@ export function EmailEditorComponent({ emailType, value, onChange }: EmailEditor
                 className="w-24 bg-white"
                 value={value.scheduleOffset || 24}
                 onChange={(e) => onChange({ scheduleOffset: parseInt(e.target.value) })}
+                data-testid="schedule-offset-input"
               />
               <Select 
                 value={value.scheduleUnit || 'hours'}
                 onValueChange={(val: 'minutes' | 'hours' | 'days') => onChange({ scheduleUnit: val })}
               >
-                <SelectTrigger className="w-32 bg-white">
+                <SelectTrigger className="w-32 bg-white" data-testid="schedule-unit-select">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -140,14 +165,25 @@ export function EmailEditorComponent({ emailType, value, onChange }: EmailEditor
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-2">
-          <Button type="button" variant="outline" size="sm" onClick={handlePreview}>
+          <Button type="button" variant="outline" size="sm" onClick={handlePreview} data-testid="preview-btn">
             <Eye size={14} className="mr-2" />
             Preview
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => setTestEmailOpen(true)}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setTestEmailOpen(true)}
+            disabled={!emailProviderAvailable}
+            title={!emailProviderAvailable ? 'Email provider not configured' : ''}
+            data-testid="send-test-btn"
+          >
             <Send size={14} className="mr-2" />
             Send Test
           </Button>
+          {!emailProviderAvailable && (
+            <span className="text-xs text-amber-600">Configure email provider in Integrations</span>
+          )}
         </div>
       </div>
 
@@ -200,8 +236,14 @@ export function EmailEditorComponent({ emailType, value, onChange }: EmailEditor
                 placeholder="test@example.com"
                 value={testEmailAddress}
                 onChange={(e) => setTestEmailAddress(e.target.value)}
+                data-testid="test-email-input"
               />
             </div>
+            {!emailProviderAvailable && (
+              <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                Email provider is not configured. Please set up your email provider in the Integrations settings first.
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setTestEmailOpen(false)}>
@@ -210,9 +252,14 @@ export function EmailEditorComponent({ emailType, value, onChange }: EmailEditor
             <Button 
               type="button" 
               onClick={handleSendTest}
-              disabled={!testEmailAddress}
+              disabled={!testEmailAddress || sendingTest || !emailProviderAvailable}
+              data-testid="confirm-send-test-btn"
             >
-              <Send size={16} className="mr-2" />
+              {sendingTest ? (
+                <Loader2 size={16} className="mr-2 animate-spin" />
+              ) : (
+                <Send size={16} className="mr-2" />
+              )}
               Send Test
             </Button>
           </DialogFooter>
