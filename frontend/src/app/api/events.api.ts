@@ -1570,6 +1570,292 @@ export const meetingAPI = {
   },
 };
 
+// Badge Design Interfaces
+export interface BadgeDesignConfig {
+  visible_fields: string[];
+  field_positions: Record<string, { x: number; y: number; width?: number }>;
+  font_size_scale: number;
+  primary_color: string;
+  secondary_color: string;
+  background_color: string;
+  logo_url: string | null;
+  show_punch_hole: boolean;
+  qr_code_size: number;
+}
+
+export interface BadgeDesign {
+  id: number;
+  event_id: number | null;
+  ticket_type_id: number | null;
+  name: string;
+  is_global_default: boolean;
+  is_event_default: boolean;
+  badge_size: string;
+  custom_width: number | null;
+  custom_height: number | null;
+  orientation: string;
+  design_config: BadgeDesignConfig;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  ticket_type_name?: string;
+}
+
+export interface CreateBadgeDesignInput {
+  ticket_type_id?: number | null;
+  name: string;
+  is_event_default?: boolean;
+  badge_size?: string;
+  custom_width?: number | null;
+  custom_height?: number | null;
+  orientation?: string;
+  design_config?: Partial<BadgeDesignConfig>;
+  is_active?: boolean;
+}
+
+export interface UpdateBadgeDesignInput {
+  name?: string;
+  is_event_default?: boolean;
+  badge_size?: string;
+  custom_width?: number | null;
+  custom_height?: number | null;
+  orientation?: string;
+  design_config?: Partial<BadgeDesignConfig>;
+  is_active?: boolean;
+}
+
+// Booking Interfaces
+export interface Booking {
+  id: number;
+  booking_code: string;
+  event_id: number;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string | null;
+  status: string;
+  payment_status: string;
+  payment_method: string | null;
+  subtotal: number;
+  tax_amount: number;
+  discount_amount: number;
+  total_amount: number;
+  currency: string;
+  promo_code: string | null;
+  source: string;
+  booked_at: string;
+  confirmed_at: string | null;
+  created_at: string;
+  event_name?: string;
+  items?: BookingItem[];
+}
+
+export interface BookingItem {
+  id: number;
+  booking_id: number;
+  ticket_id: number | null;
+  addon_id: number | null;
+  item_type: string;
+  item_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  currency: string;
+}
+
+export interface CreateBookingInput {
+  customer_name: string;
+  customer_email: string;
+  customer_phone?: string | null;
+  payment_method?: string | null;
+  promo_code?: string | null;
+  source?: string;
+  items: { ticket_id?: number; addon_id?: number; item_type: string; item_name: string; quantity: number; unit_price: number }[];
+}
+
+// Issued Ticket Interfaces
+export interface IssuedTicket {
+  id: number;
+  ticket_number: string;
+  unique_code: string;
+  event_id: number;
+  booking_id: number;
+  ticket_type_id: number | null;
+  holder_name: string;
+  holder_email: string | null;
+  holder_phone: string | null;
+  holder_company: string | null;
+  holder_job_title: string | null;
+  qr_payload: string;
+  qr_image_url: string | null;
+  badge_design_id: number | null;
+  status: string;
+  is_checked_in: boolean;
+  checked_in_at: string | null;
+  checkin_method: string | null;
+  checkin_location: string | null;
+  issued_at: string;
+  created_at: string;
+  ticket_type_name?: string;
+  booking_code?: string;
+  event_name?: string;
+}
+
+export interface IssueTicketInput {
+  booking_id: number;
+  booking_item_id?: number | null;
+  ticket_type_id?: number | null;
+  holder_name: string;
+  holder_email?: string | null;
+  holder_phone?: string | null;
+  holder_company?: string | null;
+  holder_job_title?: string | null;
+}
+
+export interface CheckinByCodeInput {
+  code: string;
+  device_id?: number;
+  device_name?: string;
+  location?: string;
+}
+
+export interface CheckinResult {
+  success: boolean;
+  message: string;
+  ticket?: IssuedTicket;
+}
+
+export interface IssuedTicketStats {
+  total_issued: number;
+  total_checked_in: number;
+  total_not_checked_in: number;
+  checkin_percentage: number;
+  by_ticket_type: { ticket_type: string; checked_in: number; total: number }[];
+}
+
+// Badge Design API
+export const badgeDesignAPI = {
+  getDesigns: async (eventId: number | string): Promise<BadgeDesign[]> => {
+    const response = await apiClient.get(`/events/${eventId}/badge-designs`);
+    return response.data as BadgeDesign[];
+  },
+
+  getDesignById: async (eventId: number | string, designId: number | string): Promise<BadgeDesign> => {
+    const response = await apiClient.get(`/events/${eventId}/badge-designs/${designId}`);
+    return response.data as BadgeDesign;
+  },
+
+  getDesignForTicket: async (eventId: number | string, ticketTypeId?: number): Promise<BadgeDesign | null> => {
+    const response = await apiClient.get(`/events/${eventId}/badge-designs/for-ticket`, {
+      params: ticketTypeId ? { ticket_type_id: ticketTypeId } : {}
+    });
+    return response.data as BadgeDesign | null;
+  },
+
+  createDesign: async (eventId: number | string, data: CreateBadgeDesignInput): Promise<BadgeDesign> => {
+    const response = await apiClient.post(`/events/${eventId}/badge-designs`, data);
+    return response.data as BadgeDesign;
+  },
+
+  updateDesign: async (eventId: number | string, designId: number | string, data: UpdateBadgeDesignInput): Promise<BadgeDesign> => {
+    const response = await apiClient.put(`/events/${eventId}/badge-designs/${designId}`, data);
+    return response.data as BadgeDesign;
+  },
+
+  deleteDesign: async (eventId: number | string, designId: number | string): Promise<void> => {
+    await apiClient.delete(`/events/${eventId}/badge-designs/${designId}`);
+  },
+
+  duplicateDesign: async (eventId: number | string, designId: number | string, newName?: string): Promise<BadgeDesign> => {
+    const response = await apiClient.post(`/events/${eventId}/badge-designs/${designId}/duplicate`, { name: newName });
+    return response.data as BadgeDesign;
+  },
+};
+
+// Booking API
+export const bookingAPI = {
+  getBookings: async (eventId: number | string, params?: { status?: string; payment_status?: string; search?: string; page?: number; limit?: number }) => {
+    const response = await apiClient.get(`/events/${eventId}/bookings`, { params });
+    return response.data as { bookings: Booking[]; total: number; page: number; limit: number };
+  },
+
+  getBookingById: async (eventId: number | string, bookingId: number | string): Promise<Booking> => {
+    const response = await apiClient.get(`/events/${eventId}/bookings/${bookingId}`);
+    return response.data as Booking;
+  },
+
+  getBookingByCode: async (bookingCode: string): Promise<{ booking: Booking; tickets: IssuedTicket[] }> => {
+    const response = await apiClient.get(`/events/public/bookings/${bookingCode}`);
+    return response.data;
+  },
+
+  createBooking: async (eventId: number | string, data: CreateBookingInput): Promise<Booking> => {
+    const response = await apiClient.post(`/events/${eventId}/bookings`, data);
+    return response.data as Booking;
+  },
+
+  confirmBooking: async (eventId: number | string, bookingId: number | string): Promise<{ booking: Booking; tickets: IssuedTicket[]; message: string }> => {
+    const response = await apiClient.post(`/events/${eventId}/bookings/${bookingId}/confirm`);
+    return response.data;
+  },
+
+  updatePaymentStatus: async (eventId: number | string, bookingId: number | string, payment_status: string, payment_reference?: string): Promise<Booking> => {
+    const response = await apiClient.post(`/events/${eventId}/bookings/${bookingId}/payment-status`, { payment_status, payment_reference });
+    return response.data as Booking;
+  },
+
+  cancelBooking: async (eventId: number | string, bookingId: number | string): Promise<Booking> => {
+    const response = await apiClient.post(`/events/${eventId}/bookings/${bookingId}/cancel`);
+    return response.data as Booking;
+  },
+
+  deleteBooking: async (eventId: number | string, bookingId: number | string): Promise<void> => {
+    await apiClient.delete(`/events/${eventId}/bookings/${bookingId}`);
+  },
+};
+
+// Issued Ticket API
+export const issuedTicketAPI = {
+  getTickets: async (eventId: number | string, params?: { booking_id?: number; status?: string; is_checked_in?: boolean; search?: string; page?: number; limit?: number }) => {
+    const response = await apiClient.get(`/events/${eventId}/issued-tickets`, { params });
+    return response.data as { tickets: IssuedTicket[]; total: number; page: number; limit: number };
+  },
+
+  getTicketById: async (eventId: number | string, ticketId: number | string): Promise<IssuedTicket> => {
+    const response = await apiClient.get(`/events/${eventId}/issued-tickets/${ticketId}`);
+    return response.data as IssuedTicket;
+  },
+
+  getTicketByCode: async (code: string): Promise<IssuedTicket> => {
+    const response = await apiClient.get(`/events/public/tickets/${code}`);
+    return response.data as IssuedTicket;
+  },
+
+  issueTicket: async (eventId: number | string, data: IssueTicketInput): Promise<IssuedTicket> => {
+    const response = await apiClient.post(`/events/${eventId}/issued-tickets`, data);
+    return response.data as IssuedTicket;
+  },
+
+  checkin: async (eventId: number | string, data: CheckinByCodeInput): Promise<CheckinResult> => {
+    const response = await apiClient.post(`/events/${eventId}/checkin`, data);
+    return response.data as CheckinResult;
+  },
+
+  undoCheckin: async (eventId: number | string, ticketId: number | string): Promise<CheckinResult> => {
+    const response = await apiClient.post(`/events/${eventId}/issued-tickets/${ticketId}/undo-checkin`);
+    return response.data as CheckinResult;
+  },
+
+  cancelTicket: async (eventId: number | string, ticketId: number | string): Promise<IssuedTicket> => {
+    const response = await apiClient.post(`/events/${eventId}/issued-tickets/${ticketId}/cancel`);
+    return response.data as IssuedTicket;
+  },
+
+  getStats: async (eventId: number | string): Promise<IssuedTicketStats> => {
+    const response = await apiClient.get(`/events/${eventId}/issued-tickets/stats`);
+    return response.data as IssuedTicketStats;
+  },
+};
+
 export const savedViewsAPI = {
   getViews: async (module: string) => {
     const response = await apiClient.get('/saved-views', { params: { module } });
