@@ -34,10 +34,9 @@ import { SettingsEmail } from './settings/SettingsEmail';
 
 interface EventSettingsProps {
   eventId?: number | string;
-  onNavigateToAdvanced?: () => void;
 }
 
-export const EventSettings = ({ eventId, onNavigateToAdvanced }: EventSettingsProps) => {
+export const EventSettings = ({ eventId }: EventSettingsProps) => {
   const [activeTab, setActiveTab] = useState('general');
 
   return (
