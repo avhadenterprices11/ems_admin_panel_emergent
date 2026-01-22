@@ -365,7 +365,7 @@ export const SettingsBadge: React.FC<SettingsBadgeProps> = ({ eventId }) => {
                         <SelectValue placeholder="Apply to all tickets" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Apply to all tickets</SelectItem>
+                        <SelectItem value="all">Apply to all tickets</SelectItem>
                         {tickets.map((ticket) => (
                           <SelectItem key={ticket.id} value={ticket.id.toString()}>
                             {ticket.name}
