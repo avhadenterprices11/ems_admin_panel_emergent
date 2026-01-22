@@ -2021,3 +2021,84 @@ export const privacySettingsAPI = {
     return response.data;
   },
 };
+
+// ===== Email Templates API =====
+export type EmailScenario = 
+  | 'registration_complete' 
+  | 'payment_successful' 
+  | 'event_reminder' 
+  | 'event_cancelled' 
+  | 'post_event_followup';
+
+export interface EmailScenarioConfig {
+  scenario: EmailScenario;
+  triggerLabel: string;
+  description: string;
+  is_enabled: boolean;
+  has_override: boolean;
+  source: 'global' | 'event';
+  subject: string;
+  body: string;
+  send_timing: 'immediate' | 'scheduled';
+  schedule_offset: number | null;
+  schedule_unit: 'minutes' | 'hours' | 'days' | null;
+  globalSubject: string;
+  globalBody: string;
+  variables: string[];
+}
+
+export interface EmailProviderStatus {
+  available: boolean;
+  provider?: string;
+  error?: string;
+}
+
+export interface EmailTemplatesResponse {
+  templates: EmailScenarioConfig[];
+  emailProviderStatus: EmailProviderStatus;
+}
+
+export interface SaveEmailTemplatesInput {
+  scenarios: Array<{
+    scenario: EmailScenario;
+    is_enabled: boolean;
+    has_override: boolean;
+    subject?: string | null;
+    body?: string | null;
+    send_timing?: 'immediate' | 'scheduled';
+    schedule_offset?: number | null;
+    schedule_unit?: 'minutes' | 'hours' | 'days' | null;
+  }>;
+}
+
+export const emailTemplatesAPI = {
+  // Get all email template configurations for an event
+  getEventTemplates: async (eventId: number | string): Promise<EmailTemplatesResponse> => {
+    const response = await apiClient.get(`/events/${eventId}/email-templates`);
+    return response.data as EmailTemplatesResponse;
+  },
+
+  // Save all email template configurations
+  saveEventTemplates: async (eventId: number | string, data: SaveEmailTemplatesInput): Promise<{ message: string; templates: EmailScenarioConfig[] }> => {
+    const response = await apiClient.put(`/events/${eventId}/email-templates`, data);
+    return response.data;
+  },
+
+  // Reset to global defaults
+  resetToGlobal: async (eventId: number | string): Promise<{ message: string; templates: EmailScenarioConfig[] }> => {
+    const response = await apiClient.post(`/events/${eventId}/email-templates/reset`);
+    return response.data;
+  },
+
+  // Send test email
+  sendTestEmail: async (eventId: number | string, scenario: EmailScenario, email: string): Promise<{ message: string; messageId?: string; provider?: string }> => {
+    const response = await apiClient.post(`/events/${eventId}/email-templates/test`, { scenario, email });
+    return response.data;
+  },
+
+  // Get email provider status
+  getEmailProviderStatus: async (eventId: number | string): Promise<EmailProviderStatus> => {
+    const response = await apiClient.get(`/events/${eventId}/email-templates/status`);
+    return response.data;
+  },
+};
