@@ -1,0 +1,59 @@
+{
+  "summary": "Tested Data & Privacy settings feature. Fixed critical bug in backend service where soft-deleted records caused unique constraint violations. All 23 backend API tests pass (100%). Frontend UI verified working - all CRUD operations, CSV export, and Reset to Global functionality work correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/tests/test_privacy_settings_api.py",
+    "/app/test_reports/pytest/pytest_privacy_settings.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Fixed bug in privacy-settings.service.ts: upsertEventSettings was failing when trying to create new settings after a reset because soft-deleted records still existed with the same event_id. The fix now checks for ANY existing record (including soft-deleted) and restores it instead of trying to insert a new one."
+  ],
+  "updated_files": [
+    "/app/backend/src/services/privacy-settings.service.ts",
+    "/app/frontend/vite.config.ts",
+    "/app/tests/test_privacy_settings_api.py"
+  ],
+  "success_rate": {
+    "backend": "100% (23/23 tests passed)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "api_base_url": "https://datapolicyhub.preview.emergentagent.com",
+    "test_event_id": 1
+  },
+  "seed_data_creation": "Event 1 has privacy settings configured. Global default settings exist with event_id=null.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Data & Privacy settings feature fully working. Key features verified: 1) GET /api/events/{eventId}/privacy-settings - returns settings with global fallback, 2) PUT /api/events/{eventId}/privacy-settings - updates event-specific settings (fixed bug with soft-deleted records), 3) POST /api/events/{eventId}/privacy-settings/reset - resets to global defaults, 4) GET /api/events/{eventId}/privacy-settings/export - exports full event data as CSV. Frontend: Settings > Data & Privacy page shows GDPR toggle, Cookie Consent toggle, Privacy Policy URL input, Data Retention dropdown (90/180/365/forever), Custom Consent Text textarea, Download CSV button, Reset to Global button, Save Changes button. All UI elements have data-testid attributes for testing.",
+  "features_tested": {
+    "get_privacy_settings": {"status": "PASS", "details": "GET /api/events/1/privacy-settings returns settings with is_global_default flag"},
+    "update_privacy_settings": {"status": "PASS", "details": "PUT updates gdpr_consent_enabled, privacy_policy_url, data_retention_days, cookie_consent_enabled"},
+    "reset_to_global": {"status": "PASS", "details": "POST /api/events/1/privacy-settings/reset soft-deletes event settings and returns global defaults"},
+    "export_csv": {"status": "PASS", "details": "GET /api/events/1/privacy-settings/export returns CSV with registrations, attendees, tickets, bookings"},
+    "data_retention_validation": {"status": "PASS", "details": "Only accepts 90, 180, 365, forever values"},
+    "global_fallback": {"status": "PASS", "details": "Non-existent events return global defaults with is_global_default=true"},
+    "frontend_gdpr_toggle": {"status": "PASS", "details": "GDPR Consent Field switch works correctly"},
+    "frontend_cookie_toggle": {"status": "PASS", "details": "Cookie Consent Banner switch works correctly"},
+    "frontend_privacy_url": {"status": "PASS", "details": "Privacy Policy URL input saves correctly"},
+    "frontend_data_retention": {"status": "PASS", "details": "Data Retention dropdown shows all 4 options and saves correctly"},
+    "frontend_save_changes": {"status": "PASS", "details": "Save Changes button triggers API call and shows success toast"},
+    "frontend_reset_to_global": {"status": "PASS", "details": "Reset to Global button resets settings and shows 'Using Global Defaults' badge"},
+    "frontend_export_csv": {"status": "PASS", "details": "Download CSV button triggers file download with correct filename"}
+  },
+  "bug_fixed": {
+    "description": "Fixed unique constraint violation when updating privacy settings after reset",
+    "root_cause": "The upsertEventSettings method was checking for existing records with is_deleted=false, but after a reset (which soft-deletes the record), it would try to INSERT a new record. This failed because the unique constraint on event_id doesn't account for soft-deleted records.",
+    "fix_applied": "Modified upsertEventSettings to check for ANY existing record (including soft-deleted) and update/restore it instead of inserting a new one. Added is_deleted: false to the update data to restore soft-deleted records.",
+    "file_modified": "/app/backend/src/services/privacy-settings.service.ts"
+  },
+  "mocked_functionality": {}
+}
