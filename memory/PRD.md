@@ -439,6 +439,82 @@ A full-stack Event Management Admin System built with:
 - **Default Values**: primary=#0f172b, secondary=#3b82f6, font=inter
 - **Test Results**: 19/19 backend API tests pass (100%), Frontend verified
 
+### 16. Badge Design, Booking & Ticket Issuance System ✅ COMPLETE (Jan 22, 2026)
+
+#### 16.1 Badge Design Page (Settings → Badge Design)
+- **Database**: `badge_designs` table with fields:
+  - `event_id` (nullable FK) - null for global default
+  - `ticket_type_id` (nullable FK) - specific ticket type design
+  - `name`, `is_global_default`, `is_event_default`
+  - `badge_size` (a6, credit, a7, custom), `custom_width`, `custom_height`, `orientation`
+  - `design_config` (jsonb): visible_fields[], primary_color, secondary_color, background_color, font_size_scale, qr_code_size, show_punch_hole, logo_url
+- **Frontend UI** (`SettingsBadge.tsx`):
+  - Design selector showing all designs for event (tabs with Global/Default/Ticket-type badges)
+  - Design editor form: Name, Ticket Type dropdown, Event Default toggle
+  - Badge Size dropdown with custom dimensions option
+  - Portrait/Landscape orientation toggle
+  - Visible Fields checkboxes (drag-reorderable): Full Name, Ticket Type, Company, Job Title, QR Code, Unique Code, Event Name, Event Date
+  - Style Options: Font Size Scale slider, QR Code Size slider, Primary/Secondary color pickers, Show Punch Hole toggle
+  - Live Badge Preview: Real-time rendering showing all selected fields
+  - Actions: New Design, Duplicate, Delete, Print Test, Save Design
+- **Backend APIs**:
+  - `GET /api/events/:eventId/badge-designs` - List all designs
+  - `GET /api/events/:eventId/badge-designs/:id` - Get single design
+  - `GET /api/events/:eventId/badge-designs/for-ticket?ticket_type_id=X` - Get appropriate design by priority
+  - `POST /api/events/:eventId/badge-designs` - Create design
+  - `PUT /api/events/:eventId/badge-designs/:id` - Update design
+  - `DELETE /api/events/:eventId/badge-designs/:id` - Soft delete (prevents deleting global default)
+  - `POST /api/events/:eventId/badge-designs/:id/duplicate` - Clone design
+- **Design Selection Priority**: Ticket-type specific → Event default → Global default
+
+#### 16.2 Booking System (Public-ready APIs)
+- **Database**: `bookings` and `booking_items` tables
+  - `bookings`: booking_code (unique), customer_name/email/phone, status (pending/confirmed/cancelled/refunded), payment_status, subtotal/tax/discount/total, currency, source (admin/website/api)
+  - `booking_items`: booking_id, ticket_id, addon_id, item_type, quantity, unit_price, total_price
+- **Backend APIs**:
+  - `GET /api/events/:eventId/bookings` - List bookings with search/filter
+  - `POST /api/events/:eventId/bookings` - Create booking with items
+  - `GET /api/events/:eventId/bookings/:id` - Get booking with items
+  - `POST /api/events/:eventId/bookings/:id/confirm` - Confirm and issue tickets
+  - `POST /api/events/:eventId/bookings/:id/payment-status` - Update payment status
+  - `POST /api/events/:eventId/bookings/:id/cancel` - Cancel booking
+  - `GET /api/events/public/bookings/:bookingCode` - Public lookup by code (returns booking + tickets)
+
+#### 16.3 Ticket Issuance with QR + Unique Code
+- **Database**: `issued_tickets` table
+  - `ticket_number` (unique) - TK-{timestamp}-{random}
+  - `unique_code` (6-char alphanumeric, unique) - Fallback check-in code
+  - `qr_payload` - Format: `{eventId}-{ticketId}-{uniqueCode}-{checksum}`
+  - `holder_name/email/phone/company/job_title` - Ticket holder info
+  - `badge_design_id` - FK to badge_designs (set at issuance)
+  - `status` (valid/used/cancelled/expired)
+  - `is_checked_in`, `checked_in_at`, `checkin_method` (qr/code/manual), `checkin_location`
+- **Ticket Issuance**: On booking confirmation, issues 1 ticket per quantity per item
+- **Backend APIs**:
+  - `GET /api/events/:eventId/issued-tickets` - List with filters
+  - `GET /api/events/:eventId/issued-tickets/:id` - Get single ticket
+  - `POST /api/events/:eventId/issued-tickets` - Manual issuance
+  - `POST /api/events/:eventId/issued-tickets/:id/cancel` - Cancel ticket
+  - `GET /api/events/public/tickets/:code` - Public lookup by unique code
+
+#### 16.4 Check-in Scanner Flow
+- **Enhanced Scanner Dialog** (EventAttendees.tsx):
+  - **QR Scanner Area**: Tap-to-open camera (mobile devices)
+  - **Manual Code Entry**: Input field for 6-digit unique code or full QR payload
+  - **Location Dropdown**: Main Gate, VIP Entrance, Side Entrance, Registration Desk
+  - **Check In Button**: Validates and marks attendee checked in
+- **Backend Check-in API**:
+  - `POST /api/events/:eventId/checkin` - Accepts code (unique_code OR qr_payload)
+    - Validates ticket exists and belongs to event
+    - Rejects already checked-in tickets
+    - Rejects cancelled/expired tickets
+    - Records: is_checked_in, checked_in_at, checkin_method, checkin_location
+    - Logs activity in event_activity_logs
+  - `POST /api/events/:eventId/issued-tickets/:id/undo-checkin` - Revert check-in
+  - `GET /api/events/:eventId/issued-tickets/stats` - Check-in statistics
+    - Returns: total_issued, total_checked_in, total_not_checked_in, checkin_percentage, by_ticket_type[]
+- **Test Results**: 33/33 backend API tests pass (100%), Frontend verified
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
@@ -446,13 +522,14 @@ A full-stack Event Management Admin System built with:
 - Drop legacy `events.category` text column after migration
 
 ### P2 - Settings Tab (Other Subsections)
-- Payment & Tax, Team & Permissions, Badge Design
+- Team & Permissions
 - Integrations, Data & Privacy, Email Configuration, Advanced Configuration
 - Archive Event, Delete Event
 
 ### P3 - Master Data Management UI
 - Admin UI for CRUD operations on categories
 - Admin UI for CRUD operations on tags
+
 
 ## Technical Architecture
 
