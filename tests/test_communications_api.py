@@ -7,7 +7,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('VITE_API_URL', 'https://eventsphere-20.preview.emergentagent.com')
+BASE_URL = os.environ.get('VITE_API_URL', 'https://datapolicyhub.preview.emergentagent.com')
 EVENT_ID = 1
 
 @pytest.fixture(scope="module")

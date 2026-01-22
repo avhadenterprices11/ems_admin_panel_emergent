@@ -88,7 +88,7 @@ export class S3Service {
     fs.writeFileSync(fullPath, file.buffer);
     
     // Return a URL that can be served
-    const baseUrl = process.env.PREVIEW_URL || process.env.APP_URL || 'https://eventsphere-20.preview.emergentagent.com';
+    const baseUrl = process.env.PREVIEW_URL || process.env.APP_URL || 'https://datapolicyhub.preview.emergentagent.com';
     return `${baseUrl}/api/uploads/${fileName}`;
   }
 
@@ -132,7 +132,7 @@ export class S3Service {
     fs.writeFileSync(fullPath, buffer);
     
     // Return a URL that can be served
-    const baseUrl = process.env.PREVIEW_URL || process.env.APP_URL || 'https://eventsphere-20.preview.emergentagent.com';
+    const baseUrl = process.env.PREVIEW_URL || process.env.APP_URL || 'https://datapolicyhub.preview.emergentagent.com';
     return `${baseUrl}/api/uploads/${fileName}`;
   }
 

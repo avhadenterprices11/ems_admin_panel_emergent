@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-https://eventsphere-20.preview.emergentagent.com/api
+https://datapolicyhub.preview.emergentagent.com/api
 ```
 
 ## Authentication
@@ -132,7 +132,7 @@ Confirms booking and automatically issues tickets with QR codes, unique codes, a
       "ticket_number": "TK-MKP98Z1V-4QYS",
       "unique_code": "F7B12A",
       "qr_payload": "1-1-F7B12A-80BY",
-      "qr_image_url": "https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png",
+      "qr_image_url": "https://datapolicyhub.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png",
       "holder_name": "John Doe",
       "holder_email": "john@example.com",
       "status": "valid",
@@ -144,7 +144,7 @@ Confirms booking and automatically issues tickets with QR codes, unique codes, a
       "ticket_number": "TK-MKP98Z1V-5ABC",
       "unique_code": "RPLQKY",
       "qr_payload": "1-2-RPLQKY-DEF2",
-      "qr_image_url": "https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-5ABC.png",
+      "qr_image_url": "https://datapolicyhub.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-5ABC.png",
       "holder_name": "John Doe",
       "holder_email": "john@example.com",
       "status": "valid",
@@ -403,7 +403,7 @@ Returns check-in metrics for an event.
 **Example Response Field:**
 ```json
 {
-  "qr_image_url": "https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png"
+  "qr_image_url": "https://datapolicyhub.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png"
 }
 ```
 
@@ -412,7 +412,7 @@ Simply use the `qr_image_url` directly in an `<img>` tag:
 
 **HTML:**
 ```html
-<img src="https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png" 
+<img src="https://datapolicyhub.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-4QYS.png" 
      alt="Ticket QR Code" 
      width="200" />
 ```
@@ -454,7 +454,7 @@ const qrImageDataUrl = await QRCode.toDataURL(qrPayload);
 
 ### Step 1: Create a Booking
 ```bash
-API_URL="https://eventsphere-20.preview.emergentagent.com"
+API_URL="https://datapolicyhub.preview.emergentagent.com"
 TOKEN="your-jwt-token"
 
 curl -X POST "$API_URL/api/events/1/bookings" \

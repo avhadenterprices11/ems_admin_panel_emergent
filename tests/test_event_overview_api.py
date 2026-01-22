@@ -13,7 +13,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('VITE_API_URL', 'https://eventsphere-20.preview.emergentagent.com')
+BASE_URL = os.environ.get('VITE_API_URL', 'https://datapolicyhub.preview.emergentagent.com')
 TEST_EVENT_ID = 1
 
 

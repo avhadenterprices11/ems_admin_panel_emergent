@@ -16,7 +16,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('VITE_API_URL', 'https://eventsphere-20.preview.emergentagent.com')
+BASE_URL = os.environ.get('VITE_API_URL', 'https://datapolicyhub.preview.emergentagent.com')
 EVENT_ID = 1  # Test event ID
 
 

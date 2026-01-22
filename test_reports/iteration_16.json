@@ -34,7 +34,7 @@
     "frontend": "100%"
   },
   "test_credentials": {
-    "api_base_url": "https://eventsphere-20.preview.emergentagent.com",
+    "api_base_url": "https://datapolicyhub.preview.emergentagent.com",
     "login_email": "admin@example.com",
     "login_password": "admin123"
   },

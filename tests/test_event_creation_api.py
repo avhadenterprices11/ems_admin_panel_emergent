@@ -7,7 +7,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://eventsphere-20.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://datapolicyhub.preview.emergentagent.com')
 
 class TestMasterDataAPIs:
     """Test master data APIs for categories and tags"""
