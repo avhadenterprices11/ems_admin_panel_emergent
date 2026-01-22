@@ -19,6 +19,6 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0',
-    allowedHosts: ['eventpro-19.preview.emergentagent.com', 'eventflow-152.preview.emergentagent.com', 'eventflow-151.preview.emergentagent.com', 'eventpanel-3.preview.emergentagent.com', 'eventmanager-18.preview.emergentagent.com', 'localhost', '127.0.0.1'],
+    allowedHosts: ['eventsphere-20.preview.emergentagent.com', 'eventpro-19.preview.emergentagent.com', 'eventflow-152.preview.emergentagent.com', 'eventflow-151.preview.emergentagent.com', 'eventpanel-3.preview.emergentagent.com', 'eventmanager-18.preview.emergentagent.com', 'localhost', '127.0.0.1'],
   },
 })
