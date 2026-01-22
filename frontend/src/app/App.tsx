@@ -59,6 +59,7 @@ export default function App() {
             <Route path="events" element={<EventsPage />} />
             <Route path="events/new" element={<EventSetupPage />} />
             <Route path="events/:id" element={<EventManagePage />} />
+            <Route path="events/:id/edit" element={<EventSetupPage />} />
             <Route path="forms" element={<FormsPage />} />
             <Route path="forms/new" element={<CreateFormPage />} />
             <Route path="people" element={<PeoplePage />} />
