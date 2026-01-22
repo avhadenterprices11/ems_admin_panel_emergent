@@ -1877,3 +1877,96 @@ export const savedViewsAPI = {
     return response.data;
   },
 };
+
+// ============================================================================
+// INTEGRATIONS API
+// ============================================================================
+
+export type IntegrationType = 'email' | 'sms' | 'maps';
+export type EmailProvider = 'sendgrid' | 'smtp';
+export type SmsProvider = 'twilio' | 'messagebird';
+export type MapsProvider = 'google_maps';
+
+export interface IntegrationConfig {
+  id: number;
+  event_id: number | null;
+  integration_type: IntegrationType;
+  provider: string;
+  is_enabled: boolean;
+  config: Record<string, any>;
+  status: 'not_configured' | 'connected' | 'error';
+  status_message: string | null;
+  last_tested_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IntegrationsResponse {
+  email: IntegrationConfig | null;
+  sms: IntegrationConfig | null;
+  maps: IntegrationConfig | null;
+}
+
+export interface SaveIntegrationsInput {
+  email?: {
+    provider: EmailProvider;
+    is_enabled: boolean;
+    config: {
+      // SendGrid
+      api_key?: string;
+      from_email?: string;
+      from_name?: string;
+      // SMTP
+      host?: string;
+      port?: number;
+      username?: string;
+      password?: string;
+      encryption?: 'none' | 'tls' | 'ssl';
+    };
+  };
+  sms?: {
+    provider: SmsProvider;
+    is_enabled: boolean;
+    config: {
+      // Twilio
+      account_sid?: string;
+      auth_token?: string;
+      from_number?: string;
+      // MessageBird
+      api_key?: string;
+      originator?: string;
+    };
+  };
+  maps?: {
+    provider: MapsProvider;
+    is_enabled: boolean;
+    config: {
+      api_key?: string;
+    };
+  };
+}
+
+export const integrationsAPI = {
+  // Get all integrations for an event (resolved with global defaults)
+  getEventIntegrations: async (eventId: number | string): Promise<IntegrationsResponse> => {
+    const response = await apiClient.get(`/events/${eventId}/integrations`);
+    return response.data as IntegrationsResponse;
+  },
+
+  // Save all integrations for an event
+  saveEventIntegrations: async (eventId: number | string, data: SaveIntegrationsInput): Promise<{ message: string; integrations: IntegrationsResponse }> => {
+    const response = await apiClient.put(`/events/${eventId}/integrations`, data);
+    return response.data;
+  },
+
+  // Test a specific integration connection
+  testConnection: async (eventId: number | string, configId: number): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.post(`/events/${eventId}/integrations/${configId}/test`);
+    return response.data;
+  },
+
+  // Delete an integration config
+  deleteIntegration: async (eventId: number | string, configId: number): Promise<void> => {
+    await apiClient.delete(`/events/${eventId}/integrations/${configId}`);
+  },
+};
