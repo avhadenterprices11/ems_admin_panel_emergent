@@ -138,47 +138,28 @@ Confirms booking and automatically issues tickets with QR codes, unique codes, a
       "status": "valid",
       "is_checked_in": false,
       "ticket_type_name": "VIP Pass"
-    }
-      "id": "1",
-      "ticket_number": "TK-M8XYZ1-A2B3",
-      "unique_code": "V8KWUS",
-      "qr_payload": "1-1-V8KWUS-ABC1",
-      "holder_name": "John Doe",
-      "holder_email": "john@example.com",
-      "status": "valid",
-      "is_checked_in": false,
-      "ticket_type_name": "VIP Pass"
     },
     {
       "id": "2",
-      "ticket_number": "TK-M8XYZ2-C4D5",
+      "ticket_number": "TK-MKP98Z1V-5ABC",
       "unique_code": "RPLQKY",
       "qr_payload": "1-2-RPLQKY-DEF2",
+      "qr_image_url": "https://eventsphere-20.preview.emergentagent.com/api/uploads/qr-codes/TK-MKP98Z1V-5ABC.png",
       "holder_name": "John Doe",
       "holder_email": "john@example.com",
       "status": "valid",
       "is_checked_in": false,
       "ticket_type_name": "VIP Pass"
-    },
-    {
-      "id": "3",
-      "ticket_number": "TK-M8XYZ3-E6F7",
-      "unique_code": "L58E0N",
-      "qr_payload": "1-3-L58E0N-GHI3",
-      "holder_name": "John Doe",
-      "holder_email": "john@example.com",
-      "status": "valid",
-      "is_checked_in": false,
-      "ticket_type_name": "Regular"
     }
   ],
-  "message": "Booking confirmed and 3 ticket(s) issued"
+  "message": "Booking confirmed and 2 ticket(s) issued"
 }
 ```
 
 **Key Fields Explained:**
-- `unique_code`: 6-character alphanumeric code for manual check-in (e.g., "V8KWUS")
-- `qr_payload`: Encoded string for QR code generation. Format: `{eventId}-{ticketId}-{uniqueCode}-{checksum}`
+- `unique_code`: 6-character alphanumeric code for manual check-in (e.g., "F7B12A")
+- `qr_payload`: Encoded string for QR code validation. Format: `{eventId}-{ticketId}-{uniqueCode}-{checksum}`
+- `qr_image_url`: **NEW** - Direct URL to the generated QR code PNG image (300x300px)
 - `ticket_number`: Human-readable ticket reference
 
 ---
