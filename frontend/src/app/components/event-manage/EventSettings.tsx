@@ -142,53 +142,62 @@ const SettingsNavItem = ({ label, icon, active, onClick }: any) => (
     </button>
 );
 
-const SettingsAdvanced = ({ onNavigate }: any) => (
-  <div className="bg-white rounded-[20px] shadow-sm border border-slate-100 p-6">
-    <div className="flex items-start gap-4 mb-6">
-      <div className="p-3 bg-blue-50 rounded-lg">
-        <Settings className="text-blue-600" size={24} />
+const SettingsAdvanced = ({ eventId }: { eventId: number }) => {
+  const navigate = useNavigate();
+  
+  const handleOpenAdvancedSettings = () => {
+    navigate(`/events/${eventId}/edit`);
+  };
+
+  return (
+    <div className="bg-white rounded-[20px] shadow-sm border border-slate-100 p-6" data-testid="settings-advanced">
+      <div className="flex items-start gap-4 mb-6">
+        <div className="p-3 bg-blue-50 rounded-lg">
+          <Settings className="text-blue-600" size={24} />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-[#1d293d] mb-2">Advanced Configuration</h3>
+          <p className="text-sm text-slate-600">
+            Manage core event settings including dates, location, agenda, SEO, accessibility, and email configuration overrides.
+          </p>
+        </div>
       </div>
-      <div className="flex-1">
-        <h3 className="text-lg font-bold text-[#1d293d] mb-2">Advanced Configuration</h3>
-        <p className="text-sm text-slate-600">
-          Manage core event settings including dates, location, agenda, SEO, accessibility, and email configuration overrides.
-        </p>
+      
+      <div className="space-y-3 mb-6">
+        <div className="flex items-center gap-3 text-sm text-slate-600">
+          <Calendar className="text-slate-400" size={16} />
+          <span>Event Details, Dates & Registration Window</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm text-slate-600">
+          <MapPin className="text-slate-400" size={16} />
+          <span>Location & Venue Configuration</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm text-slate-600">
+          <Clock className="text-slate-400" size={16} />
+          <span>Event Agenda & Schedule</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm text-slate-600">
+          <Globe className="text-slate-400" size={16} />
+          <span>SEO & Meta Information</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm text-slate-600">
+          <Shield className="text-slate-400" size={16} />
+          <span>Accessibility & Safety Settings</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm text-slate-600">
+          <Mail className="text-slate-400" size={16} />
+          <span>Email Configuration Overrides</span>
+        </div>
       </div>
+      
+      <Button 
+        onClick={handleOpenAdvancedSettings}
+        className="w-full bg-[#4f39f6] hover:bg-[#3d2cdb] text-white"
+        data-testid="open-advanced-settings-btn"
+      >
+        <ExternalLink size={16} className="mr-2" />
+        Open Advanced Settings
+      </Button>
     </div>
-    
-    <div className="space-y-3 mb-6">
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        <Calendar className="text-slate-400" size={16} />
-        <span>Event Details, Dates & Registration Window</span>
-      </div>
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        <MapPin className="text-slate-400" size={16} />
-        <span>Location & Venue Configuration</span>
-      </div>
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        <Clock className="text-slate-400" size={16} />
-        <span>Event Agenda & Schedule</span>
-      </div>
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        <Globe className="text-slate-400" size={16} />
-        <span>SEO & Meta Information</span>
-      </div>
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        <Shield className="text-slate-400" size={16} />
-        <span>Accessibility & Safety Settings</span>
-      </div>
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        <Mail className="text-slate-400" size={16} />
-        <span>Email Configuration Overrides</span>
-      </div>
-    </div>
-    
-    <Button 
-      onClick={onNavigate}
-      className="w-full bg-[#4f39f6] hover:bg-[#3d2cdb] text-white"
-    >
-      <ExternalLink size={16} className="mr-2" />
-      Open Advanced Settings
-    </Button>
-  </div>
-);
+  );
+};
