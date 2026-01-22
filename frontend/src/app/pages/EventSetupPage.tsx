@@ -466,7 +466,11 @@ const EventSetupPageComponent = () => {
   };
 
   const onBack = () => {
-    navigate('/events');
+    if (isEditMode && eventId) {
+      navigate(`/events/${eventId}`);
+    } else {
+      navigate('/events');
+    }
   };
 
   // Show loading state when fetching event data in Edit mode
