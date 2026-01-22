@@ -129,7 +129,7 @@ export const SettingsBadge: React.FC<SettingsBadgeProps> = ({ eventId }) => {
   const selectDesign = (design: BadgeDesign) => {
     setSelectedDesign(design);
     setName(design.name);
-    setTicketTypeId(design.ticket_type_id?.toString() || '');
+    setTicketTypeId(design.ticket_type_id?.toString() || 'all');
     setBadgeSize(design.badge_size);
     setCustomWidth(design.custom_width || 105);
     setCustomHeight(design.custom_height || 148);
