@@ -515,20 +515,65 @@ A full-stack Event Management Admin System built with:
     - Returns: total_issued, total_checked_in, total_not_checked_in, checkin_percentage, by_ticket_type[]
 - **Test Results**: 33/33 backend API tests pass (100%), Frontend verified
 
+### 17. Integrations Settings ✅ COMPLETE (Jan 22, 2026)
+- **Database**: `integration_configs` table with event_id (nullable), integration_type, provider, config (jsonb)
+- **Supported Integrations**:
+  - Email: SendGrid, SMTP
+  - SMS: Twilio, MessageBird
+  - Maps: Google Maps
+- **Provider Pattern**: Centralized IntegrationsService with getConfig(), upsertConfig(), testConnection()
+- **Resolution Logic**: Event-specific settings → Global defaults fallback
+- **Frontend** (`SettingsIntegrations.tsx`): Provider selection, API key inputs, enable/disable toggles, test connection buttons
+- **APIs**:
+  - `GET /api/events/:eventId/integrations` - Get all integrations (resolved)
+  - `PUT /api/events/:eventId/integrations` - Save all integrations
+  - `POST /api/events/:eventId/integrations/:configId/test` - Test connection
+
+### 18. Data & Privacy Settings ✅ COMPLETE (Jan 22, 2026)
+- **Database**: `privacy_settings` table with columns:
+  - `event_id` (nullable FK) - null for global defaults
+  - `gdpr_consent_enabled` (boolean) - require consent during registration
+  - `privacy_policy_url` (varchar 500) - link to privacy policy
+  - `custom_consent_text` (text) - optional custom GDPR consent text
+  - `data_retention_days` (varchar) - '90', '180', '365', 'forever'
+  - `cookie_consent_enabled` (boolean) - show cookie consent banner
+  - `dpa_signed`, `dpa_signed_at` - data processing agreement fields
+- **Backend Services**:
+  - `PrivacySettingsService`: getSettings(), upsertEventSettings(), resetToGlobal(), getGlobalSettings()
+  - `DataExportService`: exportEventDataCSV() - exports registrations, attendees, tickets, bookings
+- **Resolution Logic**: Event-specific settings → Global defaults fallback (same pattern as Integrations)
+- **Backend APIs**:
+  - `GET /api/events/:eventId/privacy-settings` - Fetch settings (with global fallback)
+  - `PUT /api/events/:eventId/privacy-settings` - Update event-specific settings
+  - `POST /api/events/:eventId/privacy-settings/reset` - Reset to global defaults
+  - `GET /api/events/:eventId/privacy-settings/export` - Export full event data as CSV
+- **Frontend** (`SettingsDataPrivacy.tsx`):
+  - **Compliance Section**: GDPR Consent toggle, Cookie Consent toggle, Privacy Policy URL input, Custom Consent Text textarea
+  - **Data Retention Section**: Automatic Deletion dropdown (90/180/365/forever days), Important notice about PII scrubbing
+  - **Data Export Section**: Download CSV button for full event data export
+  - **Header Actions**: "Using Global Defaults" badge when applicable, Reset to Global button, Save Changes button
+  - All UI elements have data-testid attributes for testing
+- **Bug Fixed**: Unique constraint violation when updating settings after reset (soft-deleted records handling)
+- **Test Results**: 23/23 backend API tests pass (100%), Frontend verified
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
 - Create migration script to populate `events.category_id` from old `events.category` text field
 - Drop legacy `events.category` text column after migration
 
-### P2 - Settings Tab (Other Subsections)
+### P2 - Settings Tab (Remaining Subsections)
 - Team & Permissions
-- Integrations, Data & Privacy, Email Configuration, Advanced Configuration
+- Email Configuration, Advanced Configuration
 - Archive Event, Delete Event
 
 ### P3 - Master Data Management UI
 - Admin UI for CRUD operations on categories
 - Admin UI for CRUD operations on tags
+
+### P4 - Global Settings UI
+- Build UI for managing global settings (Payment, Tax, Integrations, Privacy)
+- These serve as fallback defaults for events without custom settings
 
 
 ## Technical Architecture
