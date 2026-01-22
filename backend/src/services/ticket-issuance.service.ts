@@ -79,9 +79,11 @@ export interface CheckinResult {
 
 export class TicketIssuanceService {
   private badgeDesignService: BadgeDesignService;
+  private s3Service: S3Service;
 
   constructor() {
     this.badgeDesignService = new BadgeDesignService();
+    this.s3Service = new S3Service();
   }
 
   // Generate unique 6-character alphanumeric code
@@ -108,6 +110,32 @@ export class TicketIssuanceService {
     const data = `${eventId}-${ticketId}-${uniqueCode}`;
     const checksum = this.simpleChecksum(data);
     return `${data}-${checksum}`;
+  }
+
+  // Generate QR code image and upload to storage
+  async generateAndUploadQRImage(qrPayload: string, ticketNumber: string): Promise<string> {
+    try {
+      // Generate QR code as PNG buffer
+      const qrBuffer = await QRCode.toBuffer(qrPayload, {
+        type: 'png',
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        },
+        errorCorrectionLevel: 'M'
+      });
+
+      // Upload to storage
+      const fileName = `qr-codes/${ticketNumber}.png`;
+      const imageUrl = await this.s3Service.uploadBuffer(qrBuffer, fileName, 'image/png');
+      
+      return imageUrl;
+    } catch (error) {
+      console.error('Failed to generate/upload QR image:', error);
+      throw error;
+    }
   }
 
   // Simple checksum for validation
