@@ -102,14 +102,28 @@ export interface UpdateEventGeneralDetailsDTO {
   zip_code?: string;
   country?: string;
   meeting_url?: string;
+  // Virtual meeting
+  virtual_platform?: string;
+  meeting_platform?: string;
   // Media
   banner_image_url?: string;
   promo_video_url?: string;
+  gallery_images?: any[];
   // Accessibility & Safety
   accessibility_notes?: string;
   emergency_contact?: string;
   // Agenda
   agenda?: any[];
+  // Partners & Sponsors
+  partners?: any[];
+  sponsors?: any[];
+  // Internal
+  internal_notes?: string;
+  lifecycle_status?: string;
+  // SEO
+  meta_title?: string;
+  meta_description?: string;
+  url_slug?: string;
 }
 
 export class EventGeneralService {
