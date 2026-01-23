@@ -204,12 +204,16 @@ export const EventAttendees: React.FC<EventAttendeesProps> = ({ eventId }) => {
 
     try {
       setIsSubmitting(true);
-      // First try the new issuedTicketAPI (supports both QR payload and 6-digit unique code)
+      // Use the unified issuedTicketAPI (supports both QR payload and 6-digit unique code)
       try {
+        const codeValue = qrCode.trim();
+        // Determine if it's a QR payload (long string with dashes) or unique code (6 chars)
+        const isQRPayload = codeValue.length > 10 && codeValue.includes('-');
+        
         const result = await issuedTicketAPI.checkin(eventId, {
-          code: qrCode.trim(),
-          location: scannerLocation || undefined,
-          device_name: 'Web Scanner',
+          qr_payload: isQRPayload ? codeValue : undefined,
+          unique_code: !isQRPayload ? codeValue : undefined,
+          checked_in_by: 'Web Scanner',
         });
 
         if (result.success) {
@@ -220,6 +224,9 @@ export const EventAttendees: React.FC<EventAttendeesProps> = ({ eventId }) => {
           fetchMetrics();
           fetchLocations();
           fetchDevices();
+          return;
+        } else if (result.already_checked_in) {
+          toast.warning(result.message);
           return;
         } else {
           toast.error(result.message);
