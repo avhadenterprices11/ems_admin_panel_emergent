@@ -219,15 +219,13 @@ router.post('/:eventId/bookings/:bookingId/cancel', (req, res) => bookingControl
 router.delete('/:eventId/bookings/:bookingId', (req, res) => bookingController.deleteBooking(req, res));
 
 // Event Detail - Issued Tickets APIs
-router.get('/:eventId/issued-tickets', (req, res) => issuedTicketController.getIssuedTickets(req, res));
-router.get('/:eventId/issued-tickets/stats', (req, res) => issuedTicketController.getCheckinStats(req, res));
-router.post('/:eventId/issued-tickets', (req, res) => issuedTicketController.issueTicket(req, res));
-router.get('/:eventId/issued-tickets/:ticketId', (req, res) => issuedTicketController.getIssuedTicketById(req, res));
-router.post('/:eventId/issued-tickets/:ticketId/cancel', (req, res) => issuedTicketController.cancelTicket(req, res));
-router.post('/:eventId/issued-tickets/:ticketId/undo-checkin', (req, res) => issuedTicketController.undoCheckin(req, res));
+// DEPRECATED: Old issued-ticket routes - use UNIFIED TICKET APIs below instead
+// router.get('/:eventId/issued-tickets', ...) - replaced by unifiedTicketController.getEventTickets
+// router.post('/:eventId/issued-tickets', ...) - replaced by unifiedTicketController.issueTicket
+// router.post('/:eventId/checkin', ...) - replaced by unifiedTicketController.checkInTicket
 
-// Check-in API (supports both QR and unique code)
-router.post('/:eventId/checkin', (req, res) => issuedTicketController.checkinByCode(req, res));
+// Legacy routes kept for backward compatibility (redirect to unified)
+router.get('/:eventId/issued-tickets/legacy-stats', (req, res) => issuedTicketController.getCheckinStats(req, res));
 
 // Event Detail - Settings Tab - Integrations APIs
 router.get('/:eventId/integrations', (req, res) => integrationsController.getEventIntegrations(req, res));
