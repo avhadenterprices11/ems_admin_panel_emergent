@@ -784,6 +784,8 @@ export interface EventGeneralDetails {
   zip_code?: string;
   country?: string;
   meeting_url?: string;
+  virtual_platform?: string;
+  meeting_platform?: string;
   banner_image_url?: string;
   promo_video_url?: string;
   gallery_images?: any[];
@@ -791,6 +793,10 @@ export interface EventGeneralDetails {
   accessibility_notes?: string;
   emergency_contact?: string;
   agenda?: any[];
+  partners?: any[];
+  sponsors?: any[];
+  internal_notes?: string;
+  lifecycle_status?: string;
 }
 
 export interface UpdateEventGeneralDetailsInput {
