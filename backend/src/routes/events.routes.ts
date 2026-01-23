@@ -46,6 +46,7 @@ const paymentTaxController = new PaymentTaxController();
 const badgeDesignController = new BadgeDesignController();
 const bookingController = new BookingController();
 const issuedTicketController = new IssuedTicketController();
+const unifiedTicketController = new UnifiedTicketController();
 const integrationsController = new IntegrationsController();
 const privacySettingsController = new PrivacySettingsController();
 const emailTemplatesController = new EmailTemplatesController();
