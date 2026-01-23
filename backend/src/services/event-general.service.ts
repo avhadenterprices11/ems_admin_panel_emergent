@@ -42,6 +42,9 @@ export interface EventGeneralDetails {
   zip_code?: string;
   country?: string;
   meeting_url?: string;
+  // Virtual meeting
+  virtual_platform?: string;
+  meeting_platform?: string;
   // Media
   banner_image_url?: string;
   promo_video_url?: string;
@@ -52,6 +55,12 @@ export interface EventGeneralDetails {
   emergency_contact?: string;
   // Agenda
   agenda?: any[];
+  // Partners & Sponsors
+  partners?: any[];
+  sponsors?: any[];
+  // Internal
+  internal_notes?: string;
+  lifecycle_status?: string;
   // Meta
   created_at: string;
   updated_at: string;
