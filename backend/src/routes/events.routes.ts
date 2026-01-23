@@ -249,4 +249,31 @@ router.post('/:eventId/email-templates/reset', (req, res) => emailTemplatesContr
 router.post('/:eventId/email-templates/test', (req, res) => emailTemplatesController.sendTestEmail(req, res));
 router.get('/:eventId/email-templates/status', (req, res) => emailTemplatesController.getEmailProviderStatus(req, res));
 
+// ============================================================================
+// UNIFIED TICKET APIs (SINGLE SOURCE OF TRUTH - issued_tickets table)
+// ============================================================================
+
+// Ticket Statistics
+router.get('/:eventId/issued-tickets/stats', (req, res) => unifiedTicketController.getTicketStats(req, res));
+
+// Ticket Listing & Lookup
+router.get('/:eventId/issued-tickets', (req, res) => unifiedTicketController.getEventTickets(req, res));
+router.get('/:eventId/issued-tickets/code/:code', (req, res) => unifiedTicketController.getTicketByCode(req, res));
+router.get('/:eventId/issued-tickets/:ticketId', (req, res) => unifiedTicketController.getTicketById(req, res));
+
+// Ticket Issuance
+router.post('/:eventId/issued-tickets/issue', (req, res) => unifiedTicketController.issueTicket(req, res));
+router.post('/:eventId/bookings/:bookingId/issue-tickets', (req, res) => unifiedTicketController.issueTicketsForBooking(req, res));
+router.get('/:eventId/bookings/:bookingId/issued-tickets', (req, res) => unifiedTicketController.getBookingTickets(req, res));
+
+// Ticket Management
+router.put('/:eventId/issued-tickets/:ticketId', (req, res) => unifiedTicketController.updateTicket(req, res));
+router.post('/:eventId/issued-tickets/:ticketId/cancel', (req, res) => unifiedTicketController.cancelTicket(req, res));
+router.post('/:eventId/issued-tickets/:ticketId/confirm-payment', (req, res) => unifiedTicketController.confirmPayment(req, res));
+router.post('/:eventId/issued-tickets/:ticketId/undo-checkin', (req, res) => unifiedTicketController.undoCheckIn(req, res));
+router.delete('/:eventId/issued-tickets/:ticketId', (req, res) => unifiedTicketController.deleteTicket(req, res));
+
+// Check-in (UNIFIED - uses issued_tickets table only)
+router.post('/:eventId/checkin', (req, res) => unifiedTicketController.checkInTicket(req, res));
+
 export default router;
