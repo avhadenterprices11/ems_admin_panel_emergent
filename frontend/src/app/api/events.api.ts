@@ -1858,46 +1858,106 @@ export const bookingAPI = {
   },
 };
 
-// Issued Ticket API
+// Issued Ticket API - UNIFIED (uses issued_tickets table as SINGLE SOURCE OF TRUTH)
 export const issuedTicketAPI = {
-  getTickets: async (eventId: number | string, params?: { booking_id?: number; status?: string; is_checked_in?: boolean; search?: string; page?: number; limit?: number }) => {
+  // Get all tickets for an event with pagination and filtering
+  getTickets: async (eventId: number | string, params?: { 
+    status?: string; 
+    checked_in?: boolean; 
+    search?: string; 
+    page?: number; 
+    limit?: number 
+  }): Promise<IssuedTicketsResponse> => {
     const response = await apiClient.get(`/events/${eventId}/issued-tickets`, { params });
-    return response.data as { tickets: IssuedTicket[]; total: number; page: number; limit: number };
+    return response.data as IssuedTicketsResponse;
   },
 
+  // Get a single ticket by ID
   getTicketById: async (eventId: number | string, ticketId: number | string): Promise<IssuedTicket> => {
     const response = await apiClient.get(`/events/${eventId}/issued-tickets/${ticketId}`);
     return response.data as IssuedTicket;
   },
 
-  getTicketByCode: async (code: string): Promise<IssuedTicket> => {
-    const response = await apiClient.get(`/events/public/tickets/${code}`);
+  // Get a ticket by unique code
+  getTicketByCode: async (eventId: number | string, code: string): Promise<IssuedTicket> => {
+    const response = await apiClient.get(`/events/${eventId}/issued-tickets/code/${code}`);
     return response.data as IssuedTicket;
   },
 
-  issueTicket: async (eventId: number | string, data: IssueTicketInput): Promise<IssuedTicket> => {
-    const response = await apiClient.post(`/events/${eventId}/issued-tickets`, data);
-    return response.data as IssuedTicket;
+  // Get tickets for a booking
+  getBookingTickets: async (eventId: number | string, bookingId: number | string): Promise<{ tickets: IssuedTicket[] }> => {
+    const response = await apiClient.get(`/events/${eventId}/bookings/${bookingId}/issued-tickets`);
+    return response.data;
   },
 
-  checkin: async (eventId: number | string, data: CheckinByCodeInput): Promise<CheckinResult> => {
+  // Issue a single ticket manually
+  issueTicket: async (eventId: number | string, data: IssueTicketInput): Promise<{ message: string; ticket: IssuedTicket }> => {
+    const response = await apiClient.post(`/events/${eventId}/issued-tickets/issue`, data);
+    return response.data;
+  },
+
+  // Issue tickets for a booking (batch)
+  issueTicketsForBooking: async (
+    eventId: number | string, 
+    bookingId: number | string, 
+    data: {
+      items: Array<{
+        ticket_type_id: number;
+        quantity: number;
+        unit_price: number;
+        holder_name: string;
+        holder_email?: string;
+        holder_phone?: string;
+      }>;
+      payment_status?: 'pending' | 'completed';
+    }
+  ): Promise<{ message: string; tickets: IssuedTicket[] }> => {
+    const response = await apiClient.post(`/events/${eventId}/bookings/${bookingId}/issue-tickets`, data);
+    return response.data;
+  },
+
+  // Check in a ticket (UNIFIED - uses issued_tickets only)
+  checkin: async (eventId: number | string, data: CheckinInput): Promise<CheckinResult> => {
     const response = await apiClient.post(`/events/${eventId}/checkin`, data);
     return response.data as CheckinResult;
   },
 
-  undoCheckin: async (eventId: number | string, ticketId: number | string): Promise<CheckinResult> => {
+  // Undo check-in
+  undoCheckin: async (eventId: number | string, ticketId: number | string): Promise<{ message: string; ticket: IssuedTicket }> => {
     const response = await apiClient.post(`/events/${eventId}/issued-tickets/${ticketId}/undo-checkin`);
-    return response.data as CheckinResult;
+    return response.data;
   },
 
-  cancelTicket: async (eventId: number | string, ticketId: number | string): Promise<IssuedTicket> => {
-    const response = await apiClient.post(`/events/${eventId}/issued-tickets/${ticketId}/cancel`);
-    return response.data as IssuedTicket;
+  // Update a ticket
+  updateTicket: async (eventId: number | string, ticketId: number | string, data: Partial<IssueTicketInput>): Promise<{ message: string; ticket: IssuedTicket }> => {
+    const response = await apiClient.put(`/events/${eventId}/issued-tickets/${ticketId}`, data);
+    return response.data;
   },
 
+  // Cancel a ticket
+  cancelTicket: async (eventId: number | string, ticketId: number | string, reason?: string): Promise<{ message: string; ticket: IssuedTicket }> => {
+    const response = await apiClient.post(`/events/${eventId}/issued-tickets/${ticketId}/cancel`, { reason });
+    return response.data;
+  },
+
+  // Confirm payment for a ticket
+  confirmPayment: async (eventId: number | string, ticketId: number | string, paymentReference?: string): Promise<{ message: string; ticket: IssuedTicket }> => {
+    const response = await apiClient.post(`/events/${eventId}/issued-tickets/${ticketId}/confirm-payment`, { payment_reference: paymentReference });
+    return response.data;
+  },
+
+  // Delete a ticket (soft delete)
+  deleteTicket: async (eventId: number | string, ticketId: number | string): Promise<{ message: string }> => {
+    const response = await apiClient.delete(`/events/${eventId}/issued-tickets/${ticketId}`);
+    return response.data;
+  },
+
+  // Get ticket statistics for an event
   getStats: async (eventId: number | string): Promise<IssuedTicketStats> => {
     const response = await apiClient.get(`/events/${eventId}/issued-tickets/stats`);
     return response.data as IssuedTicketStats;
+  },
+};
   },
 };
 
