@@ -823,11 +823,20 @@ export interface UpdateEventGeneralDetailsInput {
   zip_code?: string;
   country?: string;
   meeting_url?: string;
+  virtual_platform?: string;
   banner_image_url?: string;
   promo_video_url?: string;
+  gallery_images?: any[];
   accessibility_notes?: string;
   emergency_contact?: string;
   agenda?: any[];
+  partners?: any[];
+  sponsors?: any[];
+  internal_notes?: string;
+  lifecycle_status?: string;
+  meta_title?: string;
+  meta_description?: string;
+  url_slug?: string;
 }
 
 // Event Branding Interfaces
