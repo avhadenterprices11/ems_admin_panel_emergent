@@ -1693,7 +1693,8 @@ export interface IssuedTicket {
   ticket_number: string;
   unique_code: string;
   event_id: number;
-  booking_id: number;
+  booking_id: number | null;
+  registration_id: number | null;
   ticket_type_id: number | null;
   holder_name: string;
   holder_email: string | null;
@@ -1703,48 +1704,77 @@ export interface IssuedTicket {
   qr_payload: string;
   qr_image_url: string | null;
   badge_design_id: number | null;
-  status: string;
+  status: 'pending' | 'valid' | 'used' | 'cancelled' | 'expired' | 'revoked';
   is_checked_in: boolean;
   checked_in_at: string | null;
+  checked_in_by: string | null;
   checkin_method: string | null;
   checkin_location: string | null;
+  // Pricing fields
+  unit_price: number | null;
+  total_price: number | null;
+  currency: string;
+  quantity: number;
+  // Payment fields
+  payment_status: 'pending' | 'completed' | 'refunded' | 'failed';
+  payment_method: string | null;
+  payment_reference: string | null;
+  order_reference: string | null;
+  // Additional fields
+  notes: string | null;
+  expires_at: string | null;
+  is_transferable: boolean;
+  metadata: any;
   issued_at: string;
   created_at: string;
+  updated_at: string;
+  // Joined fields from related tables
   ticket_type_name?: string;
   booking_code?: string;
   event_name?: string;
 }
 
 export interface IssueTicketInput {
-  booking_id: number;
-  booking_item_id?: number | null;
-  ticket_type_id?: number | null;
   holder_name: string;
   holder_email?: string | null;
   holder_phone?: string | null;
-  holder_company?: string | null;
-  holder_job_title?: string | null;
+  ticket_type_id?: number | null;
+  unit_price?: number | null;
+  payment_status?: 'pending' | 'completed' | 'refunded' | 'failed';
+  payment_method?: string | null;
+  payment_reference?: string | null;
+  order_reference?: string | null;
+  notes?: string | null;
 }
 
-export interface CheckinByCodeInput {
-  code: string;
-  device_id?: number;
-  device_name?: string;
-  location?: string;
+export interface CheckinInput {
+  qr_payload?: string;
+  unique_code?: string;
+  checked_in_by?: string;
 }
 
 export interface CheckinResult {
   success: boolean;
   message: string;
   ticket?: IssuedTicket;
+  already_checked_in?: boolean;
 }
 
 export interface IssuedTicketStats {
   total_issued: number;
   total_checked_in: number;
-  total_not_checked_in: number;
-  checkin_percentage: number;
-  by_ticket_type: { ticket_type: string; checked_in: number; total: number }[];
+  total_pending: number;
+  total_valid: number;
+  total_cancelled: number;
+  total_expired: number;
+  total_revenue: number;
+}
+
+export interface IssuedTicketsResponse {
+  tickets: IssuedTicket[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 // Badge Design API
