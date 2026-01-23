@@ -262,6 +262,7 @@ export class EventGeneralService {
     // Media
     if (data.banner_image_url !== undefined) eventUpdate.banner_image_url = data.banner_image_url;
     if (data.promo_video_url !== undefined) eventUpdate.promo_video_url = data.promo_video_url;
+    if (data.gallery_images !== undefined) eventUpdate.gallery_images = JSON.stringify(data.gallery_images);
 
     // Accessibility & Safety
     if (data.accessibility_notes !== undefined) eventUpdate.accessibility_notes = data.accessibility_notes;
@@ -269,6 +270,23 @@ export class EventGeneralService {
 
     // Agenda
     if (data.agenda !== undefined) eventUpdate.agenda = JSON.stringify(data.agenda);
+
+    // Partners & Sponsors
+    if (data.partners !== undefined) eventUpdate.partners = JSON.stringify(data.partners);
+    if (data.sponsors !== undefined) eventUpdate.sponsors = JSON.stringify(data.sponsors);
+
+    // Internal
+    if (data.internal_notes !== undefined) eventUpdate.internal_notes = data.internal_notes;
+    if (data.lifecycle_status !== undefined) eventUpdate.lifecycle_status = data.lifecycle_status;
+
+    // Virtual meeting
+    if (data.virtual_platform !== undefined) eventUpdate.meeting_platform = data.virtual_platform;
+    if (data.meeting_platform !== undefined) eventUpdate.meeting_platform = data.meeting_platform;
+
+    // SEO
+    if (data.meta_title !== undefined) eventUpdate.meta_title = data.meta_title;
+    if (data.meta_description !== undefined) eventUpdate.meta_description = data.meta_description;
+    if (data.url_slug !== undefined) eventUpdate.url_slug = data.url_slug;
 
     // Update events table
     await db('events').where('id', eventId).update(eventUpdate);
