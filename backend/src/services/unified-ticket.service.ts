@@ -322,7 +322,32 @@ export class UnifiedTicketService {
     const { page = 1, limit = 50, status, search, checked_in } = options;
     const offset = (page - 1) * limit;
 
-    let query = db('issued_tickets as it')
+    // Build base where conditions
+    let countQuery = db('issued_tickets')
+      .where('event_id', eventId)
+      .where('is_deleted', false);
+
+    if (status) {
+      countQuery = countQuery.where('status', status);
+    }
+    if (checked_in !== undefined) {
+      countQuery = countQuery.where('is_checked_in', checked_in);
+    }
+    if (search) {
+      countQuery = countQuery.where(function () {
+        this.where('holder_name', 'ilike', `%${search}%`)
+          .orWhere('holder_email', 'ilike', `%${search}%`)
+          .orWhere('ticket_number', 'ilike', `%${search}%`)
+          .orWhere('unique_code', 'ilike', `%${search}%`);
+      });
+    }
+
+    // Get total count
+    const countResult = await countQuery.clone().count('* as count').first();
+    const total = parseInt((countResult as any)?.count || '0', 10);
+
+    // Build data query with joins
+    let dataQuery = db('issued_tickets as it')
       .leftJoin('events as e', 'it.event_id', 'e.id')
       .leftJoin('tickets as t', 'it.ticket_type_id', 't.id')
       .leftJoin('bookings as b', 'it.booking_id', 'b.id')
@@ -336,15 +361,13 @@ export class UnifiedTicketService {
       );
 
     if (status) {
-      query = query.where('it.status', status);
+      dataQuery = dataQuery.where('it.status', status);
     }
-
     if (checked_in !== undefined) {
-      query = query.where('it.is_checked_in', checked_in);
+      dataQuery = dataQuery.where('it.is_checked_in', checked_in);
     }
-
     if (search) {
-      query = query.where(function () {
+      dataQuery = dataQuery.where(function () {
         this.where('it.holder_name', 'ilike', `%${search}%`)
           .orWhere('it.holder_email', 'ilike', `%${search}%`)
           .orWhere('it.ticket_number', 'ilike', `%${search}%`)
@@ -352,10 +375,7 @@ export class UnifiedTicketService {
       });
     }
 
-    const [countResult] = await query.clone().count('* as count');
-    const total = parseInt(countResult.count as string, 10);
-
-    const tickets = await query
+    const tickets = await dataQuery
       .orderBy('it.created_at', 'desc')
       .limit(limit)
       .offset(offset);
