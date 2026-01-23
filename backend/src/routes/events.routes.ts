@@ -18,6 +18,7 @@ import { PaymentTaxController } from '../controllers/payment-tax.controller';
 import { BadgeDesignController } from '../controllers/badge-design.controller';
 import { BookingController } from '../controllers/booking.controller';
 import { IssuedTicketController } from '../controllers/issued-ticket.controller';
+import { UnifiedTicketController } from '../controllers/unified-ticket.controller';
 import { IntegrationsController } from '../controllers/integrations.controller';
 import { PrivacySettingsController } from '../controllers/privacy-settings.controller';
 import { EmailTemplatesController } from '../controllers/email-templates.controller';
