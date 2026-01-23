@@ -440,7 +440,7 @@ const EventSetupPageComponent = () => {
         is_checkin_active: false,
         check_in_mode: data.check_in_mode || 'qr',
         data_collection_form_id: data.data_collection_form ? parseInt(data.data_collection_form) : null,
-        co_hosts: data.co_hosts || [],
+        cohost_ids: data.co_hosts || [],
         tag_ids: data.tag_ids || [],
         partners: data.partners || [],
         sponsors: data.sponsors || [],
@@ -450,6 +450,7 @@ const EventSetupPageComponent = () => {
         lifecycle_status: data.lifecycle_status || 'draft',
         virtual_platform: data.virtual_platform || null,
         promo_video_url: data.promo_video_url || null,
+        gallery_images: data.gallery_images || [],
       };
       
       if (isEditMode && eventId) {
