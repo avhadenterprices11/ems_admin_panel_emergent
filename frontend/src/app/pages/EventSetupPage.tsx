@@ -219,6 +219,16 @@ const EventSetupPageComponent = () => {
           setValue('agenda', data.agenda);
         }
         
+        // Partners (JSON field)
+        if (data.partners && Array.isArray(data.partners) && data.partners.length > 0) {
+          setValue('partners', data.partners);
+        }
+        
+        // Sponsors (JSON field)
+        if (data.sponsors && Array.isArray(data.sponsors) && data.sponsors.length > 0) {
+          setValue('sponsors', data.sponsors);
+        }
+        
         // Owner
         setValue('owner_id', data.owner || '');
         
@@ -233,6 +243,15 @@ const EventSetupPageComponent = () => {
           const tagIds = data.tags.map(t => t.id);
           setValue('tag_ids', tagIds);
         }
+        
+        // Internal notes
+        setValue('internal_notes', data.internal_notes || '');
+        
+        // Lifecycle status
+        setValue('lifecycle_status', data.lifecycle_status || 'draft');
+        
+        // Virtual platform
+        setValue('virtual_platform', data.virtual_platform || data.meeting_platform || '');
         
         // Mark SEO as already filled to prevent auto-overwrite
         setSeoAutoFilled({ meta_title: true, meta_description: true, url_slug: true });
