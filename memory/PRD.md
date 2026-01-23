@@ -586,6 +586,30 @@ A full-stack Event Management Admin System built with:
 - **Email Variables**: {{attendee_name}}, {{event_name}}, {{event_date}}, {{event_time}}, {{venue_name}}, {{confirmation_number}}, {{organizer_name}}, {{payment_amount}}, {{transaction_id}}
 - **Test Results**: 23/23 backend API tests pass (100%), Frontend verified
 
+### 20. Advanced Configuration (Edit Event) ✅ COMPLETE (Jan 23, 2026)
+- **Route**: `/events/:id/edit` - Opens Create Event form in Edit mode
+- **Navigation**: Settings → Advanced Configuration → "Open Advanced Settings" button
+- **Backend API Updates**:
+  - `GET /api/events/:eventId/general` - Returns all fields including partners, sponsors, internal_notes, lifecycle_status, virtual_platform, gallery_images
+  - `PUT /api/events/:eventId/general` - Updates all fields including JSON arrays (agenda, partners, sponsors)
+- **Frontend** (`EventSetupPage.tsx` Edit Mode):
+  - Detects Edit mode via URL params (`useParams`)
+  - Fetches event data and prefills ALL form fields:
+    - Basic Info: title, description, category, visibility, check_in_mode
+    - Date & Time: start_at, end_at, all_day, timezone
+    - Registration: reg_start_at, reg_end_at, capacity, waitlist
+    - Location: mode, venue_id, venue_name, address, city, state, zip, country
+    - Meeting: meeting_url (not auto-regenerated)
+    - Media: banner_image_url, promo_video_url, gallery_images
+    - JSON Fields: agenda, partners, sponsors
+    - Internal: internal_notes, lifecycle_status, owner_id
+    - Tags & Co-hosts: tag_ids, co_hosts
+  - Shows "Edit Event" header with "Update event configuration" subtitle
+  - Buttons: Cancel (back to event), Save Changes, Update & Publish
+  - On save: calls `updateEventGeneralDetails` API
+- **Bug Fixed**: Mode value normalization (`in_person` → `in-person`)
+- **Test Results**: 22/22 backend API tests pass (100%), Frontend verified
+
 ## Upcoming Tasks
 
 ### P1 - Data Migration (Legacy category field)
@@ -594,7 +618,6 @@ A full-stack Event Management Admin System built with:
 
 ### P2 - Settings Tab (Remaining Subsections)
 - Team & Permissions
-- Advanced Configuration
 - Archive Event, Delete Event
 
 ### P3 - Master Data Management UI
